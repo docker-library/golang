@@ -16,6 +16,8 @@ ENV GOLANG_CROSSPLATFORMS \
 	solaris/amd64 \
 	windows/386 windows/amd64
 
+# ls src/pkg/runtime/defs_*_*.h | sed -r 's!^.*/defs_([^_]+)_([^_]+)[.]h$!\1/\2!'
+
 # (set an explicit GOARM of 5 for maximum ARM compatibility)
 ENV GOARM 5
 
