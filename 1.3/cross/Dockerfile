@@ -1,6 +1,7 @@
 FROM golang:1.3
 
 # see http://golang.org/doc/install/source#environment
+# see also http://build.golang.org/
 ENV GOLANG_CROSSPLATFORMS \
 	darwin/386 darwin/amd64 \
 	dragonfly/386 dragonfly/amd64 \
