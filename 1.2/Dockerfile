@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 
 ENV GOLANG_VERSION 1.2
 
-RUN curl -sSL http://golang.org/dl/go$GOLANG_VERSION.src.tar.gz \
+RUN curl -sSL https://go.googlecode.com/files/go$GOLANG_VERSION.src.tar.gz \
 	| tar -v -C /usr/src -xz
 WORKDIR /usr/src/go
 
