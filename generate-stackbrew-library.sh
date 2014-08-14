@@ -3,7 +3,7 @@ set -e
 
 declare -A aliases
 aliases=(
-	[1.3]='1 latest'
+	[1.3.1]='1 latest'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -16,8 +16,8 @@ echo '# maintainer: InfoSiftr <github@infosiftr.com> (@infosiftr)'
 
 for version in "${versions[@]}"; do
 	commit="$(git log -1 --format='format:%H' "$version")"
-	fullVersion="$(grep -m1 'ENV GOLANG_VERSION ' "$version/Dockerfile" | cut -d' ' -f3)"
-	versionAliases=( $fullVersion $version ${aliases[$version]} )
+	#fullVersion="$(grep -m1 'ENV GOLANG_VERSION ' "$version/Dockerfile" | cut -d' ' -f3)"
+	versionAliases=( $version ${aliases[$version]} )
 	
 	echo
 	for va in "${versionAliases[@]}"; do
