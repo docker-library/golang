@@ -13,6 +13,7 @@ versions=( "${versions[@]%/}" )
 url='git://github.com/docker-library/golang'
 
 echo '# maintainer: InfoSiftr <github@infosiftr.com> (@infosiftr)'
+echo '# maintainer: Johan Euphrosine <proppy@google.com> (@proppy)'
 
 for version in "${versions[@]}"; do
 	commit="$(git log -1 --format='format:%H' "$version")"
