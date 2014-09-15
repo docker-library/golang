@@ -16,5 +16,6 @@ for version in "${versions[@]}"; do
 		set -x
 		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' "$version/Dockerfile"
 		sed -ri 's/^(FROM golang):.*/\1:'"$fullVersion"'/' "$version/"*"/Dockerfile"
+		cp go-wrapper "$version/"
 	)
 done
