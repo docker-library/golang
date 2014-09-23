@@ -1,6 +1,6 @@
 FROM golang:1.2.2
 
-# see http://golang.org/doc/install/source#environment
+# see https://golang.org/doc/install/source#environment
 # see also http://build.golang.org/
 # and canonically, see defs_OS_ARCH.h files in src/pkg/runtime
 #   https://code.google.com/p/go/source/browse?name=go1.2.2#hg%2Fsrc%2Fpkg%2Fruntime
