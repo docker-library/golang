@@ -3,7 +3,7 @@ FROM debian:wheezy
 # SCMs for "go get", gcc for cgo
 RUN apt-get update && apt-get install -y \
 		ca-certificates curl gcc libc6-dev \
-		bzr git mercurial \
+		bzr git mercurial make \
 		--no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 
