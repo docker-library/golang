@@ -10,11 +10,12 @@ fi
 versions=( "${versions[@]%/}" )
 
 for version in "${versions[@]}"; do
+	upstreamVersion="${version%.0}"
 	#fullVersion="$(curl -sSL 'https://golang.org/dl' | grep '">go'"$version"'.*\.src.tar.gz<' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | sort -V | tail -1)"
 	fullVersion="$version"
 	(
 		set -x
-		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' "$version/Dockerfile"
+		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$upstreamVersion"'/' "$version/Dockerfile"
 		sed -ri 's/^(FROM golang):.*/\1:'"$fullVersion"'/' "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
