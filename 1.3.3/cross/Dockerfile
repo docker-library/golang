@@ -27,5 +27,5 @@ RUN bash -xec '\
 			GOOS=${platform%/*} \
 			GOARCH=${platform##*/} \
 			./make.bash --no-clean 2>&1; \
-		done \
+		done \'
 	'
