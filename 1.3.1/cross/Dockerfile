@@ -21,9 +21,8 @@ ENV GOLANG_CROSSPLATFORMS \
 # (set an explicit GOARM of 5 for maximum ARM compatibility)
 ENV GOARM 5
 
-WORKDIR /usr/src/go/src
-
-RUN for platform in $GOLANG_CROSSPLATFORMS; do \
+RUN cd /usr/src/go/src && \
+	for platform in $GOLANG_CROSSPLATFORMS; do \
 		GOOS=${platform%/*} \
 		GOARCH=${platform##*/} \
 		./make.bash --no-clean 2>&1 || exit $?; \
