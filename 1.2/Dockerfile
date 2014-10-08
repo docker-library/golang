@@ -1,4 +1,4 @@
-FROM debian:wheezy
+FROM debian:jessie
 
 # SCMs for "go get", gcc for cgo
 RUN apt-get update && apt-get install -y \

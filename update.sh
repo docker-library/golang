@@ -19,4 +19,13 @@ for version in "${versions[@]}"; do
 		sed -ri 's/^(FROM golang):.*/\1:'"$versionTag"'/' "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
+	for variant in wheezy; do
+		if [ -d "$version/$variant" ]; then
+			(
+				set -x
+				cp "$version/Dockerfile" "$version/go-wrapper" "$version/$variant/"
+				sed -i 's/^FROM .*/FROM debian:'"$variant"'/' "$version/$variant/Dockerfile"
+			)
+		fi
+	done
 done
