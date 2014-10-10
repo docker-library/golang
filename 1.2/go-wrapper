@@ -55,11 +55,12 @@ if [ -f .godir ]; then
 	goPath="${GOPATH%%:*}" # this just grabs the first path listed in GOPATH, if there are multiple (which is the detection logic "go get" itself uses, too)
 	goDirPath="$goPath/src/$goDir"
 	mkdir -p "$(dirname "$goDirPath")"
-	if [ -e "$goDirPath" -a ! -L "$goDirPath" ]; then
+	if [ ! -e "$goDirPath" ]; then
+		ln -sfv "$dir" "$goDirPath"
+	elif [ ! -L "$goDirPath" ]; then
 		echo >&2 "error: $goDirPath already exists but is unexpectedly not a symlink!"
 		exit 1
 	fi
-	ln -sfv "$dir" "$goDirPath"
 	goBin="$goPath/bin/$(basename "$goDir")"
 fi
 
