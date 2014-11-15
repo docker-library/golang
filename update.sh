@@ -12,7 +12,7 @@ versions=( "${versions[@]%/}" )
 for version in "${versions[@]}"; do
 	fullVersion="$(curl -sSL 'https://golang.org/dl' | grep '">go'"$version"'.*\.src.tar.gz<' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | sort -V | tail -1)"
 	versionTag="$fullVersion"
-	[[ "$versionTag" == *.*.* ]] || versionTag+='.0'
+	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
 		set -x
 		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' "$version/Dockerfile"

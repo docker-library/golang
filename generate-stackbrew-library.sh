@@ -18,7 +18,7 @@ echo '# maintainer: Johan Euphrosine <proppy@google.com> (@proppy)'
 for version in "${versions[@]}"; do
 	commit="$(git log -1 --format='format:%H' -- "$version")"
 	fullVersion="$(grep -m1 'ENV GOLANG_VERSION ' "$version/Dockerfile" | cut -d' ' -f3)"
-	[[ "$fullVersion" == *.*.* ]] || fullVersion+='.0'
+	[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
 	versionAliases=( $fullVersion $version ${aliases[$version]} )
 	
 	echo
