@@ -5,7 +5,6 @@ FROM golang:1.4rc1
 # and canonically, see defs_OS_ARCH.h files in src/runtime
 #   https://code.google.com/p/go/source/browse?name=go1.4beta1#hg%2Fsrc%2Fruntime
 ENV GOLANG_CROSSPLATFORMS \
-	android/arm \
 	darwin/386 darwin/amd64 \
 	dragonfly/386 dragonfly/amd64 \
 	freebsd/386 freebsd/amd64 freebsd/arm \
@@ -16,6 +15,9 @@ ENV GOLANG_CROSSPLATFORMS \
 	plan9/386 plan9/amd64 \
 	solaris/amd64 \
 	windows/386 windows/amd64
+
+# TODO gcc: error: unrecognized command line option '-marm'
+#	android/arm \
 
 # ls src/runtime/defs_*_*.h | sed -r 's!^.*/defs_([^_]+)_([^_]+)[.]h$!\1/\2!'
 
