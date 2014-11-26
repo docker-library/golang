@@ -10,17 +10,19 @@ usage: $base command [args]
 This script assumes that is is run from the root of your Go package (for
 example, "/go/src/app" if your GOPATH is set to "/go").
 
-The main feature of this wrapper over the native "go" tool is that it supports
-the addition of a ".godir" file in your package directory which is a plain text
-file that is the import path your application expects (ie, it would be something
-like "github.com/jsmith/my-cool-app").  If this file is found, the current
-package is then symlinked to /go/src/<.gopath> and the commands then use that
-full import path to act on it.  This allows for applications to be universally
-cloned into a path like "/go/src/app" and then automatically built properly so
-that inter-package imports use the existing source instead of downloading it a
-second time.  This also makes the final binary have the correct name (ie,
-instead of being "/go/bin/app", it can be "/go/bin/my-cool-app"), which is why
-the "run" command exists here.
+In Go 1.4, a feature was introduced to supply the canonical "import path" for a
+given package in a comment attached to a package statement
+(https://golang.org/s/go14customimport).
+
+This script allows us to take a generic directory of Go source files such as
+"/go/src/app" and determine that the canonical "import path" of where that code
+expects to live and reference itself is "github.com/jsmith/my-cool-app".  It
+will then ensure that "/go/src/github.com/jsmith/my-cool-app" is a symlink to
+"/go/src/app", which allows us to build and run it under the proper package
+name.
+
+For compatibility with versions of Go older than 1.4, the "import path" may also
+be placed in a file named ".godir".
 
 Available Commands:
 
@@ -46,12 +48,14 @@ if ! shift; then
 	exit 1
 fi
 
-dir="$(pwd -P)"
-goBin="$(basename "$dir")" # likely "app"
+goDir="$(go list -e -f '{{.ImportComment}}' 2>/dev/null || true)"
 
-goDir=
-if [ -f .godir ]; then
+if [ -z "$goDir" -a -s .godir ]; then
 	goDir="$(cat .godir)"
+fi
+
+dir="$(pwd -P)"
+if [ "$goDir" ]; then
 	goPath="${GOPATH%%:*}" # this just grabs the first path listed in GOPATH, if there are multiple (which is the detection logic "go get" itself uses, too)
 	goDirPath="$goPath/src/$goDir"
 	mkdir -p "$(dirname "$goDirPath")"
@@ -62,6 +66,8 @@ if [ -f .godir ]; then
 		exit 1
 	fi
 	goBin="$goPath/bin/$(basename "$goDir")"
+else
+	goBin="$(basename "$dir")" # likely "app"
 fi
 
 case "$cmd" in
