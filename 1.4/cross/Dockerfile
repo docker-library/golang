@@ -1,4 +1,4 @@
-FROM golang:1.4rc1
+FROM golang:1.4rc2
 
 # see https://golang.org/doc/install/source#environment
 # see also http://build.golang.org/
