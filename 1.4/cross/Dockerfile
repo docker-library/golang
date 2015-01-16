@@ -1,4 +1,4 @@
-FROM golang:1.4.0
+FROM golang:1.4.1
 
 # see https://golang.org/doc/install/source#environment
 # see also http://build.golang.org/
