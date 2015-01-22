@@ -1,9 +1,8 @@
-FROM debian:wheezy
+FROM buildpack-deps:wheezy-scm
 
-# SCMs for "go get", gcc for cgo
+# gcc for cgo
 RUN apt-get update && apt-get install -y \
-		ca-certificates curl gcc libc6-dev make \
-		bzr git mercurial \
+		gcc libc6-dev make \
 		--no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 
