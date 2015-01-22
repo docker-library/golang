@@ -3,7 +3,7 @@ FROM golang:1.4.1
 # see https://golang.org/doc/install/source#environment
 # see also http://build.golang.org/
 # and canonically, see defs_OS_ARCH.h files in src/runtime
-#   https://code.google.com/p/go/source/browse?name=go1.4beta1#hg%2Fsrc%2Fruntime
+#   https://go.googlesource.com/go/+/go1.4.1/src/runtime/
 ENV GOLANG_CROSSPLATFORMS \
 	darwin/386 darwin/amd64 \
 	dragonfly/386 dragonfly/amd64 \
