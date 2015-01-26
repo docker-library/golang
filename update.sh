@@ -24,7 +24,7 @@ for version in "${versions[@]}"; do
 			(
 				set -x
 				cp "$version/Dockerfile" "$version/go-wrapper" "$version/$variant/"
-				sed -i 's/^FROM .*/FROM buildpack-deps:'"$variant"'-micro/' "$version/$variant/Dockerfile"
+				sed -i 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/$variant/Dockerfile"
 			)
 		fi
 	done
