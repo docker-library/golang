@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
 		--no-install-recommends \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.4.1
+ENV GOLANG_VERSION 1.4.2
 
 RUN curl -sSL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz \
 		| tar -v -C /usr/src -xz
