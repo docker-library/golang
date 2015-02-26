@@ -15,7 +15,7 @@ RUN cd /usr/src/go/src && ./make.bash --no-clean 2>&1
 
 ENV PATH /usr/src/go/bin:$PATH
 
-RUN mkdir -p /go/src
+RUN mkdir -p /go/src /go/bin && chmod -R 777 /go
 ENV GOPATH /go
 ENV PATH /go/bin:$PATH
 WORKDIR /go
