@@ -21,3 +21,5 @@ ENV PATH /go/bin:$PATH
 WORKDIR /go
 
 COPY go-wrapper /usr/local/bin/
+
+ENV GOROOT_BOOTSTRAP /usr/src/go
