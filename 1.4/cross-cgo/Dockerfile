@@ -1,4 +1,4 @@
-FROM golang:1.4.1-cross
+FROM golang:1.4.2-cross
 
 # For a list of supported platforms, see:
 # https://wiki.debian.org/CrossToolchains#For_jessie.2Ftesting
