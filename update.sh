@@ -10,7 +10,15 @@ fi
 versions=( "${versions[@]%/}" )
 
 for version in "${versions[@]}"; do
-	fullVersion="$(curl -sSL 'https://golang.org/dl' | grep '">go'"$version"'.*\.src.tar.gz<' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | grep -vE 'rc|beta' | sort -V | tail -1)"
+	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$version/VERSION" 2>/dev/null || true)"
+	if [ -z "$fullVersion" ]; then
+		fullVersion="$(curl -fsSL 'https://golang.org/dl' | grep '">go'"$version"'.*\.src\.tar\.gz<' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | sort -V | tail -1)"
+	fi
+	if [ -z "$fullVersion" ]; then
+		echo >&2 "warning: cannot find full version for $version"
+		continue
+	fi
+	fullVersion="${fullVersion#go}" # strip "go" off "go1.4.2"
 	versionTag="$fullVersion"
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
