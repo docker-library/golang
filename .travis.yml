@@ -27,6 +27,8 @@ script:
   - if [ -d cross -a -z "$VARIANT" ]; then
       docker build -t "${image}-cross" cross;
     fi
+
+after_script:
   - docker images
 
 # vim:set et ts=2 sw=2:
