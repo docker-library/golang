@@ -9,6 +9,8 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
+
+travisEnv=
 for version in "${versions[@]}"; do
 	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$version/VERSION" 2>/dev/null || true)"
 	if [ -z "$fullVersion" ]; then
@@ -34,6 +36,11 @@ for version in "${versions[@]}"; do
 				cp "$version/Dockerfile" "$version/go-wrapper" "$version/$variant/"
 				sed -i 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/$variant/Dockerfile"
 			)
+			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
+	travisEnv='\n  - VERSION='"$version VARIANT=$travisEnv"
 done
+
+travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
+echo "$travis" > .travis.yml
