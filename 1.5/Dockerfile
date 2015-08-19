@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y \
 
 ENV GOLANG_GOOS linux
 ENV GOLANG_GOARCH amd64
-ENV GOLANG_VERSION 1.5rc1
+ENV GOLANG_VERSION 1.5
 
 RUN curl -sSL https://golang.org/dl/go$GOLANG_VERSION.$GOLANG_GOOS-$GOLANG_GOARCH.tar.gz \
 		| tar -v -C /usr/local -xz
