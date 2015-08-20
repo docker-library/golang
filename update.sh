@@ -11,10 +11,21 @@ versions=( "${versions[@]%/}" )
 
 
 travisEnv=
+googleSource=$(curl -fsSL 'https://golang.org/dl/')
 for version in "${versions[@]}"; do
+	# This is kinda gross, but 1.5+ versions install from the binary package
+	# while 1.4 installs from src
+	if [ "$version" = '1.4' ]; then
+		package='src'
+	else
+		package='linux-amd64'
+	fi
+
+	# First check for full version from GitHub as a canonical source
 	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$version/VERSION" 2>/dev/null || true)"
 	if [ -z "$fullVersion" ]; then
-		fullVersion="$(curl -fsSL 'https://golang.org/dl' | grep '">go'"$version"'.*\.src\.tar\.gz<' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | sort -V | tail -1)"
+		echo >&2 "warning: cannot find version from GitHub for $version, scraping golang download page"
+		fullVersion="$(echo $googleSource | grep -Po '">go'"$version"'.*?\.'"$package"'\.tar\.gz</a>' | sed -r 's!.*go([^"/<]+)\.'"$package"'\.tar\.gz.*!\1!' | sort -V | tail -1)"
 	fi
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "warning: cannot find full version for $version"
@@ -22,10 +33,19 @@ for version in "${versions[@]}"; do
 	fi
 	fullVersion="${fullVersion#go}" # strip "go" off "go1.4.2"
 	versionTag="$fullVersion"
+
+	# Try and fetch the SHA1 checksum from the golang source page
+	checksum="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.'"$package"'\.tar\.gz</a>.*?>[a-f0-9]{40}<' | sed -r 's!.*([a-f0-9]{40}).*!\1!' | tail -1)"
+	if [ -z "$checksum" ]; then
+		echo >&2 "warning: cannot find checksum for $fullVersion"
+		continue
+	fi
+
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
 		set -x
 		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' "$version/Dockerfile"
+		sed -ri 's/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$checksum"'/' "$version/Dockerfile"
 		sed -ri 's/^(FROM golang):.*/\1:'"$version"'/' "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
