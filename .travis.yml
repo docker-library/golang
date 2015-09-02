@@ -5,6 +5,7 @@ sudo: 9000
 
 env:
   - VERSION=1.5 VARIANT=
+  - VERSION=1.5 VARIANT=wheezy
   - VERSION=1.4 VARIANT=
   - VERSION=1.4 VARIANT=wheezy
 
