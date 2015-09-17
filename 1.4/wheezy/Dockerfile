@@ -1,9 +1,11 @@
 FROM buildpack-deps:wheezy-scm
 
 # gcc for cgo
-RUN apt-get update && apt-get install -y \
-		gcc libc6-dev make \
-		--no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		g++ \
+		gcc \
+		libc6-dev \
+		make \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV GOLANG_VERSION 1.4.2
