@@ -11,7 +11,7 @@ versions=( "${versions[@]%/}" )
 
 
 travisEnv=
-googleSource=$(curl -fsSL 'https://golang.org/dl/')
+googleSource="$(curl -fsSL 'https://golang.org/dl/')"
 for version in "${versions[@]}"; do
 	# This is kinda gross, but 1.5+ versions install from the binary package
 	# while 1.4 installs from src
@@ -41,21 +41,42 @@ for version in "${versions[@]}"; do
 		continue
 	fi
 
+	if [ "$package" = 'src' ]; then
+		srcChecksum="$checksum"
+	else
+		srcChecksum="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40}<' | sed -r 's!.*([a-f0-9]{40}).*!\1!' | tail -1)"
+	fi
+
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
 		set -x
-		sed -ri 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' "$version/Dockerfile"
-		sed -ri 's/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$checksum"'/' "$version/Dockerfile"
-		sed -ri 's/^(FROM golang):.*/\1:'"$version"'/' "$version/"*"/Dockerfile"
+		sed -ri '
+			s/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/;
+			s/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$checksum"'/;
+			s/^(ENV GOLANG_SRC_SHA1) .*/\1 '"$srcChecksum"'/;
+			s/^(FROM golang):.*/\1:'"$version"'/;
+		' "$version/Dockerfile" "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
-	for variant in wheezy; do
+	if [ "$version" = '1.4' ]; then
+		# 1.4 is our "bootstrap" version for all future versions
+		(
+			set -x
+			sed -ri '
+				s/^(ENV GOLANG_BOOTSTRAP_VERSION) .*/\1 '"$fullVersion"'/;
+				s/^(ENV GOLANG_BOOTSTRAP_SHA1) .*/\1 '"$srcChecksum"'/;
+			' */Dockerfile */*/Dockerfile
+		)
+	fi
+	for variant in alpine wheezy; do
 		if [ -d "$version/$variant" ]; then
-			(
-				set -x
-				cp "$version/Dockerfile" "$version/go-wrapper" "$version/$variant/"
-				sed -i 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/$variant/Dockerfile"
-			)
+			if [ "$variant" != 'alpine' ]; then
+				(
+					set -x
+					sed 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/Dockerfile" > "$version/$variant/Dockerfile"
+					cp "$version/go-wrapper" "$version/$variant/"
+				)
+			fi
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
