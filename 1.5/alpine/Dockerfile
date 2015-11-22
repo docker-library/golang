@@ -10,7 +10,8 @@ ENV GOLANG_BOOTSTRAP_SHA1 486db10dc571a55c8d795365070f66d343458c48
 
 RUN set -ex \
 	&& buildDeps='bash ca-certificates gcc musl-dev openssl' \
-	&& apk add --update $buildDeps \
+	&& utilDeps='git' \
+	&& apk add --update $buildDeps $utilDeps \
 	&& rm -rf /var/cache/apk/* \
 	\
 	&& mkdir -p /usr/local/bootstrap \
