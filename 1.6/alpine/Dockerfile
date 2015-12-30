@@ -1,4 +1,4 @@
-FROM alpine:3.2
+FROM alpine:3.3
 
 ENV GOLANG_VERSION 1.6beta1
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
@@ -9,9 +9,12 @@ ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.t
 ENV GOLANG_BOOTSTRAP_SHA1 486db10dc571a55c8d795365070f66d343458c48
 
 RUN set -ex \
-	&& buildDeps='bash ca-certificates gcc musl-dev openssl' \
-	&& apk add --update $buildDeps \
-	&& rm -rf /var/cache/apk/* \
+	&& apk add --no-cache --virtual .build-deps \
+		bash \
+		ca-certificates \
+		gcc \
+		musl-dev \
+		openssl \
 	\
 	&& mkdir -p /usr/local/bootstrap \
 	&& wget -q "$GOLANG_BOOTSTRAP_URL" -O golang.tar.gz \
@@ -30,7 +33,7 @@ RUN set -ex \
 	&& ./make.bash \
 	\
 	&& rm -rf /usr/local/bootstrap \
-	&& apk del $buildDeps
+	&& apk del .build-deps
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
