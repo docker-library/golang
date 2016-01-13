@@ -34,17 +34,20 @@ for version in "${versions[@]}"; do
 	fullVersion="${fullVersion#go}" # strip "go" off "go1.4.2"
 	versionTag="$fullVersion"
 
-	# Try and fetch the SHA1 checksum from the golang source page
-	checksum="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.'"$package"'\.tar\.gz</a>.*?>[a-f0-9]{40}<' | sed -r 's!.*([a-f0-9]{40}).*!\1!' | tail -1)"
-	if [ -z "$checksum" ]; then
-		echo >&2 "warning: cannot find checksum for $fullVersion"
+	# Try and fetch the checksum from the golang source page
+	sha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.'"$package"'\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
+	sha1="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.'"$package"'\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{40})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
+	if [ -z "$sha1" -a -z "$sha256" ]; then
+		echo >&2 "warning: cannot find sha256 or sha1 for $fullVersion"
 		continue
 	fi
 
 	if [ "$package" = 'src' ]; then
-		srcChecksum="$checksum"
+		srcSha256="$sha256"
+		srcSha1="$sha1"
 	else
-		srcChecksum="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40}<' | sed -r 's!.*([a-f0-9]{40}).*!\1!' | tail -1)"
+		srcSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
+		srcSha1="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{40})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
 	fi
 
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
@@ -52,8 +55,10 @@ for version in "${versions[@]}"; do
 		set -x
 		sed -ri '
 			s/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/;
-			s/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$checksum"'/;
-			s/^(ENV GOLANG_SRC_SHA1) .*/\1 '"$srcChecksum"'/;
+			s/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$sha256"'/;
+			s/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$sha1"'/;
+			s/^(ENV GOLANG_SRC_SHA256) .*/\1 '"$srcSha256"'/;
+			s/^(ENV GOLANG_SRC_SHA1) .*/\1 '"$srcSha1"'/;
 			s/^(FROM golang):.*/\1:'"$version"'/;
 		' "$version/Dockerfile" "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
@@ -64,7 +69,8 @@ for version in "${versions[@]}"; do
 			set -x
 			sed -ri '
 				s/^(ENV GOLANG_BOOTSTRAP_VERSION) .*/\1 '"$fullVersion"'/;
-				s/^(ENV GOLANG_BOOTSTRAP_SHA1) .*/\1 '"$srcChecksum"'/;
+				s/^(ENV GOLANG_BOOTSTRAP_SHA256) .*/\1 '"$srcSha256"'/;
+				s/^(ENV GOLANG_BOOTSTRAP_SHA1) .*/\1 '"$srcSha1"'/;
 			' */Dockerfile */*/Dockerfile
 		)
 	fi
