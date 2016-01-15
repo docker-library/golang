@@ -32,7 +32,7 @@ RUN set -ex \
 	&& cd /usr/local/go/src \
 	&& ./make.bash \
 	\
-	&& rm -rf /usr/local/bootstrap \
+	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap \
 	&& apk del .build-deps
 
 ENV GOPATH /go
