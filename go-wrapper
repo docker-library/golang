@@ -74,17 +74,17 @@ case "$cmd" in
 	download)
 		execCommand=( go get -v -d "$@" )
 		if [ "$goDir" ]; then execCommand+=( "$goDir" ); fi
-		set -x; exec "${execCommand[@]}"
+		exec "${execCommand[@]}"
 		;;
 		
 	install)
 		execCommand=( go install -v "$@" )
 		if [ "$goDir" ]; then execCommand+=( "$goDir" ); fi
-		set -x; exec "${execCommand[@]}"
+		exec "${execCommand[@]}"
 		;;
 		
 	run)
-		set -x; exec "$goBin" "$@"
+		exec "$goBin" "$@"
 		;;
 		
 	*)
