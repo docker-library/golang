@@ -1,5 +1,7 @@
 FROM golang:1.5
 
+ARG GO15VENDOREXPERIMENT
+
 RUN mkdir -p /go/src/app
 WORKDIR /go/src/app
 
