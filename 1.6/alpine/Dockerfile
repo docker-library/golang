@@ -13,6 +13,7 @@ RUN set -ex \
 		bash \
 		ca-certificates \
 		gcc \
+		git \
 		musl-dev \
 		openssl \
 	\
