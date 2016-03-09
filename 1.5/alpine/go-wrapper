@@ -69,19 +69,16 @@ else
 fi
 case "$cmd" in
 	download)
+	echo "$args"
 		args=$(save "$@")
-		set -- go get -v -d
-		# args seems to have a space in it if they are empty.  Check to make sure it's not just a space.
-		if [ "$args" != " " ]; then set -- "$@" "$args"; fi
+		eval "set -- go get -v -d $args"
 		if [ "$goDir" ]; then set -- "$@" "$goDir"; fi
 		set -x; exec "$@"
 		;;
 
 	install)
 		args=$(save "$@")
-		set -- go install -v
-		# args seems to have a space in it if they are empty.  Check to make sure it's not just a space.
-		if [ "$args" != " " ]; then set -- "$@" "$args"; fi
+		eval "set -- go install -v $args"
 		if [ "$goDir" ]; then set -- "$@" "$goDir"; fi
 		echo "$@"
 		set -x; exec "$@"
