@@ -8,6 +8,9 @@ ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
 ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
 ENV GOLANG_BOOTSTRAP_SHA1 486db10dc571a55c8d795365070f66d343458c48
 
+# https://golang.org/issue/14851
+COPY no-pic.patch /
+
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
 		bash \
@@ -30,9 +33,10 @@ RUN set -ex \
 	&& tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
+	&& patch -p2 -i /no-pic.patch \
 	&& ./make.bash \
 	\
-	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap \
+	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap /*.patch \
 	&& apk del .build-deps
 
 ENV GOPATH /go
