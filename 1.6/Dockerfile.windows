@@ -2,10 +2,12 @@ FROM windowsservercore
 
 ENV GOLANG_VERSION 1.6.1
 ENV GOLANG_DOWNLOAD_URL "https://golang.org/dl/go$GOLANG_VERSION.windows-amd64.zip"
+ENV GOLANG_DOWNLOAD_SHA256 "1505afbcc5f71598c6ffd2a56ad550e4e8728c05649e9085f725e38d6b5a0fb8"
 
 RUN powershell -Command \
 	$ErrorActionPreference = 'Stop'; \
 	(New-Object System.Net.WebClient).DownloadFile('%GOLANG_DOWNLOAD_URL%', 'go.zip') ; \
+	if ((Get-FileHash go.zip -Algorithm sha256).Hash -ne $env:GOLANG_DOWNLOAD_SHA256) {exit 1} ; \
 	Expand-Archive go.zip -DestinationPath c:\\ ; \
 	Remove-Item go.zip -Force
 
