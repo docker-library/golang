@@ -4,10 +4,6 @@ ENV GOLANG_VERSION 1.5.4
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
 ENV GOLANG_SRC_SHA256 002acabce7ddc140d0d55891f9d4fcfbdd806b9332fb8b110c91bc91afb0bc93
 
-ENV GOLANG_BOOTSTRAP_VERSION 1.4.3
-ENV GOLANG_BOOTSTRAP_URL https://golang.org/dl/go$GOLANG_BOOTSTRAP_VERSION.src.tar.gz
-ENV GOLANG_BOOTSTRAP_SHA1 486db10dc571a55c8d795365070f66d343458c48
-
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
 		bash \
@@ -15,15 +11,9 @@ RUN set -ex \
 		gcc \
 		musl-dev \
 		openssl \
+		go \
 	\
-	&& mkdir -p /usr/local/bootstrap \
-	&& wget -q "$GOLANG_BOOTSTRAP_URL" -O golang.tar.gz \
-	&& echo "$GOLANG_BOOTSTRAP_SHA1  golang.tar.gz" | sha1sum -c - \
-	&& tar -C /usr/local/bootstrap -xzf golang.tar.gz \
-	&& rm golang.tar.gz \
-	&& cd /usr/local/bootstrap/go/src \
-	&& ./make.bash \
-	&& export GOROOT_BOOTSTRAP=/usr/local/bootstrap/go \
+	&& export GOROOT_BOOTSTRAP="$(go env GOROOT)" \
 	\
 	&& wget -q "$GOLANG_SRC_URL" -O golang.tar.gz \
 	&& echo "$GOLANG_SRC_SHA256  golang.tar.gz" | sha256sum -c - \
@@ -32,7 +22,6 @@ RUN set -ex \
 	&& cd /usr/local/go/src \
 	&& ./make.bash \
 	\
-	&& rm -rf /usr/local/bootstrap /usr/local/go/pkg/bootstrap \
 	&& apk del .build-deps
 
 ENV GOPATH /go
