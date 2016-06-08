@@ -41,7 +41,6 @@ Maintainers: Tianon Gravi <admwiggin@gmail.com> (@tianon),
              Joseph Ferguson <yosifkit@gmail.com> (@yosifkit),
              Johan Euphrosine <proppy@google.com> (@proppy)
 GitRepo: https://github.com/docker-library/golang.git
-
 EOH
 
 # prints "$2$1$3$1...$N"
