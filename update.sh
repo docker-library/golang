@@ -33,6 +33,8 @@ for version in "${versions[@]}"; do
 		continue
 	fi
 
+	windowsSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.windows-amd64\.zip</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
+
 	srcSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
 
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
@@ -56,6 +58,14 @@ for version in "${versions[@]}"; do
 			fi
 			cp "$version/go-wrapper" "$version/$variant/"
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
+		fi
+	done
+	for variant in windows/windowsservercore windows/nanoserver; do
+		if [ -d "$version/$variant" ]; then
+			(
+				set -x
+				sed -ri 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$windowsSha256"'/' "$version/$variant/Dockerfile"
+			)
 		fi
 	done
 	travisEnv='\n  - VERSION='"$version VARIANT=$travisEnv"

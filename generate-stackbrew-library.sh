@@ -68,10 +68,16 @@ for version in "${versions[@]}"; do
 		Directory: $version
 	EOE
 
-	for variant in onbuild cross wheezy alpine; do
-		[ -f "$version/$variant/Dockerfile" ] || continue
+	for v in \
+		onbuild cross wheezy alpine \
+		windows/windowsservercore windows/nanoserver \
+	; do
+		dir="$version/$v"
+		variant="$(basename "$v")"
 
-		commit="$(dirCommit "$version/$variant")"
+		[ -f "$dir/Dockerfile" ] || continue
+
+		commit="$(dirCommit "$dir")"
 
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
@@ -80,7 +86,8 @@ for version in "${versions[@]}"; do
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
 			GitCommit: $commit
-			Directory: $version/$variant
+			Directory: $dir
 		EOE
+		[ "$variant" = "$v" ] || echo "Constraints: $variant"
 	done
 done
