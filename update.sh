@@ -28,14 +28,12 @@ for version in "${versions[@]}"; do
 
 	# Try and fetch the checksum from the golang source page
 	linuxSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.linux-amd64\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-	linuxSha1="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.linux-amd64\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{40})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-	if [ -z "$linuxSha1" -a -z "$linuxSha256" ]; then
-		echo >&2 "warning: cannot find sha256 or sha1 for $fullVersion"
+	if [ -z "$linuxSha256" ]; then
+		echo >&2 "warning: cannot find sha256 for $fullVersion"
 		continue
 	fi
 
 	srcSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-	srcSha1="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{40})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
 
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
@@ -43,9 +41,7 @@ for version in "${versions[@]}"; do
 		sed -ri '
 			s/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/;
 			s/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$linuxSha256"'/;
-			s/^(ENV GOLANG_DOWNLOAD_SHA1) .*/\1 '"$linuxSha1"'/;
 			s/^(ENV GOLANG_SRC_SHA256) .*/\1 '"$srcSha256"'/;
-			s/^(ENV GOLANG_SRC_SHA1) .*/\1 '"$srcSha1"'/;
 			s/^(FROM golang):.*/\1:'"$version"'/;
 		' "$version/Dockerfile" "$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
