@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 usage() {
@@ -41,12 +41,14 @@ Available Commands:
 EOUSAGE
 }
 
-# "shift" so that "$@" becomes the remaining arguments and can be passed along to other "go" subcommands easily
-cmd="$1"
-if ! shift; then
+# make sure there is a subcommand specified
+if [ "$#" -eq 0 ]; then
 	usage >&2
 	exit 1
 fi
+# "shift" so that "$@" becomes the remaining arguments and can be passed along to other "go" subcommands easily
+cmd="$1"
+shift
 
 goDir="$(go list -e -f '{{.ImportComment}}' 2>/dev/null || true)"
 
@@ -72,15 +74,15 @@ fi
 
 case "$cmd" in
 	download)
-		execCommand=( go get -v -d "$@" )
-		if [ "$goDir" ]; then execCommand+=( "$goDir" ); fi
-		set -x; exec "${execCommand[@]}"
+		set -- go get -v -d "$@"
+		if [ "$goDir" ]; then set -- "$@" "$goDir"; fi
+		set -x; exec "$@"
 		;;
 		
 	install)
-		execCommand=( go install -v "$@" )
-		if [ "$goDir" ]; then execCommand+=( "$goDir" ); fi
-		set -x; exec "${execCommand[@]}"
+		set -- go install -v "$@"
+		if [ "$goDir" ]; then set -- "$@" "$goDir"; fi
+		set -x; exec "$@"
 		;;
 		
 	run)

@@ -52,9 +52,9 @@ for version in "${versions[@]}"; do
 				(
 					set -x
 					sed 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/Dockerfile" > "$version/$variant/Dockerfile"
-					cp "$version/go-wrapper" "$version/$variant/"
 				)
 			fi
+			cp "$version/go-wrapper" "$version/$variant/"
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
