@@ -8,9 +8,9 @@ ENV GOLANG_SRC_SHA256 88840e78905bdff7c8e408385182b4f77e8bdd062cac5c0c6382630588
 COPY no-pic.patch /
 
 RUN set -ex \
+	&& apk add --no-cache ca-certificates \
 	&& apk add --no-cache --virtual .build-deps \
 		bash \
-		ca-certificates \
 		gcc \
 		musl-dev \
 		openssl \
