@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		make \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.7beta2
+ENV GOLANG_VERSION 1.7rc1
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-ENV GOLANG_DOWNLOAD_SHA256 688f895b51def9e065fb2610ff91afcb2b0d9637233b74130c8ca331d35d5ca5
+ENV GOLANG_DOWNLOAD_SHA256 afe956b6d323c68fbd851f4e962f26f16dde61d7caa1de1a8408c7de0b6034aa
 
 RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
 	&& echo "$GOLANG_DOWNLOAD_SHA256  golang.tar.gz" | sha256sum -c - \
