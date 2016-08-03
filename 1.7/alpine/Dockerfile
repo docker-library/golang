@@ -16,6 +16,7 @@ RUN set -ex \
 		musl-dev \
 		openssl \
 		go \
+		git \
 	\
 	&& export GOROOT_BOOTSTRAP="$(go env GOROOT)" \
 	\
