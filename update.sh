@@ -40,12 +40,13 @@ for version in "${versions[@]}"; do
 	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
 	(
 		set -x
-		sed -ri '
-			s/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/;
-			s/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$linuxSha256"'/;
-			s/^(ENV GOLANG_SRC_SHA256) .*/\1 '"$srcSha256"'/;
-			s/^(FROM golang):.*/\1:'"$version"'/;
-		' "$version/Dockerfile" "$version/"*"/Dockerfile"
+		sed -ri \
+			-e 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' \
+			-e 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$linuxSha256"'/' \
+			-e 's/^(ENV GOLANG_SRC_SHA256) .*/\1 '"$srcSha256"'/' \
+			-e 's/^(FROM golang):.*/\1:'"$version"'/' \
+			"$version/Dockerfile" \
+			"$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
 	for variant in alpine wheezy; do
@@ -64,7 +65,10 @@ for version in "${versions[@]}"; do
 		if [ -d "$version/$variant" ]; then
 			(
 				set -x
-				sed -ri 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$windowsSha256"'/' "$version/$variant/Dockerfile"
+				sed -ri \
+					-e 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' \
+					-e 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$windowsSha256"'/' \
+					"$version/$variant/Dockerfile"
 			)
 		fi
 	done
