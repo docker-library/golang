@@ -58,9 +58,9 @@ ENV GOPATH C:\\gopath
 RUN [Environment]::SetEnvironmentVariable('PATH', $env:GOPATH + '\bin;C:\go\bin;' + $env:PATH, [EnvironmentVariableTarget]::Machine);
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.7rc6
+ENV GOLANG_VERSION 1.7
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.windows-amd64.zip
-ENV GOLANG_DOWNLOAD_SHA256 f043f7327049340e078ded4f9eed0b811f8cfa1adb7492403d3dea9cfebee13b
+ENV GOLANG_DOWNLOAD_SHA256 f51aad06644cc8bd119d2f6933334fa8da24d26e6676fde022cecf5978f1a0c7
 
 RUN Write-Host ('Downloading {0} ...' -f $env:GOLANG_DOWNLOAD_URL); \
 	(New-Object System.Net.WebClient).DownloadFile($env:GOLANG_DOWNLOAD_URL, 'go.zip'); \
