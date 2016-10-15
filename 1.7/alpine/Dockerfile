@@ -10,12 +10,14 @@ ENV GOLANG_SRC_SHA256 2b843f133b81b7995f26d0cb64bbdbb9d0704b90c44df45f844d28881a
 COPY no-pic.patch /
 
 RUN set -ex \
-	&& apk add --no-cache --virtual .build-deps \
+	&& apk add --no-cache \
 		bash \
 		gcc \
 		musl-dev \
-		openssl \
-		go \
+	\
+	&& apk add --no-cache --virtual .build-deps \
+	   openssl \
+	   go \
 	\
 	&& export GOROOT_BOOTSTRAP="$(go env GOROOT)" \
 	\
