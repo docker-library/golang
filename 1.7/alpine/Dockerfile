@@ -1,6 +1,6 @@
 FROM alpine:3.4
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates gcc musl-dev
 
 ENV GOLANG_VERSION 1.7.3
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
@@ -12,8 +12,6 @@ COPY default-pie.patch /
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
 		bash \
-		gcc \
-		musl-dev \
 		openssl \
 		go \
 	\
