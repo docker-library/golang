@@ -1,0 +1,13 @@
+diff --git a/src/cmd/go/build.go b/src/cmd/go/build.go
+index 3c0b994..fbaff84 100644
+--- a/src/cmd/go/build.go
++++ b/src/cmd/go/build.go
+@@ -214,7 +214,7 @@ func addBuildFlags(cmd *Command) {
+ 
+ 	cmd.Flag.Var((*stringsFlag)(&buildAsmflags), "asmflags", "")
+ 	cmd.Flag.Var(buildCompiler{}, "compiler", "")
+-	cmd.Flag.StringVar(&buildBuildmode, "buildmode", "default", "")
++	cmd.Flag.StringVar(&buildBuildmode, "buildmode", "pie", "")
+ 	cmd.Flag.Var((*stringsFlag)(&buildGcflags), "gcflags", "")
+ 	cmd.Flag.Var((*stringsFlag)(&buildGccgoflags), "gccgoflags", "")
+ 	cmd.Flag.StringVar(&buildContext.InstallSuffix, "installsuffix", "", "")

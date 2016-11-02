@@ -7,7 +7,7 @@ ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
 ENV GOLANG_SRC_SHA256 79430a0027a09b0b3ad57e214c4c1acfdd7af290961dd08d322818895af1ef44
 
 # https://golang.org/issue/14851
-COPY no-pic.patch /
+COPY default-pie.patch /
 
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
@@ -24,8 +24,8 @@ RUN set -ex \
 	&& tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
-	&& patch -p2 -i /no-pic.patch \
-	&& ./make.bash \
+	&& patch -p2 -i /default-pie.patch \
+	&& GO_LDFLAGS="-buildmode=pie" ./make.bash \
 	\
 	&& rm -rf /*.patch \
 	&& apk del .build-deps
