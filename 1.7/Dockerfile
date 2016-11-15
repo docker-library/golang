@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		libc6-dev \
 		make \
 		upx-ucl \
+		mingw-w64 \
 	&& rm -rf /var/lib/apt/lists/*
 
 ENV GOLANG_VERSION 1.7.1
