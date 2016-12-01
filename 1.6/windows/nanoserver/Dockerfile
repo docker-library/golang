@@ -1,6 +1,7 @@
 FROM microsoft/nanoserver
 
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+# $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # no Git installed (intentionally)
 #  -- Nano Server is "Windows Slim"
