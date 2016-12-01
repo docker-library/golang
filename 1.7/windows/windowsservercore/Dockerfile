@@ -1,6 +1,7 @@
 FROM microsoft/windowsservercore
 
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
+# $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
 # install Git (especially for "go get")
 ENV GIT_VERSION 2.9.2
