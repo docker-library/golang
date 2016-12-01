@@ -11,6 +11,6 @@ index 14f4fa9..5599307 100644
 +	// https://github.com/golang/go/issues/6940
 +	argv = append(argv, "-fno-PIC")
 +
- 	if Debug['v'] != 0 {
- 		fmt.Fprintf(Bso, "host link:")
+ 	if l.Debugvlog != 0 {
+ 		l.Logf("%5.2f host link:", obj.Cputime())
  		for _, v := range argv {
