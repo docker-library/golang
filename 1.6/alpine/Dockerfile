@@ -1,19 +1,17 @@
 FROM alpine:3.4
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates gcc musl-dev
 
 ENV GOLANG_VERSION 1.6.3
 ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
 ENV GOLANG_SRC_SHA256 6326aeed5f86cf18f16d6dc831405614f855e2d416a91fd3fdc334f772345b00
 
 # https://golang.org/issue/14851
-COPY no-pic.patch /
+COPY default-buildmode-pie-1.6.3.patch /
 
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
 		bash \
-		gcc \
-		musl-dev \
 		openssl \
 		go \
 	\
@@ -24,7 +22,7 @@ RUN set -ex \
 	&& tar -C /usr/local -xzf golang.tar.gz \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
-	&& patch -p2 -i /no-pic.patch \
+	&& patch -p2 -i /default-buildmode-pie-1.6.3.patch \
 	&& ./make.bash \
 	\
 	&& rm -rf /*.patch \
