@@ -1,0 +1,33 @@
+diff --git a/src/cmd/link/internal/ld/lib.go b/src/cmd/link/internal/ld/lib.go
+index 14f4fa9..bf2de57 100644
+--- a/src/cmd/link/internal/ld/lib.go
++++ b/src/cmd/link/internal/ld/lib.go
+@@ -1251,6 +1251,28 @@ func hostlink() {
+ 		}
+ 	}
+ 
++	// When building a program with the default -buildmode=exe the
++	// gc compiler generates code requires DT_TEXTREL in a
++	// position independent executable (PIE). On systems where the
++	// toolchain creates PIEs by default, and where DT_TEXTREL
++	// does not work, the resulting programs will not run. See
++	// issue #17847. To avoid this problem pass -no-pie to the
++	// toolchain if it is supported.
++	if Buildmode == BuildmodeExe {
++		src := filepath.Join(tmpdir, "trivial.c")
++		if err := ioutil.WriteFile(src, []byte{}, 0666); err != nil {
++			Ctxt.Diag("WriteFile trivial.c failed: %v", err)
++		}
++		cmd := exec.Command(argv[0], "-c", "-no-pie", "trivial.c")
++		cmd.Dir = tmpdir
++		cmd.Env = append([]string{"LC_ALL=C"}, os.Environ()...)
++		out, err := cmd.CombinedOutput()
++		supported := err == nil && !bytes.Contains(out, []byte("unrecognized"))
++		if supported {
++			argv = append(argv, "-no-pie")
++		}
++	}
++
+ 	for _, p := range strings.Fields(extldflags) {
+ 		argv = append(argv, p)
+ 

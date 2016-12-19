@@ -8,6 +8,8 @@ ENV GOLANG_SRC_SHA256 4c189111e9ba651a2bb3ee868aa881fab36b2f2da3409e80885ca758a6
 
 # https://golang.org/issue/14851
 COPY no-pic.patch /
+# https://golang.org/issue/17847
+COPY 17847.patch /
 
 RUN set -ex \
 	&& apk add --no-cache --virtual .build-deps \
@@ -25,6 +27,7 @@ RUN set -ex \
 	&& rm golang.tar.gz \
 	&& cd /usr/local/go/src \
 	&& patch -p2 -i /no-pic.patch \
+	&& patch -p2 -i /17847.patch \
 	&& ./make.bash \
 	\
 	&& rm -rf /*.patch \
