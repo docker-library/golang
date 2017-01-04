@@ -25,10 +25,6 @@ script:
   - ~/official-images/test/run.sh "$image"
 # the "onbuild" variant has to happen with the base variant because it's FROM it
   - true && [ "$VARIANT" ] || docker build -t "${image}-onbuild" onbuild
-# the "cross" variant has to happen with the base variant because it's FROM it
-  - if [ -d cross -a -z "$VARIANT" ]; then
-      docker build -t "${image}-cross" cross;
-    fi
 
 after_script:
   - docker images

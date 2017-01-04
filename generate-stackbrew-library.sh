@@ -69,7 +69,7 @@ for version in "${versions[@]}"; do
 	EOE
 
 	for v in \
-		onbuild cross wheezy alpine \
+		onbuild wheezy alpine \
 		windows/windowsservercore windows/nanoserver \
 	; do
 		dir="$version/$v"
