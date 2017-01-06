@@ -49,7 +49,7 @@ for version in "${versions[@]}"; do
 			"$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
-	for variant in alpine wheezy; do
+	for variant in alpine wheezy jessie; do
 		if [ -d "$version/$variant" ]; then
 			if [ "$variant" != 'alpine' ]; then
 				(
