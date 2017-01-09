@@ -49,9 +49,9 @@ for version in "${versions[@]}"; do
 			"$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
-	for variant in alpine wheezy; do
+	for variant in alpine3.5 alpine wheezy; do
 		if [ -d "$version/$variant" ]; then
-			if [ "$variant" != 'alpine' ]; then
+			if [[ "$variant" != 'alpine'* ]]; then
 				(
 					set -x
 					sed 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/Dockerfile" > "$version/$variant/Dockerfile"
