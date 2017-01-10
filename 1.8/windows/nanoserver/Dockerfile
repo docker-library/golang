@@ -16,9 +16,9 @@ RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
 	setx /M PATH $newPath;
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.8beta2
+ENV GOLANG_VERSION 1.8rc1
 ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.windows-amd64.zip
-ENV GOLANG_DOWNLOAD_SHA256 98e44960cdbdd9f42fb466bfd02b347a78fab9b9e48744ea86e02d9d19439ee1
+ENV GOLANG_DOWNLOAD_SHA256 6b0fd0b5c78c6534125ea5440b2ee736cd14609e1d41eb45167ff2a37c2718c3
 
 RUN Write-Host ('Downloading {0} ...' -f $env:GOLANG_DOWNLOAD_URL); \
 	Invoke-WebRequest -Uri $env:GOLANG_DOWNLOAD_URL -OutFile 'go.zip'; \
