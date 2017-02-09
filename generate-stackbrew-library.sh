@@ -3,6 +3,7 @@ set -eu
 
 declare -A aliases=(
 	[1.7]='1 latest'
+	[1.8-rc]='rc'
 )
 
 self="$(basename "$BASH_SOURCE")"
@@ -50,6 +51,8 @@ join() {
 }
 
 for version in "${versions[@]}"; do
+	rcVersion="${version%-rc}"
+
 	commit="$(dirCommit "$version")"
 
 	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
@@ -58,6 +61,13 @@ for version in "${versions[@]}"; do
 	versionAliases=(
 		$fullVersion
 		$version
+	)
+	if [ "$version" != "$rcVersion" ]; then
+		versionAliases+=(
+			$rcVersion
+		)
+	fi
+	versionAliases+=(
 		${aliases[$version]:-}
 	)
 

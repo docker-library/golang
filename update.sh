@@ -13,11 +13,19 @@ versions=( "${versions[@]%/}" )
 travisEnv=
 googleSource="$(curl -fsSL 'https://golang.org/dl/')"
 for version in "${versions[@]}"; do
+	rcVersion="${version%-rc}"
+	rcGrepV='-v'
+	if [ "$rcVersion" != "$version" ]; then
+		rcGrepV=
+	fi
+	rcGrepV+=' -E'
+	rcGrepExpr='rc'
+
 	# First check for full version from GitHub as a canonical source
-	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$version/VERSION" 2>/dev/null || true)"
+	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$rcVersion/VERSION" 2>/dev/null | grep $rcGrepV -- "$rcGrepExpr" || true)"
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "warning: cannot find version from GitHub for $version, scraping golang download page"
-		fullVersion="$(echo $googleSource | grep -Po '">go'"$version"'.*?\.src\.tar\.gz</a>' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | sort -V | tail -1)"
+		fullVersion="$(echo $googleSource | grep -Po '">go'"$rcVersion"'.*?\.src\.tar\.gz</a>' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | grep $rcGrepV -- "$rcGrepExpr" | sort -V | tail -1)"
 	fi
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "warning: cannot find full version for $version"
