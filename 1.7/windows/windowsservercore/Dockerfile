@@ -3,7 +3,10 @@ FROM microsoft/windowsservercore
 # $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# install Git (especially for "go get")
+# install MinGit (especially for "go get")
+# https://blogs.msdn.microsoft.com/visualstudioalm/2016/09/03/whats-new-in-git-for-windows-2-10/
+# "Essentially, it is a Git for Windows that was stripped down as much as possible without sacrificing the functionality in which 3rd-party software may be interested."
+# "It currently requires only ~45MB on disk."
 ENV GIT_VERSION 2.11.1
 ENV GIT_TAG v${GIT_VERSION}.windows.1
 ENV GIT_DOWNLOAD_URL https://github.com/git-for-windows/git/releases/download/${GIT_TAG}/MinGit-${GIT_VERSION}-64-bit.zip
@@ -21,7 +24,7 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	Write-Host 'Expanding ...'; \
 	Expand-Archive -Path git.zip -DestinationPath C:\git\.; \
 	\
-	Write-Host 'Removing installer ...'; \
+	Write-Host 'Removing ...'; \
 	Remove-Item git.zip -Force; \
 	\
 	Write-Host 'Updating PATH ...'; \
