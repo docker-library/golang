@@ -57,7 +57,7 @@ for version in "${versions[@]}"; do
 			"$version/"*"/Dockerfile"
 		cp go-wrapper "$version/"
 	)
-	for variant in alpine3.5 alpine stretch wheezy; do
+	for variant in alpine3.5 alpine stretch wheezy xenial; do
 		if [ -d "$version/$variant" ]; then
 			if [[ "$variant" != 'alpine'* ]]; then
 				(
