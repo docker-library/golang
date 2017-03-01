@@ -9,9 +9,6 @@ env:
   - VERSION=1.7 VARIANT=wheezy
   - VERSION=1.7 VARIANT=alpine
   - VERSION=1.7 VARIANT=alpine3.5
-  - VERSION=1.6 VARIANT=
-  - VERSION=1.6 VARIANT=wheezy
-  - VERSION=1.6 VARIANT=alpine
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
