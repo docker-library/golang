@@ -24,4 +24,7 @@ ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
 
+RUN go get -u github.com/golang/lint/golint \
+    && rm -rf "$GOPATH/src"/* "$GOPATH/pkg"
+
 COPY go-wrapper /usr/local/bin/
