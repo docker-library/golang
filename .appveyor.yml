@@ -1,0 +1,27 @@
+version: build-{build}.{branch}
+image: Visual Studio 2017
+
+environment:
+  matrix:
+    - version: 1.8
+      variant: nanoserver
+    - version: 1.8
+      variant: windowsservercore
+    - version: 1.7
+      variant: nanoserver
+    - version: 1.7
+      variant: windowsservercore
+
+install:
+  - ps: |
+      [Environment]::SetEnvironmentVariable('dockerImage', ('golang:{0}' -f $env:version), [EnvironmentVariableTarget]::Process);
+      [Environment]::SetEnvironmentVariable('buildDirectory', ('{0}/windows/{1}' -f $env:version, $env:variant), [EnvironmentVariableTarget]::Process);
+
+build_script:
+  - cmd: appveyor-retry docker build --pull -t %dockerImage% %buildDirectory%
+
+after_build:
+  - ps: docker images
+
+test_script:
+  - ps: docker run --rm $env:dockerImage go version
