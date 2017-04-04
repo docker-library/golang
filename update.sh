@@ -11,6 +11,7 @@ versions=( "${versions[@]%/}" )
 
 
 travisEnv=
+appveyorEnv=
 googleSource="$(curl -fsSL 'https://golang.org/dl/')"
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
@@ -78,6 +79,7 @@ for version in "${versions[@]}"; do
 					-e 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$windowsSha256"'/' \
 					"$version/$variant/Dockerfile"
 			)
+			appveyorEnv='\n    - version: '"$version"'\n      variant: '"$(basename "$variant")$appveyorEnv"
 		fi
 	done
 	travisEnv='\n  - VERSION='"$version VARIANT=$travisEnv"
@@ -85,3 +87,6 @@ done
 
 travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
 echo "$travis" > .travis.yml
+
+appveyor="$(awk -v 'RS=\n\n' '$1 == "environment:" { $0 = "environment:\n  matrix:'"$appveyorEnv"'" } { printf "%s%s", $0, RS }' .appveyor.yml)"
+echo "$appveyor" > .appveyor.yml
