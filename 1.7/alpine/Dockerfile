@@ -3,35 +3,38 @@ FROM alpine:3.4
 RUN apk add --no-cache ca-certificates
 
 ENV GOLANG_VERSION 1.7.5
-ENV GOLANG_SRC_URL https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz
-ENV GOLANG_SRC_SHA256 4e834513a2079f8cbbd357502cccaac9507fd00a1efe672375798858ff291815
 
-# https://golang.org/issue/14851
-COPY no-pic.patch /
-# https://golang.org/issue/17847
-COPY 17847.patch /
+# https://golang.org/issue/14851 (Go 1.8 & 1.7)
+# https://golang.org/issue/17847 (Go 1.7)
+COPY *.patch /go-alpine-patches/
 
-RUN set -ex \
-	&& apk add --no-cache --virtual .build-deps \
+RUN set -eux; \
+	apk add --no-cache --virtual .build-deps \
 		bash \
 		gcc \
 		musl-dev \
 		openssl \
 		go \
+	; \
+	export GOROOT_BOOTSTRAP="$(go env GOROOT)"; \
 	\
-	&& export GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
+	echo '4e834513a2079f8cbbd357502cccaac9507fd00a1efe672375798858ff291815 *go.tgz' | sha256sum -c -; \
+	tar -C /usr/local -xzf go.tgz; \
+	rm go.tgz; \
 	\
-	&& wget -q "$GOLANG_SRC_URL" -O golang.tar.gz \
-	&& echo "$GOLANG_SRC_SHA256  golang.tar.gz" | sha256sum -c - \
-	&& tar -C /usr/local -xzf golang.tar.gz \
-	&& rm golang.tar.gz \
-	&& cd /usr/local/go/src \
-	&& patch -p2 -i /no-pic.patch \
-	&& patch -p2 -i /17847.patch \
-	&& ./make.bash \
+	cd /usr/local/go/src; \
+	for p in /go-alpine-patches/*.patch; do \
+		[ -f "$p" ] || continue; \
+		patch -p2 -i "$p"; \
+	done; \
+	./make.bash; \
 	\
-	&& rm -rf /*.patch \
-	&& apk del .build-deps
+	rm -rf /go-alpine-patches; \
+	apk del .build-deps; \
+	\
+	export PATH="/usr/local/go/bin:$PATH"; \
+	go version
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH

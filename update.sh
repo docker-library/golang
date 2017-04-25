@@ -1,5 +1,25 @@
 #!/bin/bash
-set -e
+set -Eeuo pipefail
+
+# a mapping of "dpkg --print-architecture" to Go release arch
+# see https://golang.org/dl/
+declare -A dpkgArches=(
+	[amd64]='amd64'
+	[armhf]='armv6l'
+	[i386]='386'
+	[ppc64el]='ppc64le'
+	[s390x]='s390x'
+)
+
+defaultDebianSuite='stretch'
+declare -A debianSuite=(
+	[1.8]='jessie'
+	[1.7]='jessie'
+)
+defaultAlpineVersion='3.5'
+declare -A alpineVersion=(
+	[1.7]='3.4'
+)
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -9,10 +29,22 @@ if [ ${#versions[@]} -eq 0 ]; then
 fi
 versions=( "${versions[@]%/}" )
 
+# see http://stackoverflow.com/a/2705678/433558
+sed_escape_lhs() {
+	echo "$@" | sed -e 's/[]\/$*.^|[]/\\&/g'
+}
+sed_escape_rhs() {
+	echo "$@" | sed -e 's/[\/&]/\\&/g' | sed -e ':a;N;$!ba;s/\n/\\n/g'
+}
+
+googleSource="$(curl -fsSL 'https://golang.org/dl/')"
+scrape_sha256() {
+	local filename="$1"
+	echo $googleSource | grep -Po '">'"$(sed_escape_lhs "$filename")"'</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1
+}
 
 travisEnv=
 appveyorEnv=
-googleSource="$(curl -fsSL 'https://golang.org/dl/')"
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
 	rcGrepV='-v'
@@ -33,56 +65,59 @@ for version in "${versions[@]}"; do
 		continue
 	fi
 	fullVersion="${fullVersion#go}" # strip "go" off "go1.4.2"
-	versionTag="$fullVersion"
 
-	# Try and fetch the checksum from the golang source page
-	linuxSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.linux-amd64\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-	if [ -z "$linuxSha256" ]; then
-		echo >&2 "warning: cannot find sha256 for $fullVersion"
-		continue
-	fi
+	srcSha256="$(scrape_sha256 "go${fullVersion}.src.tar.gz")"
+	linuxArchCase='dpkgArch="$(dpkg --print-architecture)"; '$'\\\n'
+	linuxArchCase+=$'\t''case "${dpkgArch##*-}" in '$'\\\n'
+	for dpkgArch in "${!dpkgArches[@]}"; do
+		goArch="${dpkgArches[$dpkgArch]}"
+		sha256="$(scrape_sha256 "go${fullVersion}.linux-${goArch}.tar.gz")"
+		if [ -z "$sha256" ]; then
+			echo >&2 "warning: cannot find sha256 for $fullVersion on arch $goArch"
+			continue 2
+		fi
+		linuxArchCase+=$'\t\t'"$dpkgArch) goRelArch='linux-$goArch'; goRelSha256='$sha256' ;; "$'\\\n'
+	done
+	linuxArchCase+=$'\t\t'"*) goRelArch='src'; goRelSha256='$srcSha256'; "$'\\\n'
+	linuxArchCase+=$'\t\t\t''echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; '$'\\\n'
+	linuxArchCase+=$'\t''esac'
+	windowsSha256="$(scrape_sha256 "go${fullVersion}.windows-amd64.zip")"
 
-	windowsSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.windows-amd64\.zip</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-
-	srcSha256="$(echo $googleSource | grep -Po '">go'"$fullVersion"'\.src\.tar\.gz</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1)"
-
-	[[ "$versionTag" == *.*[^0-9]* ]] || versionTag+='.0'
-	(
-		set -x
-		sed -ri \
-			-e 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' \
-			-e 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$linuxSha256"'/' \
-			-e 's/^(ENV GOLANG_SRC_SHA256) .*/\1 '"$srcSha256"'/' \
-			-e 's/^(FROM golang):.*/\1:'"$version"'/' \
-			"$version/Dockerfile" \
-			"$version/"*"/Dockerfile"
-		cp go-wrapper "$version/"
-	)
-	for variant in alpine3.5 alpine stretch wheezy; do
+	for variant in alpine3.5 alpine; do
 		if [ -d "$version/$variant" ]; then
-			if [[ "$variant" != 'alpine'* ]]; then
-				(
-					set -x
-					sed 's/^FROM .*/FROM buildpack-deps:'"$variant"'-scm/' "$version/Dockerfile" > "$version/$variant/Dockerfile"
-				)
-			fi
-			cp "$version/go-wrapper" "$version/$variant/"
+			ver="${variant#alpine}"
+			ver="${ver:-${alpineVersion[$version]:-$defaultAlpineVersion}}"
+			sed -r \
+				-e 's!%%VERSION%%!'"$fullVersion"'!g' \
+				-e 's!%%ALPINE-VERSION%%!'"$ver"'!g' \
+				-e 's!%%SRC-SHA256%%!'"$srcSha256"'!g' \
+				Dockerfile-alpine.template > "$version/$variant/Dockerfile"
+			cp go-wrapper "$version/$variant/"
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
-	for variant in windows/windowsservercore windows/nanoserver; do
+	for variant in stretch wheezy ''; do
 		if [ -d "$version/$variant" ]; then
-			(
-				set -x
-				sed -ri \
-					-e 's/^(ENV GOLANG_VERSION) .*/\1 '"$fullVersion"'/' \
-					-e 's/^(ENV GOLANG_DOWNLOAD_SHA256) .*/\1 '"$windowsSha256"'/' \
-					"$version/$variant/Dockerfile"
-			)
-			appveyorEnv='\n    - version: '"$version"'\n      variant: '"$(basename "$variant")$appveyorEnv"
+			sed -r \
+				-e 's!%%VERSION%%!'"$fullVersion"'!g' \
+				-e 's!%%DEBIAN-SUITE%%!'"${variant:-${debianSuite[$version]:-$defaultDebianSuite}}"'!g' \
+				-e 's!%%ARCH-CASE%%!'"$(sed_escape_rhs "$linuxArchCase")"'!g' \
+				Dockerfile-debian.template > "$version/$variant/Dockerfile"
+			cp go-wrapper "$version/$variant/"
+			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
-	travisEnv='\n  - VERSION='"$version VARIANT=$travisEnv"
+	for winVariant in windowsservercore nanoserver; do
+		if [ -d "$version/windows/$winVariant" ]; then
+			sed -r \
+				-e 's!%%VERSION%%!'"$fullVersion"'!g' \
+				-e 's!%%WIN-SHA256%%!'"$windowsSha256"'!g' \
+				"Dockerfile-windows-$winVariant.template" > "$version/windows/$winVariant/Dockerfile"
+			appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant$appveyorEnv"
+		fi
+	done
+
+	echo "$version: $fullVersion ($srcSha256)"
 done
 
 travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
