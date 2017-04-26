@@ -16,7 +16,18 @@ RUN set -eux; \
 		openssl \
 		go \
 	; \
-	export GOROOT_BOOTSTRAP="$(go env GOROOT)"; \
+	export \
+# set GOROOT_BOOTSTRAP such that we can actually build Go
+		GOROOT_BOOTSTRAP="$(go env GOROOT)" \
+# ... and set "cross-building" related vars to the installed system's values so that we create a build targeting the proper arch
+# (for example, if our build host is GOARCH=amd64, but our build env/image is GOARCH=386, our build needs GOARCH=386)
+		GOOS="$(go env GOOS)" \
+		GOARCH="$(go env GOARCH)" \
+		GO386="$(go env GO386)" \
+		GOARM="$(go env GOARM)" \
+		GOHOSTOS="$(go env GOHOSTOS)" \
+		GOHOSTARCH="$(go env GOHOSTARCH)" \
+	; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
 	echo '33daf4c03f86120fdfdc66bddf6bfff4661c7ca11c5da473e537f4d69b470e57 *go.tgz' | sha256sum -c -; \
