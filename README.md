@@ -10,6 +10,8 @@ See a change merged here that doesn't show up on the Docker Hub yet? Check [the 
 
 -	[Travis CI:  
 	![build status badge](https://img.shields.io/travis/docker-library/golang/master.svg)](https://travis-ci.org/docker-library/golang/branches)
+-	[AppVeyor (Windows):  
+	![build status badge](https://ci.appveyor.com/api/projects/status/github/docker-library/golang?branch=master&svg=true)](https://ci.appveyor.com/project/docker-library/golang)
 -	[Automated `update.sh`:  
 	![build status badge](https://doi-janky.infosiftr.net/job/update.sh/job/golang/badge/icon)](https://doi-janky.infosiftr.net/job/update.sh/job/golang)
 
