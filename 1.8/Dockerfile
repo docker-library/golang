@@ -9,19 +9,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		pkg-config \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.8
+ENV GOLANG_VERSION 1.8.1
 
 RUN set -eux; \
 	\
 # this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='7e78afe33377b4d4c04817d48feb9f2a904406d32216df015d44462f0432643b' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='8f618dc8b01c2e53e639a38d780645b8424e671e292c7b518248022205d6a448' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='fb893a546902c2afdff929ddf5a9fbc0fd50b9017126ee85e80604d8620010fe' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='32553dbb342f74a821ed5069cb72ec7e135c031102e7d01c6bc4da8ad6df5202' ;; \
-		amd64) goRelArch='linux-amd64'; goRelSha256='53ab94104ee3923e228a2cb2116e5e462ad3ebaeea06ff04463479d7f12d27ca' ;; \
-		*) goRelArch='src'; goRelSha256='406865f587b44be7092f206d73fc1de252600b79b3cacc587b74b5ef5c623596'; \
+		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='b7b47572a2676449716865a66901090c057f6f1d8dfb1e19528fcd0372e5ce74' ;; \
+		i386) goRelArch='linux-386'; goRelSha256='cb3f4527112075a8b045d708f793aeee2709d2f5ddd320973a1413db06fddb50' ;; \
+		s390x) goRelArch='linux-s390x'; goRelSha256='0a59f4034a27fc51431989da520fd244d5261f364888134cab737e5bc2158cb2' ;; \
+		armhf) goRelArch='linux-armv6l'; goRelSha256='e8a8326913640409028ef95c2107773f989b1b2a6e11ceb463c77c42887381da' ;; \
+		amd64) goRelArch='linux-amd64'; goRelSha256='a579ab19d5237e263254f1eac5352efcf1d70b9dacadb6d6bb12b0911ede8994' ;; \
+		*) goRelArch='src'; goRelSha256='33daf4c03f86120fdfdc66bddf6bfff4661c7ca11c5da473e537f4d69b470e57'; \
 			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
 	esac; \
 	\

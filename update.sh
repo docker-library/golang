@@ -37,12 +37,6 @@ sed_escape_rhs() {
 	echo "$@" | sed -e 's/[\/&]/\\&/g' | sed -e ':a;N;$!ba;s/\n/\\n/g'
 }
 
-googleSource="$(curl -fsSL 'https://golang.org/dl/')"
-scrape_sha256() {
-	local filename="$1"
-	echo $googleSource | grep -Po '">'"$(sed_escape_lhs "$filename")"'</a>.*?>[a-f0-9]{40,64}<' | sed -r 's!.*>([a-f0-9]{64})<.*!\1!; s!.*[<>]+.*!!' | tail -1
-}
-
 travisEnv=
 appveyorEnv=
 for version in "${versions[@]}"; do
@@ -52,26 +46,39 @@ for version in "${versions[@]}"; do
 		rcGrepV=
 	fi
 	rcGrepV+=' -E'
-	rcGrepExpr='rc'
+	rcGrepExpr='beta|rc'
 
-	# First check for full version from GitHub as a canonical source
-	fullVersion="$(curl -fsSL "https://raw.githubusercontent.com/golang/go/release-branch.go$rcVersion/VERSION" 2>/dev/null | grep $rcGrepV -- "$rcGrepExpr" || true)"
-	if [ -z "$fullVersion" ]; then
-		echo >&2 "warning: cannot find version from GitHub for $version, scraping golang download page"
-		fullVersion="$(echo $googleSource | grep -Po '">go'"$rcVersion"'.*?\.src\.tar\.gz</a>' | sed -r 's!.*go([^"/<]+)\.src\.tar\.gz.*!\1!' | grep $rcGrepV -- "$rcGrepExpr" | sort -V | tail -1)"
-	fi
+	# https://github.com/golang/go/issues/13220
+	fullVersion="$(
+		curl -fsSL 'https://storage.googleapis.com/golang/' \
+			| grep -oE '<Key>go[^<]+[.]src[.]tar[.]gz</Key>' \
+			| sed -r \
+				-e 's!</?Key>!!g' \
+				-e 's![.]src[.]tar[.]gz$!!' \
+				-e 's!^go!!' \
+			| grep $rcGrepV -- "$rcGrepExpr" \
+			| grep -E "^${version}([.]|$)" \
+			| sort -V \
+			| tail -1
+	)" || true
 	if [ -z "$fullVersion" ]; then
 		echo >&2 "warning: cannot find full version for $version"
 		continue
 	fi
 	fullVersion="${fullVersion#go}" # strip "go" off "go1.4.2"
 
-	srcSha256="$(scrape_sha256 "go${fullVersion}.src.tar.gz")"
+	# https://github.com/golang/build/commit/24f7399f96feb8dd2fc54f064e47a886c2f8bb4a
+	srcSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.src.tar.gz.sha256")"
+	if [ -z "$srcSha256" ]; then
+		echo >&2 "warning: cannot find sha256 for $fullVersion src tarball"
+		continue
+	fi
+
 	linuxArchCase='dpkgArch="$(dpkg --print-architecture)"; '$'\\\n'
 	linuxArchCase+=$'\t''case "${dpkgArch##*-}" in '$'\\\n'
 	for dpkgArch in "${!dpkgArches[@]}"; do
 		goArch="${dpkgArches[$dpkgArch]}"
-		sha256="$(scrape_sha256 "go${fullVersion}.linux-${goArch}.tar.gz")"
+		sha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.linux-${goArch}.tar.gz.sha256")"
 		if [ -z "$sha256" ]; then
 			echo >&2 "warning: cannot find sha256 for $fullVersion on arch $goArch"
 			continue 2
@@ -81,7 +88,8 @@ for version in "${versions[@]}"; do
 	linuxArchCase+=$'\t\t'"*) goRelArch='src'; goRelSha256='$srcSha256'; "$'\\\n'
 	linuxArchCase+=$'\t\t\t''echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; '$'\\\n'
 	linuxArchCase+=$'\t''esac'
-	windowsSha256="$(scrape_sha256 "go${fullVersion}.windows-amd64.zip")"
+
+	windowsSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.windows-amd64.zip.sha256")"
 
 	for variant in alpine3.5 alpine; do
 		if [ -d "$version/$variant" ]; then

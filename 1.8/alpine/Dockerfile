@@ -2,7 +2,7 @@ FROM alpine:3.5
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.8
+ENV GOLANG_VERSION 1.8.1
 
 # https://golang.org/issue/14851 (Go 1.8 & 1.7)
 # https://golang.org/issue/17847 (Go 1.7)
@@ -30,7 +30,7 @@ RUN set -eux; \
 	; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo '406865f587b44be7092f206d73fc1de252600b79b3cacc587b74b5ef5c623596 *go.tgz' | sha256sum -c -; \
+	echo '33daf4c03f86120fdfdc66bddf6bfff4661c7ca11c5da473e537f4d69b470e57 *go.tgz' | sha256sum -c -; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
