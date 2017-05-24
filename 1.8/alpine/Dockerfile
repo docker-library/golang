@@ -1,6 +1,6 @@
 FROM alpine:3.5
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates it
 
 ENV GOLANG_VERSION 1.8.3
 
