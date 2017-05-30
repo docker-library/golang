@@ -5,9 +5,11 @@ env:
   - VERSION=1.8 VARIANT=
   - VERSION=1.8 VARIANT=stretch
   - VERSION=1.8 VARIANT=alpine
+  - VERSION=1.8 VARIANT=alpine3.6
   - VERSION=1.7 VARIANT=
   - VERSION=1.7 VARIANT=wheezy
   - VERSION=1.7 VARIANT=alpine
+  - VERSION=1.7 VARIANT=alpine3.6
   - VERSION=1.7 VARIANT=alpine3.5
 
 install:

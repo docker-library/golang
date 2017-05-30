@@ -16,9 +16,10 @@ declare -A debianSuite=(
 	[1.8]='jessie'
 	[1.7]='jessie'
 )
-defaultAlpineVersion='3.5'
+defaultAlpineVersion='3.6'
 declare -A alpineVersion=(
 	[1.7]='3.4'
+	[1.8]='3.5'
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -91,7 +92,7 @@ for version in "${versions[@]}"; do
 
 	windowsSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.windows-amd64.zip.sha256")"
 
-	for variant in alpine3.5 alpine; do
+	for variant in alpine3.5 alpine3.6 alpine; do
 		if [ -d "$version/$variant" ]; then
 			ver="${variant#alpine}"
 			ver="${ver:-${alpineVersion[$version]:-$defaultAlpineVersion}}"
