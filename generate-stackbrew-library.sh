@@ -9,8 +9,13 @@ declare -A aliases=(
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
+source '.architectures-lib'
+
 versions=( */ )
 versions=( "${versions[@]%/}" )
+
+# sort version numbers with highest first
+IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -rV) ); unset IFS
 
 # get the most recent commit which modified any of "$@"
 fileCommit() {
@@ -71,9 +76,12 @@ for version in "${versions[@]}"; do
 		${aliases[$version]:-}
 	)
 
+	versionArches="$(variantArches "$version" '')"
+
 	echo
 	cat <<-EOE
 		Tags: $(join ', ' "${versionAliases[@]}")
+		Architectures: $(join ', ' $versionArches)
 		GitCommit: $commit
 		Directory: $version
 	EOE
@@ -92,9 +100,17 @@ for version in "${versions[@]}"; do
 		variantAliases=( "${versionAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
+		case "$v" in
+			onbuild)   variantArches="$versionArches" ;;
+			alpine*)   variantArches="$(parentArches "$version" "$v")" ;;
+			windows/*) variantArches='windows-amd64' ;;
+			*)         variantArches="$(variantArches "$version" "$v")" ;;
+		esac
+
 		echo
 		cat <<-EOE
 			Tags: $(join ', ' "${variantAliases[@]}")
+			Architectures: $(join ', ' $variantArches)
 			GitCommit: $commit
 			Directory: $dir
 		EOE
