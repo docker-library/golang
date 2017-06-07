@@ -1,16 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-# a mapping of "dpkg --print-architecture" to Go release arch
-# see https://golang.org/dl/
-declare -A dpkgArches=(
-	[amd64]='amd64'
-	[armhf]='armv6l'
-	[i386]='386'
-	[ppc64el]='ppc64le'
-	[s390x]='s390x'
-)
-
 defaultDebianSuite='stretch'
 declare -A debianSuite=(
 	[1.8]='jessie'
@@ -23,6 +13,8 @@ declare -A alpineVersion=(
 )
 
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
+
+source '.architectures-lib'
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
@@ -77,8 +69,8 @@ for version in "${versions[@]}"; do
 
 	linuxArchCase='dpkgArch="$(dpkg --print-architecture)"; '$'\\\n'
 	linuxArchCase+=$'\t''case "${dpkgArch##*-}" in '$'\\\n'
-	for dpkgArch in "${!dpkgArches[@]}"; do
-		goArch="${dpkgArches[$dpkgArch]}"
+	for dpkgArch in $(dpkgArches "$version"); do
+		goArch="$(dpkgToGoArch "$version" "$dpkgArch")"
 		sha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.linux-${goArch}.tar.gz.sha256")"
 		if [ -z "$sha256" ]; then
 			echo >&2 "warning: cannot find sha256 for $fullVersion on arch $goArch"
