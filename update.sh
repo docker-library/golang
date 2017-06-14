@@ -30,6 +30,22 @@ sed_escape_rhs() {
 	echo "$@" | sed -e 's/[\/&]/\\&/g' | sed -e ':a;N;$!ba;s/\n/\\n/g'
 }
 
+# https://github.com/golang/go/issues/13220
+allGoVersions=()
+apiBaseUrl='https://www.googleapis.com/storage/v1/b/golang/o?fields=nextPageToken,items%2Fname'
+pageToken=
+while [ "$pageToken" != 'null' ]; do
+	page="$(curl -fsSL "$apiBaseUrl&pageToken=$pageToken")"
+	allGoVersions+=( $(
+		echo "$page" \
+			| jq -r '.items[].name' \
+			| grep -E '^go[0-9].*[.]src[.]tar[.]gz$' \
+			| sed -r -e 's!^go!!' -e 's![.]src[.]tar[.]gz$!!'
+	) )
+	# TODO extract per-version "available binary tarballs" information while we've got it handy here?
+	pageToken="$(echo "$page" | jq -r '.nextPageToken')"
+done
+
 travisEnv=
 appveyorEnv=
 for version in "${versions[@]}"; do
@@ -41,16 +57,10 @@ for version in "${versions[@]}"; do
 	rcGrepV+=' -E'
 	rcGrepExpr='beta|rc'
 
-	# https://github.com/golang/go/issues/13220
 	fullVersion="$(
-		curl -fsSL 'https://storage.googleapis.com/golang/' \
-			| grep -oE '<Key>go[^<]+[.]src[.]tar[.]gz</Key>' \
-			| sed -r \
-				-e 's!</?Key>!!g' \
-				-e 's![.]src[.]tar[.]gz$!!' \
-				-e 's!^go!!' \
+		echo "${allGoVersions[@]}" | xargs -n1 \
 			| grep $rcGrepV -- "$rcGrepExpr" \
-			| grep -E "^${version}([.]|$)" \
+			| grep -E "^${rcVersion}([.a-z]|$)" \
 			| sort -V \
 			| tail -1
 	)" || true

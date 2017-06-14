@@ -2,6 +2,8 @@ language: bash
 services: docker
 
 env:
+  - VERSION=1.9-rc VARIANT=
+  - VERSION=1.9-rc VARIANT=alpine
   - VERSION=1.8 VARIANT=
   - VERSION=1.8 VARIANT=stretch
   - VERSION=1.8 VARIANT=alpine
@@ -18,13 +20,13 @@ install:
 before_script:
   - env | sort
   - cd "$VERSION"
-  - image="$(awk '$1 == "FROM" { print $2; exit }' onbuild/Dockerfile)${VARIANT:+-$VARIANT}"
+  - image="golang:$VERSION${VARIANT:+-$VARIANT}"
 
 script:
   - travis_retry docker build -t "$image" "${VARIANT:-.}"
   - ~/official-images/test/run.sh "$image"
 # the "onbuild" variant has to happen with the base variant because it's FROM it
-  - true && [ "$VARIANT" ] || travis_retry docker build -t "${image}-onbuild" onbuild
+  - if [ -z "$VARIANT" ] && [ -d onbuild ]; then travis_retry docker build -t "${image}-onbuild" onbuild; fi
 
 after_script:
   - docker images
