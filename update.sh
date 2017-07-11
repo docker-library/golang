@@ -1,17 +1,6 @@
 #!/bin/bash
 set -Eeuo pipefail
 
-defaultDebianSuite='stretch'
-declare -A debianSuite=(
-	[1.8]='jessie'
-	[1.7]='jessie'
-)
-defaultAlpineVersion='3.6'
-declare -A alpineVersion=(
-	[1.7]='3.4'
-	[1.8]='3.5'
-)
-
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 source '.architectures-lib'
@@ -94,10 +83,9 @@ for version in "${versions[@]}"; do
 
 	windowsSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.windows-amd64.zip.sha256")"
 
-	for variant in alpine3.5 alpine3.6 alpine; do
+	for variant in alpine3.4 alpine3.5 alpine3.6; do
 		if [ -d "$version/$variant" ]; then
 			ver="${variant#alpine}"
-			ver="${ver:-${alpineVersion[$version]:-$defaultAlpineVersion}}"
 			sed -r \
 				-e 's!%%VERSION%%!'"$fullVersion"'!g' \
 				-e 's!%%ALPINE-VERSION%%!'"$ver"'!g' \
@@ -107,11 +95,11 @@ for version in "${versions[@]}"; do
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
-	for variant in stretch wheezy ''; do
+	for variant in stretch jessie wheezy; do
 		if [ -d "$version/$variant" ]; then
 			sed -r \
 				-e 's!%%VERSION%%!'"$fullVersion"'!g' \
-				-e 's!%%DEBIAN-SUITE%%!'"${variant:-${debianSuite[$version]:-$defaultDebianSuite}}"'!g' \
+				-e 's!%%DEBIAN-SUITE%%!'"$variant"'!g' \
 				-e 's!%%ARCH-CASE%%!'"$(sed_escape_rhs "$linuxArchCase")"'!g' \
 				Dockerfile-debian.template > "$version/$variant/Dockerfile"
 			cp go-wrapper "$version/$variant/"

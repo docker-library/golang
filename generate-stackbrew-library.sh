@@ -1,6 +1,17 @@
 #!/bin/bash
 set -eu
 
+defaultDebianSuite='stretch'
+declare -A debianSuite=(
+	[1.8]='jessie'
+	[1.7]='jessie'
+)
+defaultAlpineVersion='3.6'
+declare -A alpineVersion=(
+	[1.7]='3.4'
+	[1.8]='3.5'
+)
+
 declare -A aliases=(
 	[1.8]='1 latest'
 	[1.9-rc]='rc'
@@ -58,13 +69,7 @@ join() {
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
 
-	commit="$(dirCommit "$version")"
-
-	fullVersion="$(git show "$commit":"$version/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
-	[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
-
 	versionAliases=(
-		$fullVersion
 		$version
 	)
 	if [ "$version" != "$rcVersion" ]; then
@@ -76,32 +81,41 @@ for version in "${versions[@]}"; do
 		${aliases[$version]:-}
 	)
 
-	versionArches="$(variantArches "$version" '')"
-
-	echo
-	cat <<-EOE
-		Tags: $(join ', ' "${versionAliases[@]}")
-		Architectures: $(join ', ' $versionArches)
-		GitCommit: $commit
-		Directory: $version
-	EOE
-
 	for v in \
-		onbuild wheezy stretch alpine alpine3.6 alpine3.5 \
+		stretch jessie wheezy alpine3.6 alpine3.5 alpine3.4 onbuild \
 		windows/windowsservercore windows/nanoserver \
 	; do
 		dir="$version/$v"
-		variant="$(basename "$v")"
 
 		[ -f "$dir/Dockerfile" ] || continue
 
-		commit="$(dirCommit "$dir")"
+		variant="$(basename "$v")"
+		versionSuite="${debianSuite[$version]:-$defaultDebianSuite}"
 
-		variantAliases=( "${versionAliases[@]/%/-$variant}" )
+		commit="$(dirCommit "$dir")"
+		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
+
+		if [ -z "$fullVersion" ]; then
+			# for onbuild, since it does not contain GOLANG_VERSION
+			suiteCommit="$(dirCommit "$version/$versionSuite")"
+			fullVersion="$(git show "$suiteCommit":"$version/$versionSuite/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
+		fi
+
+		[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
+
+		baseAliases=( $fullVersion "${versionAliases[@]}" )
+		variantAliases=( "${baseAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
+		if [ "$variant" = "$versionSuite" ]; then
+			variantAliases+=( "${baseAliases[@]}" )
+		elif [ "${variant#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ]; then
+			variantAliases+=( "${baseAliases[@]/%/-alpine}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
+		fi
+
 		case "$v" in
-			onbuild)   variantArches="$versionArches" ;;
+			onbuild)   variantArches="$(variantArches "$version" "$versionSuite" )";;
 			alpine*)   variantArches="$(parentArches "$version" "$v")" ;;
 			windows/*) variantArches='windows-amd64' ;;
 			*)         variantArches="$(variantArches "$version" "$v")" ;;
