@@ -1,5 +1,10 @@
-#!/bin/bash
-set -eu
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+declare -A aliases=(
+	[1.8]='1 latest'
+	[1.9-rc]='rc'
+)
 
 defaultDebianSuite='stretch'
 declare -A debianSuite=(
@@ -10,11 +15,6 @@ defaultAlpineVersion='3.6'
 declare -A alpineVersion=(
 	[1.7]='3.4'
 	[1.8]='3.5'
-)
-
-declare -A aliases=(
-	[1.8]='1 latest'
-	[1.9-rc]='rc'
 )
 
 self="$(basename "$BASH_SOURCE")"
