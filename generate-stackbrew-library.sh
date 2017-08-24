@@ -2,18 +2,16 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[1.8]='1 latest'
-	[1.9-rc]='rc'
+	[1.9]='1 latest'
+	[1.10-rc]='rc'
 )
 
 defaultDebianSuite='stretch'
 declare -A debianSuite=(
 	[1.8]='jessie'
-	[1.7]='jessie'
 )
 defaultAlpineVersion='3.6'
 declare -A alpineVersion=(
-	[1.7]='3.4'
 	[1.8]='3.5'
 )
 
