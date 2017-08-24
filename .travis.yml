@@ -2,17 +2,12 @@ language: bash
 services: docker
 
 env:
-  - VERSION=1.9-rc VARIANT=stretch
-  - VERSION=1.9-rc VARIANT=alpine3.6
+  - VERSION=1.9 VARIANT=stretch
+  - VERSION=1.9 VARIANT=alpine3.6
   - VERSION=1.8 VARIANT=jessie
   - VERSION=1.8 VARIANT=stretch
   - VERSION=1.8 VARIANT=alpine3.6
   - VERSION=1.8 VARIANT=alpine3.5
-  - VERSION=1.7 VARIANT=wheezy
-  - VERSION=1.7 VARIANT=jessie
-  - VERSION=1.7 VARIANT=alpine3.6
-  - VERSION=1.7 VARIANT=alpine3.5
-  - VERSION=1.7 VARIANT=alpine3.4
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images

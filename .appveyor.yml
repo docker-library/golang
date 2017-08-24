@@ -3,17 +3,13 @@ image: Visual Studio 2017
 
 environment:
   matrix:
-    - version: 1.9-rc
+    - version: 1.9
       variant: nanoserver
-    - version: 1.9-rc
+    - version: 1.9
       variant: windowsservercore
     - version: 1.8
       variant: nanoserver
     - version: 1.8
-      variant: windowsservercore
-    - version: 1.7
-      variant: nanoserver
-    - version: 1.7
       variant: windowsservercore
 
 install:
