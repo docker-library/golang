@@ -7,7 +7,7 @@ usage() {
 
 usage: $base command [args]
 
-This script assumes that is is run from the root of your Go package (for
+This script assumes that it is run from the root of your Go package (for
 example, "/go/src/app" if your GOPATH is set to "/go").
 
 In Go 1.4, a feature was introduced to supply the canonical "import path" for a
