@@ -105,9 +105,7 @@ for version in "${versions[@]}"; do
 		variantAliases=( "${baseAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
-		if [ "$variant" = "$versionSuite" ]; then
-			variantAliases+=( "${baseAliases[@]}" )
-		elif [ "${variant#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ]; then
+		if [ "${variant#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ]; then
 			variantAliases+=( "${baseAliases[@]/%/-alpine}" )
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 		fi
@@ -120,8 +118,11 @@ for version in "${versions[@]}"; do
 		esac
 
 		echo
+		echo "Tags: $(join ', ' "${variantAliases[@]}")"
+		if [ "$variant" = "$versionSuite" ] || [ "$variant" = 'windowsservercore' ]; then
+			echo "SharedTags: $(join ', ' "${baseAliases[@]}")"
+		fi
 		cat <<-EOE
-			Tags: $(join ', ' "${variantAliases[@]}")
 			Architectures: $(join ', ' $variantArches)
 			GitCommit: $commit
 			Directory: $dir
