@@ -23,11 +23,16 @@ RUN set -eux; \
 # (for example, if our build host is GOARCH=amd64, but our build env/image is GOARCH=386, our build needs GOARCH=386)
 		GOOS="$(go env GOOS)" \
 		GOARCH="$(go env GOARCH)" \
-		GO386="$(go env GO386)" \
-		GOARM="$(go env GOARM)" \
 		GOHOSTOS="$(go env GOHOSTOS)" \
 		GOHOSTARCH="$(go env GOHOSTARCH)" \
 	; \
+# also explicitly set GO386 and GOARM if appropriate
+# https://github.com/docker-library/golang/issues/184
+	apkArch="$(apk --print-arch)"; \
+	case "$apkArch" in \
+		armhf) export GOARM='6' ;; \
+		x86) export GO386='387' ;; \
+	esac; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
 	echo '665f184bf8ac89986cfd5a4460736976f60b57df6b320ad71ad4cef53bb143dc *go.tgz' | sha256sum -c -; \
