@@ -10,9 +10,10 @@ defaultDebianSuite='stretch'
 declare -A debianSuite=(
 	[1.8]='jessie'
 )
-defaultAlpineVersion='3.6'
+defaultAlpineVersion='3.7'
 declare -A alpineVersion=(
 	[1.8]='3.5'
+	[1.9]='3.6'
 )
 
 self="$(basename "$BASH_SOURCE")"
@@ -80,7 +81,7 @@ for version in "${versions[@]}"; do
 	)
 
 	for v in \
-		stretch jessie wheezy alpine3.6 alpine3.5 alpine3.4 onbuild \
+		stretch jessie wheezy alpine3.{7,6,5,4} onbuild \
 		windows/windowsservercore-{ltsc2016,1709} \
 		windows/nanoserver-{sac2016,1709} \
 	; do
