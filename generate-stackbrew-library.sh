@@ -70,13 +70,6 @@ for version in "${versions[@]}"; do
 
 	versionAliases=(
 		$version
-	)
-	if [ "$version" != "$rcVersion" ]; then
-		versionAliases+=(
-			$rcVersion
-		)
-	fi
-	versionAliases+=(
 		${aliases[$version]:-}
 	)
 
