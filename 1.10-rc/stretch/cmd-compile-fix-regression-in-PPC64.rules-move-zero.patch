@@ -1,0 +1,705 @@
+TL;DR: this is for Go-1.9 and 1.9.1. Need to be removed for Go 1.9.2
+as the patch is targeted for inclusion, for details see
+https://github.com/golang/go/issues/21947
+ --kir
+
+From 3fda3765b8691de51d62ef6d68ce772f4eb0c601 Mon Sep 17 00:00:00 2001
+From: Lynn Boger <laboger@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 17:36:57 -0400
+Subject: [PATCH] cmd/compile: fix regression in PPC64.rules move zero
+
+When a MOVDstorezero (8 bytes) is used the offset field
+in the instruction must be a multiple of 4. This situation
+had been corrected in the rules for other types of stores
+but not for the zero case.
+
+This also removes some of the special MOVDstorezero cases since
+they can be handled by the general LowerZero case.
+
+Updates made to the ssa test for lowering zero moves to
+include cases where the target is not aligned to at least 4.
+
+Fixes #21947
+
+Change-Id: I7cceceb1be4898c77cd3b5e78b58dce0a7e28edd
+Reviewed-on: https://go-review.googlesource.com/64970
+Run-TryBot: Lynn Boger <laboger@linux.vnet.ibm.com>
+TryBot-Result: Gobot Gobot <gobot@golang.org>
+Reviewed-by: Carlos Eduardo Seo <cseo@linux.vnet.ibm.com>
+Reviewed-by: Cherry Zhang <cherryyz@google.com>
+---
+ .../compile/internal/gc/testdata/gen/zeroGen.go    |  63 ++++++
+ src/cmd/compile/internal/gc/testdata/zero.go       | 216 +++++++++++++++++++++
+ src/cmd/compile/internal/ssa/gen/PPC64.rules       |  58 ++----
+ src/cmd/compile/internal/ssa/rewritePPC64.go       | 172 +++++-----------
+ 4 files changed, 350 insertions(+), 159 deletions(-)
+
+diff --git a/src/cmd/compile/internal/gc/testdata/gen/zeroGen.go b/src/cmd/compile/internal/gc/testdata/gen/zeroGen.go
+index fa70b16495..c764c369e6 100644
+--- a/src/cmd/compile/internal/gc/testdata/gen/zeroGen.go
++++ b/src/cmd/compile/internal/gc/testdata/gen/zeroGen.go
+@@ -19,6 +19,7 @@ import (
+ // will be written into the parent directory containing the tests.
+ 
+ var sizes = [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 16, 17, 23, 24, 25, 31, 32, 33, 63, 64, 65, 1023, 1024, 1025}
++var usizes = [...]int{8, 16, 24, 32, 64, 256}
+ 
+ func main() {
+ 	w := new(bytes.Buffer)
+@@ -61,12 +62,74 @@ func main() {
+ 		fmt.Fprintf(w, "}\n")
+ 	}
+ 
++	for _, s := range usizes {
++		// type for test
++		fmt.Fprintf(w, "type T%du1 struct {\n", s)
++		fmt.Fprintf(w, "  b   bool\n")
++		fmt.Fprintf(w, "  val [%d]byte\n", s)
++		fmt.Fprintf(w, "}\n")
++
++		fmt.Fprintf(w, "type T%du2 struct {\n", s)
++		fmt.Fprintf(w, "  i   uint16\n")
++		fmt.Fprintf(w, "  val [%d]byte\n", s)
++		fmt.Fprintf(w, "}\n")
++
++		// function being tested
++		fmt.Fprintf(w, "//go:noinline\n")
++		fmt.Fprintf(w, "func zero%du1_ssa(t *T%du1) {\n", s, s)
++		fmt.Fprintf(w, "  t.val = [%d]byte{}\n", s)
++		fmt.Fprintf(w, "}\n")
++
++		// function being tested
++		fmt.Fprintf(w, "//go:noinline\n")
++		fmt.Fprintf(w, "func zero%du2_ssa(t *T%du2) {\n", s, s)
++		fmt.Fprintf(w, "  t.val = [%d]byte{}\n", s)
++		fmt.Fprintf(w, "}\n")
++
++		// testing harness
++		fmt.Fprintf(w, "func testZero%du() {\n", s)
++		fmt.Fprintf(w, "  a := T%du1{false, [%d]byte{", s, s)
++		for i := 0; i < s; i++ {
++			fmt.Fprintf(w, "255,")
++		}
++		fmt.Fprintf(w, "}}\n")
++		fmt.Fprintf(w, "  zero%du1_ssa(&a)\n", s)
++		fmt.Fprintf(w, "  want := T%du1{false, [%d]byte{", s, s)
++		for i := 0; i < s; i++ {
++			fmt.Fprintf(w, "0,")
++		}
++		fmt.Fprintf(w, "}}\n")
++		fmt.Fprintf(w, "  if a != want {\n")
++		fmt.Fprintf(w, "    fmt.Printf(\"zero%du2 got=%%v, want %%v\\n\", a, want)\n", s)
++		fmt.Fprintf(w, "    failed=true\n")
++		fmt.Fprintf(w, "  }\n")
++		fmt.Fprintf(w, "  b := T%du2{15, [%d]byte{", s, s)
++		for i := 0; i < s; i++ {
++			fmt.Fprintf(w, "255,")
++		}
++		fmt.Fprintf(w, "}}\n")
++		fmt.Fprintf(w, "  zero%du2_ssa(&b)\n", s)
++		fmt.Fprintf(w, "  wantb := T%du2{15, [%d]byte{", s, s)
++		for i := 0; i < s; i++ {
++			fmt.Fprintf(w, "0,")
++		}
++		fmt.Fprintf(w, "}}\n")
++		fmt.Fprintf(w, "  if b != wantb {\n")
++		fmt.Fprintf(w, "    fmt.Printf(\"zero%du2 got=%%v, want %%v\\n\", b, wantb)\n", s)
++		fmt.Fprintf(w, "    failed=true\n")
++		fmt.Fprintf(w, "  }\n")
++		fmt.Fprintf(w, "}\n")
++	}
++
+ 	// boilerplate at end
+ 	fmt.Fprintf(w, "var failed bool\n")
+ 	fmt.Fprintf(w, "func main() {\n")
+ 	for _, s := range sizes {
+ 		fmt.Fprintf(w, "  testZero%d()\n", s)
+ 	}
++	for _, s := range usizes {
++		fmt.Fprintf(w, "  testZero%du()\n", s)
++	}
+ 	fmt.Fprintf(w, "  if failed {\n")
+ 	fmt.Fprintf(w, "    panic(\"failed\")\n")
+ 	fmt.Fprintf(w, "  }\n")
+diff --git a/src/cmd/compile/internal/gc/testdata/zero.go b/src/cmd/compile/internal/gc/testdata/zero.go
+index f6354868cb..9d261aa401 100644
+--- a/src/cmd/compile/internal/gc/testdata/zero.go
++++ b/src/cmd/compile/internal/gc/testdata/zero.go
+@@ -505,6 +505,216 @@ func testZero1025() {
+ 	}
+ }
+ 
++type T8u1 struct {
++	b   bool
++	val [8]byte
++}
++type T8u2 struct {
++	i   uint16
++	val [8]byte
++}
++
++//go:noinline
++func zero8u1_ssa(t *T8u1) {
++	t.val = [8]byte{}
++}
++
++//go:noinline
++func zero8u2_ssa(t *T8u2) {
++	t.val = [8]byte{}
++}
++func testZero8u() {
++	a := T8u1{false, [8]byte{255, 255, 255, 255, 255, 255, 255, 255}}
++	zero8u1_ssa(&a)
++	want := T8u1{false, [8]byte{0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero8u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T8u2{15, [8]byte{255, 255, 255, 255, 255, 255, 255, 255}}
++	zero8u2_ssa(&b)
++	wantb := T8u2{15, [8]byte{0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero8u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
++type T16u1 struct {
++	b   bool
++	val [16]byte
++}
++type T16u2 struct {
++	i   uint16
++	val [16]byte
++}
++
++//go:noinline
++func zero16u1_ssa(t *T16u1) {
++	t.val = [16]byte{}
++}
++
++//go:noinline
++func zero16u2_ssa(t *T16u2) {
++	t.val = [16]byte{}
++}
++func testZero16u() {
++	a := T16u1{false, [16]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero16u1_ssa(&a)
++	want := T16u1{false, [16]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero16u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T16u2{15, [16]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero16u2_ssa(&b)
++	wantb := T16u2{15, [16]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero16u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
++type T24u1 struct {
++	b   bool
++	val [24]byte
++}
++type T24u2 struct {
++	i   uint16
++	val [24]byte
++}
++
++//go:noinline
++func zero24u1_ssa(t *T24u1) {
++	t.val = [24]byte{}
++}
++
++//go:noinline
++func zero24u2_ssa(t *T24u2) {
++	t.val = [24]byte{}
++}
++func testZero24u() {
++	a := T24u1{false, [24]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero24u1_ssa(&a)
++	want := T24u1{false, [24]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero24u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T24u2{15, [24]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero24u2_ssa(&b)
++	wantb := T24u2{15, [24]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero24u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
++type T32u1 struct {
++	b   bool
++	val [32]byte
++}
++type T32u2 struct {
++	i   uint16
++	val [32]byte
++}
++
++//go:noinline
++func zero32u1_ssa(t *T32u1) {
++	t.val = [32]byte{}
++}
++
++//go:noinline
++func zero32u2_ssa(t *T32u2) {
++	t.val = [32]byte{}
++}
++func testZero32u() {
++	a := T32u1{false, [32]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero32u1_ssa(&a)
++	want := T32u1{false, [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero32u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T32u2{15, [32]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero32u2_ssa(&b)
++	wantb := T32u2{15, [32]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero32u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
++type T64u1 struct {
++	b   bool
++	val [64]byte
++}
++type T64u2 struct {
++	i   uint16
++	val [64]byte
++}
++
++//go:noinline
++func zero64u1_ssa(t *T64u1) {
++	t.val = [64]byte{}
++}
++
++//go:noinline
++func zero64u2_ssa(t *T64u2) {
++	t.val = [64]byte{}
++}
++func testZero64u() {
++	a := T64u1{false, [64]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero64u1_ssa(&a)
++	want := T64u1{false, [64]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero64u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T64u2{15, [64]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero64u2_ssa(&b)
++	wantb := T64u2{15, [64]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero64u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
++type T256u1 struct {
++	b   bool
++	val [256]byte
++}
++type T256u2 struct {
++	i   uint16
++	val [256]byte
++}
++
++//go:noinline
++func zero256u1_ssa(t *T256u1) {
++	t.val = [256]byte{}
++}
++
++//go:noinline
++func zero256u2_ssa(t *T256u2) {
++	t.val = [256]byte{}
++}
++func testZero256u() {
++	a := T256u1{false, [256]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero256u1_ssa(&a)
++	want := T256u1{false, [256]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if a != want {
++		fmt.Printf("zero256u2 got=%v, want %v\n", a, want)
++		failed = true
++	}
++	b := T256u2{15, [256]byte{255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255}}
++	zero256u2_ssa(&b)
++	wantb := T256u2{15, [256]byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}
++	if b != wantb {
++		fmt.Printf("zero256u2 got=%v, want %v\n", b, wantb)
++		failed = true
++	}
++}
++
+ var failed bool
+ 
+ func main() {
+@@ -533,6 +743,12 @@ func main() {
+ 	testZero1023()
+ 	testZero1024()
+ 	testZero1025()
++	testZero8u()
++	testZero16u()
++	testZero24u()
++	testZero32u()
++	testZero64u()
++	testZero256u()
+ 	if failed {
+ 		panic("failed")
+ 	}
+diff --git a/src/cmd/compile/internal/ssa/gen/PPC64.rules b/src/cmd/compile/internal/ssa/gen/PPC64.rules
+index 0a09724b8e..6e8d335c90 100644
+--- a/src/cmd/compile/internal/ssa/gen/PPC64.rules
++++ b/src/cmd/compile/internal/ssa/gen/PPC64.rules
+@@ -572,49 +572,29 @@
+ 	(MOVBstorezero [6] destptr
+ 		(MOVHstorezero [4] destptr
+ 			(MOVWstorezero destptr mem)))
+-(Zero [8] destptr mem) ->
+-	(MOVDstorezero destptr mem)
+ 
+-// Zero small numbers of words directly.
+-(Zero [12] destptr mem) ->
++// MOVD for store with DS must have offsets that are multiple of 4
++(Zero [8] {t} destptr mem) && t.(*types.Type).Alignment()%4 == 0 ->
++        (MOVDstorezero destptr mem)
++(Zero [8] destptr mem) ->
++        (MOVWstorezero [4] destptr
++                (MOVWstorezero [0] destptr mem))
++// Handle these cases only if aligned properly, otherwise use general case below
++(Zero [12] {t} destptr mem) && t.(*types.Type).Alignment()%4 == 0 ->
+         (MOVWstorezero [8] destptr
+                 (MOVDstorezero [0] destptr mem))
+-(Zero [16] destptr mem) ->
+-	(MOVDstorezero [8] destptr
++(Zero [16] {t} destptr mem) && t.(*types.Type).Alignment()%4 == 0 ->
++       (MOVDstorezero [8] destptr
+                 (MOVDstorezero [0] destptr mem))
+-(Zero [24] destptr mem) ->
+-	(MOVDstorezero [16] destptr
+-		(MOVDstorezero [8] destptr
+-			(MOVDstorezero [0] destptr mem)))
+-(Zero [32] destptr mem) ->
+-	(MOVDstorezero [24] destptr
+-		(MOVDstorezero [16] destptr
+-			(MOVDstorezero [8] destptr
+-				(MOVDstorezero [0] destptr mem))))
+-
+-(Zero [40] destptr mem) ->
+-	(MOVDstorezero [32] destptr
+-		(MOVDstorezero [24] destptr
+-			(MOVDstorezero [16] destptr
+-				(MOVDstorezero [8] destptr
+-					(MOVDstorezero [0] destptr mem)))))
+-
+-(Zero [48] destptr mem) ->
+-	(MOVDstorezero [40] destptr
+-		(MOVDstorezero [32] destptr
+-			(MOVDstorezero [24] destptr
+-				(MOVDstorezero [16] destptr
+-					(MOVDstorezero [8] destptr
+-						(MOVDstorezero [0] destptr mem))))))
+-
+-(Zero [56] destptr mem) ->
+-	(MOVDstorezero [48] destptr
+-		(MOVDstorezero [40] destptr
+-			(MOVDstorezero [32] destptr
+-				(MOVDstorezero [24] destptr
+-					(MOVDstorezero [16] destptr
+-						(MOVDstorezero [8] destptr
+-							(MOVDstorezero [0] destptr mem)))))))
++(Zero [24] {t} destptr mem) && t.(*types.Type).Alignment()%4 == 0 ->
++       (MOVDstorezero [16] destptr
++               (MOVDstorezero [8] destptr
++                       (MOVDstorezero [0] destptr mem)))
++(Zero [32] {t} destptr mem) && t.(*types.Type).Alignment()%4 == 0 ->
++       (MOVDstorezero [24] destptr
++               (MOVDstorezero [16] destptr
++                       (MOVDstorezero [8] destptr
++                               (MOVDstorezero [0] destptr mem))))
+ 
+ // Handle cases not handled above
+ (Zero [s] ptr mem) -> (LoweredZero [s] ptr mem)
+diff --git a/src/cmd/compile/internal/ssa/rewritePPC64.go b/src/cmd/compile/internal/ssa/rewritePPC64.go
+index 53d457f224..7167c9516b 100644
+--- a/src/cmd/compile/internal/ssa/rewritePPC64.go
++++ b/src/cmd/compile/internal/ssa/rewritePPC64.go
+@@ -12688,35 +12688,39 @@ func rewriteValuePPC64_OpZero_0(v *Value) bool {
+ 		v.AddArg(v0)
+ 		return true
+ 	}
+-	// match: (Zero [8] destptr mem)
+-	// cond:
++	// match: (Zero [8] {t} destptr mem)
++	// cond: t.(*types.Type).Alignment()%4 == 0
+ 	// result: (MOVDstorezero destptr mem)
+ 	for {
+ 		if v.AuxInt != 8 {
+ 			break
+ 		}
++		t := v.Aux
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
++		if !(t.(*types.Type).Alignment()%4 == 0) {
++			break
++		}
+ 		v.reset(OpPPC64MOVDstorezero)
+ 		v.AddArg(destptr)
+ 		v.AddArg(mem)
+ 		return true
+ 	}
+-	// match: (Zero [12] destptr mem)
++	// match: (Zero [8] destptr mem)
+ 	// cond:
+-	// result: (MOVWstorezero [8] destptr                 (MOVDstorezero [0] destptr mem))
++	// result: (MOVWstorezero [4] destptr                 (MOVWstorezero [0] destptr mem))
+ 	for {
+-		if v.AuxInt != 12 {
++		if v.AuxInt != 8 {
+ 			break
+ 		}
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
+ 		v.reset(OpPPC64MOVWstorezero)
+-		v.AuxInt = 8
++		v.AuxInt = 4
+ 		v.AddArg(destptr)
+-		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
++		v0 := b.NewValue0(v.Pos, OpPPC64MOVWstorezero, types.TypeMem)
+ 		v0.AuxInt = 0
+ 		v0.AddArg(destptr)
+ 		v0.AddArg(mem)
+@@ -12728,17 +12732,21 @@ func rewriteValuePPC64_OpZero_0(v *Value) bool {
+ func rewriteValuePPC64_OpZero_10(v *Value) bool {
+ 	b := v.Block
+ 	_ = b
+-	// match: (Zero [16] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [8] destptr                 (MOVDstorezero [0] destptr mem))
++	// match: (Zero [12] {t} destptr mem)
++	// cond: t.(*types.Type).Alignment()%4 == 0
++	// result: (MOVWstorezero [8] destptr                 (MOVDstorezero [0] destptr mem))
+ 	for {
+-		if v.AuxInt != 16 {
++		if v.AuxInt != 12 {
+ 			break
+ 		}
++		t := v.Aux
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
+-		v.reset(OpPPC64MOVDstorezero)
++		if !(t.(*types.Type).Alignment()%4 == 0) {
++			break
++		}
++		v.reset(OpPPC64MOVWstorezero)
+ 		v.AuxInt = 8
+ 		v.AddArg(destptr)
+ 		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+@@ -12748,161 +12756,85 @@ func rewriteValuePPC64_OpZero_10(v *Value) bool {
+ 		v.AddArg(v0)
+ 		return true
+ 	}
+-	// match: (Zero [24] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [16] destptr 		(MOVDstorezero [8] destptr 			(MOVDstorezero [0] destptr mem)))
++	// match: (Zero [16] {t} destptr mem)
++	// cond: t.(*types.Type).Alignment()%4 == 0
++	// result: (MOVDstorezero [8] destptr                 (MOVDstorezero [0] destptr mem))
+ 	for {
+-		if v.AuxInt != 24 {
++		if v.AuxInt != 16 {
+ 			break
+ 		}
++		t := v.Aux
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
+-		v.reset(OpPPC64MOVDstorezero)
+-		v.AuxInt = 16
+-		v.AddArg(destptr)
+-		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v0.AuxInt = 8
+-		v0.AddArg(destptr)
+-		v1 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v1.AuxInt = 0
+-		v1.AddArg(destptr)
+-		v1.AddArg(mem)
+-		v0.AddArg(v1)
+-		v.AddArg(v0)
+-		return true
+-	}
+-	// match: (Zero [32] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [24] destptr 		(MOVDstorezero [16] destptr 			(MOVDstorezero [8] destptr 				(MOVDstorezero [0] destptr mem))))
+-	for {
+-		if v.AuxInt != 32 {
++		if !(t.(*types.Type).Alignment()%4 == 0) {
+ 			break
+ 		}
+-		_ = v.Args[1]
+-		destptr := v.Args[0]
+-		mem := v.Args[1]
+ 		v.reset(OpPPC64MOVDstorezero)
+-		v.AuxInt = 24
++		v.AuxInt = 8
+ 		v.AddArg(destptr)
+ 		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v0.AuxInt = 16
++		v0.AuxInt = 0
+ 		v0.AddArg(destptr)
+-		v1 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v1.AuxInt = 8
+-		v1.AddArg(destptr)
+-		v2 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v2.AuxInt = 0
+-		v2.AddArg(destptr)
+-		v2.AddArg(mem)
+-		v1.AddArg(v2)
+-		v0.AddArg(v1)
++		v0.AddArg(mem)
+ 		v.AddArg(v0)
+ 		return true
+ 	}
+-	// match: (Zero [40] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [32] destptr 		(MOVDstorezero [24] destptr 			(MOVDstorezero [16] destptr 				(MOVDstorezero [8] destptr 					(MOVDstorezero [0] destptr mem)))))
++	// match: (Zero [24] {t} destptr mem)
++	// cond: t.(*types.Type).Alignment()%4 == 0
++	// result: (MOVDstorezero [16] destptr                (MOVDstorezero [8] destptr                        (MOVDstorezero [0] destptr mem)))
+ 	for {
+-		if v.AuxInt != 40 {
++		if v.AuxInt != 24 {
+ 			break
+ 		}
++		t := v.Aux
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
+-		v.reset(OpPPC64MOVDstorezero)
+-		v.AuxInt = 32
+-		v.AddArg(destptr)
+-		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v0.AuxInt = 24
+-		v0.AddArg(destptr)
+-		v1 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v1.AuxInt = 16
+-		v1.AddArg(destptr)
+-		v2 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v2.AuxInt = 8
+-		v2.AddArg(destptr)
+-		v3 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v3.AuxInt = 0
+-		v3.AddArg(destptr)
+-		v3.AddArg(mem)
+-		v2.AddArg(v3)
+-		v1.AddArg(v2)
+-		v0.AddArg(v1)
+-		v.AddArg(v0)
+-		return true
+-	}
+-	// match: (Zero [48] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [40] destptr 		(MOVDstorezero [32] destptr 			(MOVDstorezero [24] destptr 				(MOVDstorezero [16] destptr 					(MOVDstorezero [8] destptr 						(MOVDstorezero [0] destptr mem))))))
+-	for {
+-		if v.AuxInt != 48 {
++		if !(t.(*types.Type).Alignment()%4 == 0) {
+ 			break
+ 		}
+-		_ = v.Args[1]
+-		destptr := v.Args[0]
+-		mem := v.Args[1]
+ 		v.reset(OpPPC64MOVDstorezero)
+-		v.AuxInt = 40
++		v.AuxInt = 16
+ 		v.AddArg(destptr)
+ 		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v0.AuxInt = 32
++		v0.AuxInt = 8
+ 		v0.AddArg(destptr)
+ 		v1 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v1.AuxInt = 24
++		v1.AuxInt = 0
+ 		v1.AddArg(destptr)
+-		v2 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v2.AuxInt = 16
+-		v2.AddArg(destptr)
+-		v3 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v3.AuxInt = 8
+-		v3.AddArg(destptr)
+-		v4 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v4.AuxInt = 0
+-		v4.AddArg(destptr)
+-		v4.AddArg(mem)
+-		v3.AddArg(v4)
+-		v2.AddArg(v3)
+-		v1.AddArg(v2)
++		v1.AddArg(mem)
+ 		v0.AddArg(v1)
+ 		v.AddArg(v0)
+ 		return true
+ 	}
+-	// match: (Zero [56] destptr mem)
+-	// cond:
+-	// result: (MOVDstorezero [48] destptr 		(MOVDstorezero [40] destptr 			(MOVDstorezero [32] destptr 				(MOVDstorezero [24] destptr 					(MOVDstorezero [16] destptr 						(MOVDstorezero [8] destptr 							(MOVDstorezero [0] destptr mem)))))))
++	// match: (Zero [32] {t} destptr mem)
++	// cond: t.(*types.Type).Alignment()%4 == 0
++	// result: (MOVDstorezero [24] destptr                (MOVDstorezero [16] destptr                        (MOVDstorezero [8] destptr                                (MOVDstorezero [0] destptr mem))))
+ 	for {
+-		if v.AuxInt != 56 {
++		if v.AuxInt != 32 {
+ 			break
+ 		}
++		t := v.Aux
+ 		_ = v.Args[1]
+ 		destptr := v.Args[0]
+ 		mem := v.Args[1]
++		if !(t.(*types.Type).Alignment()%4 == 0) {
++			break
++		}
+ 		v.reset(OpPPC64MOVDstorezero)
+-		v.AuxInt = 48
++		v.AuxInt = 24
+ 		v.AddArg(destptr)
+ 		v0 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v0.AuxInt = 40
++		v0.AuxInt = 16
+ 		v0.AddArg(destptr)
+ 		v1 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v1.AuxInt = 32
++		v1.AuxInt = 8
+ 		v1.AddArg(destptr)
+ 		v2 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v2.AuxInt = 24
++		v2.AuxInt = 0
+ 		v2.AddArg(destptr)
+-		v3 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v3.AuxInt = 16
+-		v3.AddArg(destptr)
+-		v4 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v4.AuxInt = 8
+-		v4.AddArg(destptr)
+-		v5 := b.NewValue0(v.Pos, OpPPC64MOVDstorezero, types.TypeMem)
+-		v5.AuxInt = 0
+-		v5.AddArg(destptr)
+-		v5.AddArg(mem)
+-		v4.AddArg(v5)
+-		v3.AddArg(v4)
+-		v2.AddArg(v3)
++		v2.AddArg(mem)
+ 		v1.AddArg(v2)
+ 		v0.AddArg(v1)
+ 		v.AddArg(v0)
+-- 
+2.14.1
+
