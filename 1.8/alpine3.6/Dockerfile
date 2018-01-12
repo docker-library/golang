@@ -13,6 +13,7 @@ RUN set -eux; \
 		gcc \
 		musl-dev \
 		openssl \
+		git \
 		go \
 	; \
 	export \
