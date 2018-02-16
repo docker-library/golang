@@ -2,17 +2,15 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[1.9]='1 latest'
-	[1.10-rc]='rc'
+	[1.10]='1 latest'
+	[1.11-rc]='rc'
 )
 
 defaultDebianSuite='stretch'
 declare -A debianSuite=(
-	[1.8]='jessie'
 )
 defaultAlpineVersion='3.7'
 declare -A alpineVersion=(
-	[1.8]='3.5'
 	[1.9]='3.6'
 )
 
@@ -74,7 +72,7 @@ for version in "${versions[@]}"; do
 	)
 
 	for v in \
-		stretch jessie wheezy alpine3.{7,6,5,4} onbuild \
+		stretch jessie wheezy alpine3.{7,6,5,4} \
 		windows/windowsservercore-{ltsc2016,1709} \
 		windows/nanoserver-{sac2016,1709} \
 	; do
@@ -88,12 +86,6 @@ for version in "${versions[@]}"; do
 		commit="$(dirCommit "$dir")"
 		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
 
-		if [ -z "$fullVersion" ]; then
-			# for onbuild, since it does not contain GOLANG_VERSION
-			suiteCommit="$(dirCommit "$version/$versionSuite")"
-			fullVersion="$(git show "$suiteCommit":"$version/$versionSuite/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
-		fi
-
 		[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
 
 		baseAliases=( $fullVersion "${versionAliases[@]}" )
@@ -106,7 +98,6 @@ for version in "${versions[@]}"; do
 		fi
 
 		case "$v" in
-			onbuild)   variantArches="$(variantArches "$version" "$versionSuite" )";;
 			alpine*)   variantArches="$(parentArches "$version" "$v")" ;;
 			windows/*) variantArches='windows-amd64' ;;
 			*)         variantArches="$(variantArches "$version" "$v")" ;;

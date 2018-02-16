@@ -102,7 +102,7 @@ for version in "${versions[@]}"; do
 				"Dockerfile-${template}.template" > "$version/$variant/Dockerfile"
 
 			case "$version" in
-				1.8|1.9)
+				1.9)
 					# our "go-wrapper" script is officially deprecated in 1.10+
 					cp -a go-wrapper "$version/$variant/"
 					cat >> "$version/$variant/Dockerfile" <<-'EODF'
