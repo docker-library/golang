@@ -84,8 +84,8 @@ for version in "${versions[@]}"; do
 	windowsSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.windows-amd64.zip.sha256")"
 
 	for variant in \
-		alpine3.{4,5,6,7} \
-		stretch jessie wheezy \
+		alpine3.{6,7} \
+		stretch \
 	; do
 		if [ -d "$version/$variant" ]; then
 			tag="$variant"
@@ -102,7 +102,7 @@ for version in "${versions[@]}"; do
 				"Dockerfile-${template}.template" > "$version/$variant/Dockerfile"
 
 			case "$version" in
-				1.8|1.9)
+				1.9)
 					# our "go-wrapper" script is officially deprecated in 1.10+
 					cp -a go-wrapper "$version/$variant/"
 					cat >> "$version/$variant/Dockerfile" <<-'EODF'
