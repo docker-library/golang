@@ -2,7 +2,7 @@ FROM alpine:3.7
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.9.4
+ENV GOLANG_VERSION 1.9.5
 
 # no-pic.patch: https://golang.org/issue/14851 (Go 1.8 & 1.7)
 COPY *.patch /go-alpine-patches/
@@ -34,7 +34,7 @@ RUN set -eux; \
 	esac; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo '0573a8df33168977185aa44173305e5a0450f55213600e94541604b75d46dc06 *go.tgz' | sha256sum -c -; \
+	echo 'f1c2bb7f32bbd8fa7a19cc1608e0d06582df32ff5f0340967d83fb0017c49fbc *go.tgz' | sha256sum -c -; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
