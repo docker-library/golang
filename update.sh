@@ -112,6 +112,14 @@ for version in "${versions[@]}"; do
 					;;
 			esac
 
+			(
+				shopt -s nullglob
+				variantPatches=( "$version/$variant/"*.patch )
+				if [ "${#variantPatches[@]}" -eq 0 ]; then
+					sed -ri 's/^COPY.*patch/#&/' "$version/$variant/Dockerfile"
+				fi
+			)
+
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done

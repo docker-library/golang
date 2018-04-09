@@ -4,8 +4,8 @@ RUN apk add --no-cache ca-certificates
 
 ENV GOLANG_VERSION 1.10.1
 
-# no-pic.patch: https://golang.org/issue/14851 (Go 1.8 & 1.7)
-COPY *.patch /go-alpine-patches/
+# make-sure-R0-is-zero-before-main-on-ppc64le.patch: https://github.com/golang/go/commit/9aea0e89b6df032c29d0add8d69ba2c95f1106d9 (Go 1.9)
+#COPY *.patch /go-alpine-patches/
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
