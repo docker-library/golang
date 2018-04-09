@@ -5,7 +5,7 @@ RUN apk add --no-cache ca-certificates
 ENV GOLANG_VERSION 1.10.1
 
 # no-pic.patch: https://golang.org/issue/14851 (Go 1.8 & 1.7)
-COPY *.patch /go-alpine-patches/
+#COPY *.patch /go-alpine-patches/
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
