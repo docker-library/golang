@@ -2,7 +2,7 @@ FROM alpine:3.7
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.10.1
+ENV GOLANG_VERSION 1.10.2
 
 # make-sure-R0-is-zero-before-main-on-ppc64le.patch: https://github.com/golang/go/commit/9aea0e89b6df032c29d0add8d69ba2c95f1106d9 (Go 1.9)
 #COPY *.patch /go-alpine-patches/
@@ -34,7 +34,7 @@ RUN set -eux; \
 	esac; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo '589449ff6c3ccbff1d391d4e7ab5bb5d5643a5a41a04c99315e55c16bbf73ddc *go.tgz' | sha256sum -c -; \
+	echo '6264609c6b9cd8ed8e02ca84605d727ce1898d74efa79841660b2e3e985a98bd *go.tgz' | sha256sum -c -; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
