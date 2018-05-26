@@ -125,8 +125,8 @@ for version in "${versions[@]}"; do
 	done
 
 	for winVariant in \
-		nanoserver-{1709,sac2016} \
-		windowsservercore-{1709,ltsc2016} \
+		nanoserver-{sac2016,1709,1803} \
+		windowsservercore-{ltsc2016,1709,1803} \
 	; do
 		if [ -d "$version/windows/$winVariant" ]; then
 			sed -r \
@@ -136,7 +136,7 @@ for version in "${versions[@]}"; do
 				"Dockerfile-windows-${winVariant%%-*}.template" > "$version/windows/$winVariant/Dockerfile"
 
 			case "$winVariant" in
-				*-1709) ;; # no AppVeyor support for 1709 yet: https://github.com/appveyor/ci/issues/1885
+				*-1709|*-1803) ;; # no AppVeyor support for 1709 or 1803 yet: https://github.com/appveyor/ci/issues/1885
 				*) appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant$appveyorEnv" ;;
 			esac
 		fi
