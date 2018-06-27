@@ -7,6 +7,10 @@ environment:
       variant: windowsservercore-ltsc2016
     - version: 1.9
       variant: nanoserver-sac2016
+    - version: 1.11-rc
+      variant: windowsservercore-ltsc2016
+    - version: 1.11-rc
+      variant: nanoserver-sac2016
     - version: 1.10
       variant: windowsservercore-ltsc2016
     - version: 1.10
