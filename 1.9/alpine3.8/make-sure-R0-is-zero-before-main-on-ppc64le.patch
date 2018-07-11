@@ -1,0 +1,32 @@
+From 9aea0e89b6df032c29d0add8d69ba2c95f1106d9 Mon Sep 17 00:00:00 2001
+From: Carlos Eduardo Seo <cseo@linux.vnet.ibm.com>
+Date: Thu, 10 Aug 2017 14:48:36 -0300
+Subject: [PATCH] runtime: make sure R0 is zero before _main on ppc64le
+
+_main has an early check to verify if a binary is statically or dynamically
+linked that depends on R0 being zero. R0 is not guaranteed to be zero at that
+point and this was breaking Go on Alpine for ppc64le.
+
+Change-Id: I4a1059ff7fd3db6fc489e7dcfe631c1814dd965b
+Reviewed-on: https://go-review.googlesource.com/54730
+Run-TryBot: Lynn Boger <laboger@linux.vnet.ibm.com>
+Reviewed-by: Lynn Boger <laboger@linux.vnet.ibm.com>
+---
+ src/runtime/rt0_linux_ppc64le.s | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/src/runtime/rt0_linux_ppc64le.s b/src/runtime/rt0_linux_ppc64le.s
+index 134858bff8..73b9ae392d 100644
+--- a/src/runtime/rt0_linux_ppc64le.s
++++ b/src/runtime/rt0_linux_ppc64le.s
+@@ -2,6 +2,7 @@
+ #include "textflag.h"
+ 
+ TEXT _rt0_ppc64le_linux(SB),NOSPLIT,$0
++	XOR R0, R0	  // Make sure R0 is zero before _main
+ 	BR _main<>(SB)
+ 
+ TEXT _rt0_ppc64le_linux_lib(SB),NOSPLIT,$-8
+-- 
+2.14.1
+
