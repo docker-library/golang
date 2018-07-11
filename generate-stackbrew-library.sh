@@ -11,7 +11,7 @@ declare -A debianSuite=(
 )
 defaultAlpineVersion='3.8'
 declare -A alpineVersion=(
-	[1.9]='3.6'
+	#[1.9]='3.7'
 )
 
 self="$(basename "$BASH_SOURCE")"
@@ -72,7 +72,7 @@ for version in "${versions[@]}"; do
 	)
 
 	for v in \
-		stretch alpine3.{8,7,6} \
+		stretch alpine3.{8,7} \
 		windows/windowsservercore-{ltsc2016,1709,1803} \
 		windows/nanoserver-{sac2016,1709,1803} \
 	; do
