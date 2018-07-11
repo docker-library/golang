@@ -3,11 +3,14 @@ services: docker
 
 env:
   - VERSION=1.9 VARIANT=stretch
+  - VERSION=1.9 VARIANT=alpine3.8
   - VERSION=1.9 VARIANT=alpine3.7
   - VERSION=1.9 VARIANT=alpine3.6
   - VERSION=1.11-rc VARIANT=stretch
+  - VERSION=1.11-rc VARIANT=alpine3.8
   - VERSION=1.11-rc VARIANT=alpine3.7
   - VERSION=1.10 VARIANT=stretch
+  - VERSION=1.10 VARIANT=alpine3.8
   - VERSION=1.10 VARIANT=alpine3.7
 
 install:
