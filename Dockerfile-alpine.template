@@ -51,6 +51,8 @@ RUN set -eux; \
 	done; \
 	./make.bash; \
 	\
+	rm -rf /usr/local/go/pkg/bootstrap; \
+	rm -rf /usr/local/go/pkg/obj/go-build/; \
 	rm -rf /go-alpine-patches; \
 	apk del .build-deps; \
 	\
