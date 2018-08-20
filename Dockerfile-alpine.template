@@ -51,9 +51,14 @@ RUN set -eux; \
 	done; \
 	./make.bash; \
 	\
-	rm -rf /usr/local/go/pkg/bootstrap; \
-	rm -rf /usr/local/go/pkg/obj/go-build/; \
-	rm -rf /go-alpine-patches; \
+	rm -rf \
+		/go-alpine-patches \
+# https://github.com/golang/go/blob/0b30cf534a03618162d3015c8705dd2231e34703/src/cmd/dist/buildtool.go#L121-L125
+		/usr/local/go/pkg/bootstrap \
+# https://golang.org/cl/82095
+# https://github.com/golang/build/blob/e3fe1605c30f6a3fd136b561569933312ede8782/cmd/release/releaselet.go#L56
+		/usr/local/go/pkg/obj \
+	; \
 	apk del .build-deps; \
 	\
 	export PATH="/usr/local/go/bin:$PATH"; \
