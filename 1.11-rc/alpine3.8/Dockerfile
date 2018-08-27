@@ -10,9 +10,6 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV GOLANG_VERSION 1.11rc2
 
-# make-sure-R0-is-zero-before-main-on-ppc64le.patch: https://github.com/golang/go/commit/9aea0e89b6df032c29d0add8d69ba2c95f1106d9 (Go 1.9)
-#COPY *.patch /go-alpine-patches/
-
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
 		bash \
@@ -45,14 +42,9 @@ RUN set -eux; \
 	rm go.tgz; \
 	\
 	cd /usr/local/go/src; \
-	for p in /go-alpine-patches/*.patch; do \
-		[ -f "$p" ] || continue; \
-		patch -p2 -i "$p"; \
-	done; \
 	./make.bash; \
 	\
 	rm -rf \
-		/go-alpine-patches \
 # https://github.com/golang/go/blob/0b30cf534a03618162d3015c8705dd2231e34703/src/cmd/dist/buildtool.go#L121-L125
 		/usr/local/go/pkg/bootstrap \
 # https://golang.org/cl/82095

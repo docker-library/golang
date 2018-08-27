@@ -101,25 +101,6 @@ for version in "${versions[@]}"; do
 				-e 's!%%ARCH-CASE%%!'"$(sed_escape_rhs "$linuxArchCase")"'!g' \
 				"Dockerfile-${template}.template" > "$version/$variant/Dockerfile"
 
-			case "$version" in
-				1.9)
-					# our "go-wrapper" script is officially deprecated in 1.10+
-					cp -a go-wrapper "$version/$variant/"
-					cat >> "$version/$variant/Dockerfile" <<-'EODF'
-
-						COPY go-wrapper /usr/local/bin/
-					EODF
-					;;
-			esac
-
-			(
-				shopt -s nullglob
-				variantPatches=( "$version/$variant/"*.patch )
-				if [ "${#variantPatches[@]}" -eq 0 ]; then
-					sed -ri 's/^COPY.*patch/#&/' "$version/$variant/Dockerfile"
-				fi
-			)
-
 			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
