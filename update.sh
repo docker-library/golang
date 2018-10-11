@@ -101,7 +101,7 @@ for version in "${versions[@]}"; do
 				-e 's!%%ARCH-CASE%%!'"$(sed_escape_rhs "$linuxArchCase")"'!g' \
 				"Dockerfile-${template}.template" > "$version/$variant/Dockerfile"
 
-			travisEnv='\n  - VERSION='"$version VARIANT=$variant$travisEnv"
+			travisEnv='\n    - os: linux\n      env: VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
 
@@ -117,7 +117,8 @@ for version in "${versions[@]}"; do
 				"Dockerfile-windows-${winVariant%%-*}.template" > "$version/windows/$winVariant/Dockerfile"
 
 			case "$winVariant" in
-				*-1709|*-1803) ;; # no AppVeyor support for 1709 or 1803 yet: https://github.com/appveyor/ci/issues/1885
+				*-1803) travisEnv='\n    - os: windows\n      dist: 1803-containers\n      env: VERSION='"$version VARIANT=windows/$winVariant$travisEnv" ;;
+				*-1709) ;; # no AppVeyor or Travis support for 1709: https://github.com/appveyor/ci/issues/1885
 				*) appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant$appveyorEnv" ;;
 			esac
 		fi
@@ -126,7 +127,7 @@ for version in "${versions[@]}"; do
 	echo "$version: $fullVersion ($srcSha256)"
 done
 
-travis="$(awk -v 'RS=\n\n' '$1 == "env:" { $0 = "env:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
+travis="$(awk -v 'RS=\n\n' '$1 == "matrix:" { $0 = "matrix:\n  include:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
 echo "$travis" > .travis.yml
 
 appveyor="$(awk -v 'RS=\n\n' '$1 == "environment:" { $0 = "environment:\n  matrix:'"$appveyorEnv"'" } { printf "%s%s", $0, RS }' .appveyor.yml)"
