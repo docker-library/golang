@@ -14,14 +14,12 @@ install:
 
 before_script:
   - env | sort
-  - cd "$VERSION"
+  - cd "$VERSION${VARIANT:+/$VARIANT}"
   - image="golang:$VERSION${VARIANT:+-$VARIANT}"
 
 script:
-  - travis_retry docker build -t "$image" "${VARIANT:-.}"
+  - docker build -t "$image" .
   - ~/official-images/test/run.sh "$image"
-# the "onbuild" variant has to happen with the base variant because it's FROM it
-  - if [ -z "$VARIANT" ] && [ -d onbuild ]; then travis_retry docker build -t "${image}-onbuild" onbuild; fi
 
 after_script:
   - docker images
