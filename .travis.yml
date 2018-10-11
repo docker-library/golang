@@ -1,13 +1,26 @@
 language: bash
 services: docker
 
-env:
-  - VERSION=1.11 VARIANT=stretch
-  - VERSION=1.11 VARIANT=alpine3.8
-  - VERSION=1.11 VARIANT=alpine3.7
-  - VERSION=1.10 VARIANT=stretch
-  - VERSION=1.10 VARIANT=alpine3.8
-  - VERSION=1.10 VARIANT=alpine3.7
+matrix:
+  include:
+    - os: windows
+      dist: 1803-containers
+      env: VERSION=1.11 VARIANT=windows/windowsservercore-1803
+    - os: linux
+      env: VERSION=1.11 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.11 VARIANT=alpine3.8
+    - os: linux
+      env: VERSION=1.11 VARIANT=alpine3.7
+    - os: windows
+      dist: 1803-containers
+      env: VERSION=1.10 VARIANT=windows/windowsservercore-1803
+    - os: linux
+      env: VERSION=1.10 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.10 VARIANT=alpine3.8
+    - os: linux
+      env: VERSION=1.10 VARIANT=alpine3.7
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
@@ -15,11 +28,22 @@ install:
 before_script:
   - env | sort
   - cd "$VERSION${VARIANT:+/$VARIANT}"
-  - image="golang:$VERSION${VARIANT:+-$VARIANT}"
+  - slash='/'; image="golang:$VERSION${VARIANT:+-${VARIANT//$slash/-}}"
 
 script:
-  - docker build -t "$image" .
-  - ~/official-images/test/run.sh "$image"
+  - |
+    (
+      set -Eeuo pipefail
+      set -x
+      docker build -t "$image" .
+      if [ "$TRAVIS_OS_NAME" = 'windows' ]; then
+        # TODO make the tests run successfully on Windows too!
+        docker run --rm "$image" go version
+        docker run --rm "$image" git --version
+      else
+        ~/official-images/test/run.sh "$image"
+      fi
+    )
 
 after_script:
   - docker images
