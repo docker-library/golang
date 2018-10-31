@@ -12,7 +12,7 @@ Check [the "library/golang" manifest file in the docker-library/official-images 
 
 For more information about the official images process, see the [docker-library/official-images readme](https://github.com/docker-library/official-images/blob/master/README.md).
 
----
+---   . 
 
 -	[Travis CI:  
 	![build status badge](https://img.shields.io/travis/docker-library/golang/master.svg)](https://travis-ci.org/docker-library/golang/branches)
