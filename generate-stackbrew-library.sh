@@ -73,8 +73,8 @@ for version in "${versions[@]}"; do
 
 	for v in \
 		stretch alpine3.{8,7} \
-		windows/windowsservercore-{ltsc2016,1709,1803} \
-		windows/nanoserver-{sac2016,1709,1803} \
+		windows/windowsservercore-{ltsc2016,1709,1803,1809} \
+		windows/nanoserver-{sac2016,1709,1803,1809} \
 	; do
 		dir="$version/$v"
 
