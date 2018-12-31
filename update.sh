@@ -106,8 +106,8 @@ for version in "${versions[@]}"; do
 	done
 
 	for winVariant in \
-		nanoserver-{sac2016,1709,1803} \
-		windowsservercore-{ltsc2016,1709,1803} \
+		nanoserver-{sac2016,1709,1803,1809} \
+		windowsservercore-{ltsc2016,1709,1803,1809} \
 	; do
 		if [ -d "$version/windows/$winVariant" ]; then
 			sed -r \
@@ -118,7 +118,7 @@ for version in "${versions[@]}"; do
 
 			case "$winVariant" in
 				*-1803) travisEnv='\n    - os: windows\n      dist: 1803-containers\n      env: VERSION='"$version VARIANT=windows/$winVariant$travisEnv" ;;
-				*-1709) ;; # no AppVeyor or Travis support for 1709: https://github.com/appveyor/ci/issues/1885
+				*-1709|*-1809) ;; # no AppVeyor or Travis support for 1709 or 1809: https://github.com/appveyor/ci/issues/1885 and https://github.com/appveyor/ci/issues/2676
 				*) appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant$appveyorEnv" ;;
 			esac
 		fi
