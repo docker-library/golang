@@ -9,20 +9,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		pkg-config \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.12beta1
+ENV GOLANG_VERSION 1.12beta2
 
 RUN set -eux; \
 	\
 # this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		amd64) goRelArch='linux-amd64'; goRelSha256='65bfd4a99925f1f85d712f4c1109977aa24ee4c6e198162bf8e819fdde19e875' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='e0ba7091227b42e98a9ed83f52e3821f7b3b836a16a5815ccf237bcaa590083a' ;; \
-		arm64) goRelArch='linux-arm64'; goRelSha256='df79a288b2c569bd26e43ea3acc245b7eabae897b4783f7b4acffdd97ba0a01c' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='5c93266b9b9f6e4ac452517b073a54d2dbb4cbbae901bc7e2b5d34415adf658b' ;; \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='8ae18d580913cc4cb67cdac36c058aad279419640f469931e44d6b7f0bbd9062' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='c575e5835a0ed3b19040497e24f7de6913eb73a42983e828f5dc2af4c9fcecf7' ;; \
-		*) goRelArch='src'; goRelSha256='639585de6bfb67865a85cd750d41ecc39968039dafb9d1fdb15361eb118d150a'; \
+		amd64) goRelArch='linux-amd64'; goRelSha256='9e4884b46a72e0558187a8af6e8733e039432df1b755f14b361f18b63fa5a63e' ;; \
+		armhf) goRelArch='linux-armv6l'; goRelSha256='d41674dda2e33a539929a980c7ba8d68c90c8aabcb138b65a2dc36704af02ace' ;; \
+		arm64) goRelArch='linux-arm64'; goRelSha256='77d80484e455ad65aa0778aa82391c02ded01a37ee65f7887167dc03a6ef3251' ;; \
+		i386) goRelArch='linux-386'; goRelSha256='ffe0d1c92473b2fd653e399c1ddb11535b9666f22b6ae5653bd1fb4f84534c46' ;; \
+		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='a1701e3c216c970a833248d6e5df5f2c27c6103e8e3bde34c5c3c25e839e87f9' ;; \
+		s390x) goRelArch='linux-s390x'; goRelSha256='bb4ea794a8fa459ad596c03b08fba9de647c62369c74f5daf21a6bae8c855b11' ;; \
+		*) goRelArch='src'; goRelSha256='fd3f4e1860ac59d647c22a2c1589fcf4a96c02bbbfef1ca1ea44bc25cf62a490'; \
 			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
 	esac; \
 	\
