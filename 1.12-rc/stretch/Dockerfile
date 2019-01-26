@@ -41,11 +41,15 @@ RUN set -eux; \
 	fi; \
 	\
 	export PATH="/usr/local/go/bin:$PATH"; \
-	go version
+	go version; \
+	\
+	if [ ! -z "$(go env GOCACHE)" ]; then \
+		mkdir -p "$(go env GOCACHE)"; \
+		chmod -R 777 "$(go env GOCACHE)"; \
+	fi;
 
-ENV GOCACHE /.cache
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
-RUN mkdir -p "$GOCACHE" "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH" "$GOCACHE"
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
 WORKDIR $GOPATH
