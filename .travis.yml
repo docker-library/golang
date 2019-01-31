@@ -9,12 +9,16 @@ matrix:
     - os: linux
       env: VERSION=1.12-rc VARIANT=stretch
     - os: linux
+      env: VERSION=1.12-rc VARIANT=alpine3.9
+    - os: linux
       env: VERSION=1.12-rc VARIANT=alpine3.8
     - os: windows
       dist: 1803-containers
       env: VERSION=1.11 VARIANT=windows/windowsservercore-1803
     - os: linux
       env: VERSION=1.11 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.11 VARIANT=alpine3.9
     - os: linux
       env: VERSION=1.11 VARIANT=alpine3.8
     - os: linux
@@ -24,6 +28,8 @@ matrix:
       env: VERSION=1.10 VARIANT=windows/windowsservercore-1803
     - os: linux
       env: VERSION=1.10 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.10 VARIANT=alpine3.9
     - os: linux
       env: VERSION=1.10 VARIANT=alpine3.8
     - os: linux
