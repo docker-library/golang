@@ -21,8 +21,6 @@ matrix:
       env: VERSION=1.11 VARIANT=alpine3.9
     - os: linux
       env: VERSION=1.11 VARIANT=alpine3.8
-    - os: linux
-      env: VERSION=1.11 VARIANT=alpine3.7
     - os: windows
       dist: 1803-containers
       env: VERSION=1.10 VARIANT=windows/windowsservercore-1803
@@ -32,8 +30,6 @@ matrix:
       env: VERSION=1.10 VARIANT=alpine3.9
     - os: linux
       env: VERSION=1.10 VARIANT=alpine3.8
-    - os: linux
-      env: VERSION=1.10 VARIANT=alpine3.7
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
