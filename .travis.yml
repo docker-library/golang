@@ -5,24 +5,6 @@ matrix:
   include:
     - os: windows
       dist: 1803-containers
-      env: VERSION=1.11 VARIANT=windows/windowsservercore-1803
-    - os: linux
-      env: VERSION=1.11 VARIANT=stretch
-    - os: linux
-      env: VERSION=1.11 VARIANT=alpine3.9
-    - os: linux
-      env: VERSION=1.11 VARIANT=alpine3.8
-    - os: windows
-      dist: 1803-containers
-      env: VERSION=1.10 VARIANT=windows/windowsservercore-1803
-    - os: linux
-      env: VERSION=1.10 VARIANT=stretch
-    - os: linux
-      env: VERSION=1.10 VARIANT=alpine3.9
-    - os: linux
-      env: VERSION=1.10 VARIANT=alpine3.8
-    - os: windows
-      dist: 1803-containers
       env: VERSION=1.12 VARIANT=windows/windowsservercore-1803
     - os: linux
       env: VERSION=1.12 VARIANT=stretch
@@ -30,6 +12,15 @@ matrix:
       env: VERSION=1.12 VARIANT=alpine3.9
     - os: linux
       env: VERSION=1.12 VARIANT=alpine3.8
+    - os: windows
+      dist: 1803-containers
+      env: VERSION=1.11 VARIANT=windows/windowsservercore-1803
+    - os: linux
+      env: VERSION=1.11 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.11 VARIANT=alpine3.9
+    - os: linux
+      env: VERSION=1.11 VARIANT=alpine3.8
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
