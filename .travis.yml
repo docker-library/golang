@@ -10,8 +10,6 @@ matrix:
       env: VERSION=1.12 VARIANT=stretch
     - os: linux
       env: VERSION=1.12 VARIANT=alpine3.9
-    - os: linux
-      env: VERSION=1.12 VARIANT=alpine3.8
     - os: windows
       dist: 1803-containers
       env: VERSION=1.11 VARIANT=windows/windowsservercore-1803
