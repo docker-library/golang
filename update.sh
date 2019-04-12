@@ -106,7 +106,7 @@ for version in "${versions[@]}"; do
 	done
 
 	for winVariant in \
-		nanoserver-{sac2016,1803,1809} \
+		nanoserver-{1803,1809} \
 		windowsservercore-{ltsc2016,1803,1809} \
 	; do
 		if [ -d "$version/windows/$winVariant" ]; then
