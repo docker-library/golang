@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/nanoserver:1809
+FROM mcr.microsoft.com/powershell:nanoserver-1809
 
 # $ProgressPreference: https://github.com/PowerShell/PowerShell/issues/2138#issuecomment-251261324
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
@@ -16,13 +16,13 @@ RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
     setx /M PATH $newPath;
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.11.9
+ENV GOLANG_VERSION 1.11.10
 
 RUN $url = ('https://golang.org/dl/go{0}.windows-amd64.zip' -f $env:GOLANG_VERSION); \
     Write-Host ('Downloading {0} ...' -f $url); \
     Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
     \
-    $sha256 = 'f3f3e3c428131d5be65d79cf8663b3a81b6675e5cf9780c3b0769cfca6824922'; \
+    $sha256 = 'e0354b5cef18dbf5867fff022ed4264c441df504f3cb86c90d8b987eca336f78'; \
     Write-Host ('Verifying sha256 ({0}) ...' -f $sha256); \
     if ((Get-FileHash go.zip -Algorithm sha256).Hash -ne $sha256) { \
     Write-Host 'FAILED!'; \
