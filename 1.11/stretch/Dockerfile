@@ -9,20 +9,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		pkg-config \
 	&& rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.11.10
+ENV GOLANG_VERSION 1.11.11
 
 RUN set -eux; \
 	\
 # this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		amd64) goRelArch='linux-amd64'; goRelSha256='aefaa228b68641e266d1f23f1d95dba33f17552ba132878b65bb798ffa37e6d0' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='29812e3443c469de6b976e4e44b5e6402d55f6358a544278addc22446a0abe8b' ;; \
-		arm64) goRelArch='linux-arm64'; goRelSha256='6743c54f0e33873c113cbd66df7749e81785f378567734831c2e5d3b6b6aa2b8' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='619ddab5b56597d72681467810c63238063ab0d221fe0df9b2e85608c10161e5' ;; \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='a6c7129e92fe325645229846257e563dab1d970bb0e61820d63524df2b54fcf8' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='35f196abd74db6f049018829ea6230fde6b8c2e24d2da9f9e75ce0e6d0292b49' ;; \
-		*) goRelArch='src'; goRelSha256='df27e96a9d1d362c46ecd975f1faa56b8c300f5c529074e9ea79bdd885493c1b'; \
+		amd64) goRelArch='linux-amd64'; goRelSha256='2fd47b824d6e32154b0f6c8742d066d816667715763e06cebb710304b195c775' ;; \
+		armhf) goRelArch='linux-armv6l'; goRelSha256='c2b882a5fbb3bac5c9cc6d65bfe17a5febfe0251a339fc059306bb825dec9b17' ;; \
+		arm64) goRelArch='linux-arm64'; goRelSha256='5ee39ea08e5d8c017658f36d0f969b17a44d49576214f4a00710f2d98bb773be' ;; \
+		i386) goRelArch='linux-386'; goRelSha256='c711fe5025608e14bcd0efda9403e9b8f05cb4a53a125e296d639c10d280a65f' ;; \
+		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='98ff7ff2367239e26745231aabeaf9d7e51c40b616bb9aa15d4376792ff581d1' ;; \
+		s390x) goRelArch='linux-s390x'; goRelSha256='d7471874ed396f72dd550c3593c9f42d5e3d38a2cca7658e669305bf9023e6c8' ;; \
+		*) goRelArch='src'; goRelSha256='1fff7c33ef2522e6dfaf6ab96ec4c2a8b76d018aae6fc88ce2bd40f2202d0f8c'; \
 			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
 	esac; \
 	\
