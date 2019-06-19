@@ -84,7 +84,7 @@ for version in "${versions[@]}"; do
 	windowsSha256="$(curl -fsSL "https://storage.googleapis.com/golang/go${fullVersion}.windows-amd64.zip.sha256")"
 
 	for variant in \
-		alpine{3.8,3.9} \
+		alpine{3.9,3.10} \
 		stretch \
 	; do
 		if [ -d "$version/$variant" ]; then
