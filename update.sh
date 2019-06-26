@@ -85,7 +85,7 @@ for version in "${versions[@]}"; do
 
 	for variant in \
 		alpine{3.9,3.10} \
-		stretch \
+		stretch buster \
 	; do
 		if [ -d "$version/$variant" ]; then
 			tag="$variant"
