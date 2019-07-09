@@ -107,7 +107,7 @@ for version in "${versions[@]}"; do
 
 	for winVariant in \
 		nanoserver-{1803,1809} \
-		windowsservercore-{ltsc2016,1803,1809} \
+		windowsservercore-{ltsc2016,1803,1809,1903} \
 	; do
 		if [ -d "$version/windows/$winVariant" ]; then
 			sed -r \
