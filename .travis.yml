@@ -51,6 +51,15 @@ script:
         # TODO make the tests run successfully on Windows too!
         docker run --rm "$image" go version
         docker run --rm "$image" git --version
+        # if we've got nanoserver, let's build test that too
+        nanoserverDir="../nanoserver-${VARIANT#windows/windowsservercore-}"
+        if [ -f "$nanoserverDir/Dockerfile" ]; then
+          nanoserverImage="${image//windowsservercore/nanoserver}"
+          nanoserverFromWindows="$(awk -F '[ =]' '$1 == "COPY" && $2 == "--from" { print $3; exit }' "$nanoserverDir/Dockerfile")" # match "COPY --from=..." value
+          docker tag "$image" "$nanoserverFromWindows"
+          docker build -t "$nanoserverImage" "$nanoserverDir"
+          docker run --rm "$nanoserverImage" go version
+        fi
       else
         ~/official-images/test/run.sh "$image"
       fi
