@@ -116,6 +116,15 @@ for version in "${versions[@]}"; do
 			sharedTags+=( "${baseAliases[@]}" )
 		fi
 
+		constraints=
+		if [ "$variant" != "$v" ]; then
+			constraints="$variant"
+			if [[ "$variant" == nanoserver-* ]]; then
+				# nanoserver variants "COPY --from=...:...-windowsservercore-... ..."
+				constraints+=", windowsservercore-${variant#nanoserver-}"
+			fi
+		fi
+
 		echo
 		echo "Tags: $(join ', ' "${variantAliases[@]}")"
 		if [ "${#sharedTags[@]}" -gt 0 ]; then
@@ -126,6 +135,6 @@ for version in "${versions[@]}"; do
 			GitCommit: $commit
 			Directory: $dir
 		EOE
-		[ "$variant" = "$v" ] || echo "Constraints: $variant"
+		[ -z "$constraints" ] || echo "Constraints: $constraints"
 	done
 done
