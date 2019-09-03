@@ -5,11 +5,11 @@ matrix:
   include:
     - os: windows
       dist: 1803-containers
-      env: VERSION=1.13-rc VARIANT=windows/windowsservercore-1803
+      env: VERSION=1.13 VARIANT=windows/windowsservercore-1803
     - os: linux
-      env: VERSION=1.13-rc VARIANT=buster
+      env: VERSION=1.13 VARIANT=buster
     - os: linux
-      env: VERSION=1.13-rc VARIANT=alpine3.10
+      env: VERSION=1.13 VARIANT=alpine3.10
     - os: windows
       dist: 1803-containers
       env: VERSION=1.12 VARIANT=windows/windowsservercore-1803
