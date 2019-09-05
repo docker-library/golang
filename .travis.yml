@@ -9,6 +9,8 @@ matrix:
     - os: linux
       env: VERSION=1.13 VARIANT=buster
     - os: linux
+      env: VERSION=1.13 VARIANT=stretch
+    - os: linux
       env: VERSION=1.13 VARIANT=alpine3.10
     - os: windows
       dist: 1803-containers
