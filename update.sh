@@ -84,12 +84,14 @@ for version in "${versions[@]}"; do
 	for variant in \
 		alpine{3.10,3.11} \
 		stretch buster \
+		bionic \
 	; do
 		if [ -d "$version/$variant" ]; then
 			tag="$variant"
 			template='debian'
 			case "$variant" in
 				alpine*) tag="${variant#alpine}"; template='alpine' ;;
+				bionic) template='ubuntu' ;;
 			esac
 
 			sed -r \

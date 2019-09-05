@@ -1,0 +1,60 @@
+def versions = ["1.12", "1.13", "1.14"]
+
+def generateBuildStage(job) {
+    return {
+        stage("Build golang:${job}") {
+            sh "docker build -t vaporio/golang:${job} ${job}/bionic"
+        }
+    }
+}
+
+def generatePublishStage(job) {
+    return {
+        stage("Publish golang:${job}") {
+            withDockerRegistry(registry: [credentialsId: 'vio-docker-hub']) {
+                sh "docker push vaporio/golang:${job}"
+            }
+        }
+    }
+}
+
+def buildStagesMap = versions.collectEntries {
+    ["${it}" : generateBuildStage(it)]
+}
+
+def publishStagesMap = versions.collectEntries {
+    ["${it}" : generatePublishStage(it)]
+}
+
+pipeline {
+
+    agent any
+
+    triggers {
+        upstream(upstreamProjects: 'vapor-ware/buildpack-deps/master', threshold: hudson.model.Result.SUCCESS)
+    }
+
+    stages {
+        stage('Update') {
+            steps {
+                sh './update.sh'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                script {
+                    parallel buildStagesMap
+                }
+            }
+        }
+
+        stage('Publish') {
+            steps {
+                script {
+                    parallel publishStagesMap
+                }
+            }
+        }
+    }
+}
