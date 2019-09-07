@@ -32,8 +32,8 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	$env:PATH = 'C:\git\cmd;C:\git\mingw64\bin;C:\git\usr\bin;' + $env:PATH; \
 	[Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); \
 	\
-	Write-Host 'Verifying install ...'; \
-	Write-Host '  git --version'; git --version; \
+	Write-Host 'Verifying install ("git version") ...'; \
+	git version; \
 	\
 	Write-Host 'Complete.';
 
@@ -62,11 +62,11 @@ RUN $url = ('https://golang.org/dl/go{0}.windows-amd64.zip' -f $env:GOLANG_VERSI
 	Write-Host 'Expanding ...'; \
 	Expand-Archive go.zip -DestinationPath C:\; \
 	\
-	Write-Host 'Verifying install ("go version") ...'; \
-	go version; \
-	\
 	Write-Host 'Removing ...'; \
 	Remove-Item go.zip -Force; \
+	\
+	Write-Host 'Verifying install ("go version") ...'; \
+	go version; \
 	\
 	Write-Host 'Complete.';
 
