@@ -11,6 +11,8 @@ matrix:
     - os: linux
       env: VERSION=1.13 VARIANT=stretch
     - os: linux
+      env: VERSION=1.13 VARIANT=jessie
+    - os: linux
       env: VERSION=1.13 VARIANT=alpine3.10
     - os: windows
       dist: 1803-containers
@@ -19,6 +21,8 @@ matrix:
       env: VERSION=1.12 VARIANT=buster
     - os: linux
       env: VERSION=1.12 VARIANT=stretch
+    - os: linux
+      env: VERSION=1.12 VARIANT=jessie
     - os: linux
       env: VERSION=1.12 VARIANT=alpine3.10
     - os: linux
