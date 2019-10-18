@@ -1,0 +1,9 @@
+# see https://golang.org/dl/
+
+# bashbrew-arch dpkg-arch golang-release-arch
+amd64   amd64   amd64
+arm32v7 armhf   armv6l
+arm64v8 arm64   arm64
+i386    i386    386
+ppc64le ppc64el ppc64le
+s390x   s390x   s390x
