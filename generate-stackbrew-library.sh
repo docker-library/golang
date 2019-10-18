@@ -93,7 +93,11 @@ for version in "${versions[@]}"; do
 
 		[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
 
-		baseAliases=( $fullVersion "${versionAliases[@]}" )
+		if [ "$version" = "$fullVersion" ]; then
+			baseAliases=( "${versionAliases[@]}" )
+		else
+			baseAliases=( $fullVersion "${versionAliases[@]}" )
+		fi
 		variantAliases=( "${baseAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
