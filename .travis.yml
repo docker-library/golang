@@ -5,15 +5,6 @@ matrix:
   include:
     - os: windows
       dist: 1803-containers
-      env: VERSION=1.13.2 VARIANT=windows/windowsservercore-1803
-    - os: linux
-      env: VERSION=1.13.2 VARIANT=buster
-    - os: linux
-      env: VERSION=1.13.2 VARIANT=stretch
-    - os: linux
-      env: VERSION=1.13.2 VARIANT=alpine3.10
-    - os: windows
-      dist: 1803-containers
       env: VERSION=1.13 VARIANT=windows/windowsservercore-1803
     - os: linux
       env: VERSION=1.13 VARIANT=buster
@@ -21,17 +12,6 @@ matrix:
       env: VERSION=1.13 VARIANT=stretch
     - os: linux
       env: VERSION=1.13 VARIANT=alpine3.10
-    - os: windows
-      dist: 1803-containers
-      env: VERSION=1.12.11 VARIANT=windows/windowsservercore-1803
-    - os: linux
-      env: VERSION=1.12.11 VARIANT=buster
-    - os: linux
-      env: VERSION=1.12.11 VARIANT=stretch
-    - os: linux
-      env: VERSION=1.12.11 VARIANT=alpine3.10
-    - os: linux
-      env: VERSION=1.12.11 VARIANT=alpine3.9
     - os: windows
       dist: 1803-containers
       env: VERSION=1.12 VARIANT=windows/windowsservercore-1803
