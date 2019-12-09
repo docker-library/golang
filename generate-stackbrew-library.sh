@@ -78,8 +78,8 @@ for version in "${versions[@]}"; do
 
 	for v in \
 		buster stretch alpine{3.10,3.9} \
-		windows/windowsservercore-{ltsc2016,1803,1809} \
-		windows/nanoserver-{1803,1809} \
+		windows/windowsservercore-{ltsc2016,1809} \
+		windows/nanoserver-1809 \
 	; do
 		dir="$version/$v"
 
