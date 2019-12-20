@@ -33,6 +33,7 @@ RUN set -eux; \
 	apkArch="$(apk --print-arch)"; \
 	case "$apkArch" in \
 		armhf) export GOARM='6' ;; \
+		armv7) export GOARM='7' ;; \
 		x86) export GO386='387' ;; \
 	esac; \
 	\
