@@ -10,7 +10,7 @@ defaultDebianSuite='buster'
 declare -A debianSuite=(
 	#[1.13-rc]='buster'
 )
-defaultAlpineVersion='3.10'
+defaultAlpineVersion='3.11'
 declare -A alpineVersion=(
 	#[1.9]='3.7'
 )
@@ -77,7 +77,7 @@ for version in "${versions[@]}"; do
 	)
 
 	for v in \
-		buster stretch alpine{3.10,3.9} \
+		buster stretch alpine{3.11,3.10} \
 		windows/windowsservercore-{ltsc2016,1809} \
 		windows/nanoserver-1809 \
 	; do
