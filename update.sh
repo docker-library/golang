@@ -118,8 +118,13 @@ for version in "${versions[@]}"; do
 
 			case "$winVariant" in
 				nanoserver-*) ;; # nanoserver images COPY --from=...:...-windowsservercore-...
-				*-1809) ;; # no AppVeyor or Travis support for 1809: https://github.com/appveyor/ci/issues/1885 and https://github.com/appveyor/ci/issues/2676
-				*) appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant$appveyorEnv" ;;
+				# https://www.appveyor.com/docs/windows-images-software/
+				*-1809)
+					appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant"'\n      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019'"$appveyorEnv"
+					;;
+				*-ltsc2016)
+					appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant"'\n      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017'"$appveyorEnv"
+					;;
 			esac
 		fi
 	done
