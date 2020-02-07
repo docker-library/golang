@@ -6,6 +6,8 @@ matrix:
     - os: linux
       env: VERSION=1.14-rc VARIANT=buster
     - os: linux
+      env: VERSION=1.14-rc VARIANT=stretch
+    - os: linux
       env: VERSION=1.14-rc VARIANT=alpine3.11
     - os: linux
       env: VERSION=1.13 VARIANT=buster
