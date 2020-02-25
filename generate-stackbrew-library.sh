@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[1.13]='1 latest'
-	[1.14-rc]='rc'
+	[1.14]='1 latest'
+	[1.15-rc]='rc'
 )
 
 defaultDebianSuite='buster'

@@ -4,11 +4,11 @@ services: docker
 matrix:
   include:
     - os: linux
-      env: VERSION=1.14-rc VARIANT=buster
+      env: VERSION=1.14 VARIANT=buster
     - os: linux
-      env: VERSION=1.14-rc VARIANT=stretch
+      env: VERSION=1.14 VARIANT=stretch
     - os: linux
-      env: VERSION=1.14-rc VARIANT=alpine3.11
+      env: VERSION=1.14 VARIANT=alpine3.11
     - os: linux
       env: VERSION=1.13 VARIANT=buster
     - os: linux
@@ -17,14 +17,6 @@ matrix:
       env: VERSION=1.13 VARIANT=alpine3.11
     - os: linux
       env: VERSION=1.13 VARIANT=alpine3.10
-    - os: linux
-      env: VERSION=1.12 VARIANT=buster
-    - os: linux
-      env: VERSION=1.12 VARIANT=stretch
-    - os: linux
-      env: VERSION=1.12 VARIANT=alpine3.11
-    - os: linux
-      env: VERSION=1.12 VARIANT=alpine3.10
 
 install:
   - git clone https://github.com/docker-library/official-images.git ~/official-images
