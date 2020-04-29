@@ -35,8 +35,6 @@ while [ "$pageToken" != 'null' ]; do
 	pageToken="$(echo "$page" | jq -r '.nextPageToken')"
 done
 
-travisEnv=
-appveyorEnv=
 for version in "${versions[@]}"; do
 	rcVersion="${version%-rc}"
 	rcGrepV='-v'
@@ -100,8 +98,6 @@ for version in "${versions[@]}"; do
 				-e 's!%%SRC-SHA256%%!'"$srcSha256"'!g' \
 				-e 's!%%ARCH-CASE%%!'"$(sed_escape_rhs "$linuxArchCase")"'!g' \
 				"Dockerfile-${template}.template" > "$version/$variant/Dockerfile"
-
-			travisEnv='\n    - os: linux\n      env: VERSION='"$version VARIANT=$variant$travisEnv"
 		fi
 	done
 
@@ -115,25 +111,8 @@ for version in "${versions[@]}"; do
 				-e 's!%%WIN-SHA256%%!'"$windowsSha256"'!g' \
 				-e 's!%%MICROSOFT-TAG%%!'"${winVariant#*-}"'!g' \
 				"Dockerfile-windows-${winVariant%%-*}.template" > "$version/windows/$winVariant/Dockerfile"
-
-			case "$winVariant" in
-				nanoserver-*) ;; # nanoserver images COPY --from=...:...-windowsservercore-...
-				# https://www.appveyor.com/docs/windows-images-software/
-				*-1809)
-					appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant"'\n      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019'"$appveyorEnv"
-					;;
-				*-ltsc2016)
-					appveyorEnv='\n    - version: '"$version"'\n      variant: '"$winVariant"'\n      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017'"$appveyorEnv"
-					;;
-			esac
 		fi
 	done
 
 	echo "$version: $fullVersion ($srcSha256)"
 done
-
-travis="$(awk -v 'RS=\n\n' '$1 == "matrix:" { $0 = "matrix:\n  include:'"$travisEnv"'" } { printf "%s%s", $0, RS }' .travis.yml)"
-echo "$travis" > .travis.yml
-
-appveyor="$(awk -v 'RS=\n\n' '$1 == "environment:" { $0 = "environment:\n  matrix:'"$appveyorEnv"'" } { printf "%s%s", $0, RS }' .appveyor.yml)"
-echo "$appveyor" > .appveyor.yml
