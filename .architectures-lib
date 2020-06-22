@@ -3,7 +3,7 @@
 _awkArch() {
 	local version="$1"; shift
 	local awkExpr="$1"; shift
-	awk "$@" "/^#|^\$/ { next } $awkExpr" "$version/release-architectures"
+	awk "$@" "/^#|^\$/ { next } $awkExpr" release-architectures
 }
 
 dpkgArches() {

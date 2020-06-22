@@ -107,9 +107,16 @@ for version in "${versions[@]}"; do
 		fi
 
 		case "$v" in
-			alpine*)   variantArches="$(parentArches "$version" "$v")" ;;
 			windows/*) variantArches='windows-amd64' ;;
-			*)         variantArches="$(variantArches "$version" "$v")" ;;
+
+			# stretch's "golang-go" package doesn't include GOARM for arm32v5 and "gccgo" in stretch can't build mips64le
+			stretch)
+				variantArches="$(variantArches "$version" "$v")"
+				;;
+
+			*)
+				variantArches="$(parentArches "$version" "$v")"
+				;;
 		esac
 
 		sharedTags=()
