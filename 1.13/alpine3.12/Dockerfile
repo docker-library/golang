@@ -8,7 +8,7 @@ RUN apk add --no-cache \
 # - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
 RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
-ENV GOLANG_VERSION 1.13.13
+ENV GOLANG_VERSION 1.13.14
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -38,7 +38,7 @@ RUN set -eux; \
 	esac; \
 	\
 	wget -O go.tgz "https://golang.org/dl/go$GOLANG_VERSION.src.tar.gz"; \
-	echo 'ab7e44461e734ce1fd5f4f82c74c6d236e947194d868514d48a2b1ea73d25137 *go.tgz' | sha256sum -c -; \
+	echo '197333e97290e9ea8796f738d61019dcba1c377c2f3961fd6a114918ecc7ab06 *go.tgz' | sha256sum -c -; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
