@@ -1,4 +1,4 @@
-FROM buildpack-deps:stretch-scm
+FROM buildpack-deps:buster-scm
 
 # gcc for cgo
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -11,20 +11,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.13.15
+ENV GOLANG_VERSION 1.15
 
 RUN set -eux; \
 	\
 # this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		amd64) goRelArch='linux-amd64'; goRelSha256='01cc3ddf6273900eba3e2bf311238828b7168b822bb57a9ccab4d7aa2acd6028' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='c58eacae1745769e77328aec08e0e3b4da1b4e99e1153046b1b00ae0b3338d42' ;; \
-		arm64) goRelArch='linux-arm64'; goRelSha256='a5c59e3f0aeaf6e939790152a8bfabb91d70c9787afb7aee06aef9bd4411c551' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='1a63e97b6f1a673966d6a4f4f7f9c724fdd68bdeac11425bf8a39c7a24ddc0a7' ;; \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='bee55510a87bd366381df0be4736fd5cc89523228f9ca20eb1687f59e80ca029' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='6c370800d470ae116a9521f5439b3fa6271f06a6d4c2a18913c8c6226d78fe4b' ;; \
-		*) goRelArch='src'; goRelSha256='5fb43171046cf8784325e67913d55f88a683435071eef8e9da1aa8a1588fcf5d'; \
+		amd64) goRelArch='linux-amd64'; goRelSha256='2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602' ;; \
+		armhf) goRelArch='linux-armv6l'; goRelSha256='6d8914ddd25f85f2377c269ccfb359acf53adf71a42cdbf53434a7c76fa7a9bd' ;; \
+		arm64) goRelArch='linux-arm64'; goRelSha256='7e18d92f61ddf480a4f9a57db09389ae7b9dadf68470d0cb9c00d734a0c57f8d' ;; \
+		i386) goRelArch='linux-386'; goRelSha256='68ce979083126694ceef60233f69efe870f54af24d81a120f76265107a9e9aab' ;; \
+		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='4603736a158b3d8ac52b9245f39bf715936c801e05bb5ad7c44b1edd6d5ef6a2' ;; \
+		s390x) goRelArch='linux-s390x'; goRelSha256='8825f93caaf87465e32f298408c48b98d4180f3ddb885bd027f2926e711d23e8' ;; \
+		*) goRelArch='src'; goRelSha256='69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a'; \
 			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
 	esac; \
 	\
