@@ -18,13 +18,13 @@ declare -A alpineVersion=(
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
-source '.architectures-lib'
-
-versions=( */ )
-versions=( "${versions[@]%/}" )
+if [ "$#" -eq 0 ]; then
+	versions="$(jq -r 'keys | map(@sh) | join(" ")' versions.json)"
+	eval "set -- $versions"
+fi
 
 # sort version numbers with highest first
-IFS=$'\n'; versions=( $(echo "${versions[*]}" | sort -rV) ); unset IFS
+IFS=$'\n'; set -- $(sort -rV <<<"$*"); unset IFS
 
 # get the most recent commit which modified any of "$@"
 fileCommit() {
@@ -52,6 +52,22 @@ dirCommit() {
 	)
 }
 
+getArches() {
+	local repo="$1"; shift
+	local officialImagesUrl='https://github.com/docker-library/official-images/raw/master/library/'
+
+	eval "declare -g -A parentRepoToArches=( $(
+		find -name 'Dockerfile' -exec awk '
+				toupper($1) == "FROM" && $2 !~ /^('"$repo"'|scratch|.*\/.*)(:|$)/ {
+					print "'"$officialImagesUrl"'" $2
+				}
+			' '{}' + \
+			| sort -u \
+			| xargs bashbrew cat --format '[{{ .RepoName }}:{{ .TagName }}]="{{ join " " .TagEntry.Architectures }}"'
+	) )"
+}
+getArches 'golang'
+
 cat <<-EOH
 # this file is generated via https://github.com/docker-library/golang/blob/$(fileCommit "$self")/$self
 
@@ -68,28 +84,24 @@ join() {
 	echo "${out#$sep}"
 }
 
-for version in "${versions[@]}"; do
-	rcVersion="${version%-rc}"
+for version; do
+	export version
+	variants="$(jq -r '.[env.version].variants | map(@sh) | join(" ")' versions.json)"
+	eval "variants=( $variants )"
 
 	versionAliases=(
 		$version
 		${aliases[$version]:-}
 	)
 
-	for v in \
-		buster stretch alpine{3.12,3.11} \
-		windows/windowsservercore-{ltsc2016,1809} \
-		windows/nanoserver-1809 \
-	; do
+	for v in "${variants[@]}"; do
 		dir="$version/$v"
-
 		[ -f "$dir/Dockerfile" ] || continue
 
 		variant="$(basename "$v")"
 		versionSuite="${debianSuite[$version]:-$defaultDebianSuite}"
 
-		commit="$(dirCommit "$dir")"
-		fullVersion="$(git show "$commit":"$dir/Dockerfile" | awk '$1 == "ENV" && $2 == "GOLANG_VERSION" { print $3; exit }')"
+		fullVersion="$(jq -r '.[env.version].version' versions.json)"
 
 		[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
 
@@ -107,15 +119,20 @@ for version in "${versions[@]}"; do
 		fi
 
 		case "$v" in
-			windows/*) variantArches='windows-amd64' ;;
-
-			# stretch's "golang-go" package doesn't include GOARM for arm32v5 and "gccgo" in stretch can't build mips64le
-			stretch)
-				variantArches="$(variantArches "$version" "$v")"
+			windows/*)
+				variantArches='windows-amd64'
 				;;
 
 			*)
-				variantArches="$(parentArches "$version" "$v")"
+				variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+				variantArches="${parentRepoToArches[$variantParent]}"
+
+				if [ "$variant" = 'stretch' ]; then
+					# stretch's "golang-go" package doesn't include GOARM for arm32v5
+					variantArches="$(sed <<<" $variantArches " -e 's/ arm32v5 / /g')"
+					# ... and "gccgo" in stretch can't build mips64le
+					variantArches="$(sed <<<" $variantArches " -e 's/ mips64le / /g')"
+				fi
 				;;
 		esac
 
@@ -139,6 +156,8 @@ for version in "${versions[@]}"; do
 				constraints+=", windowsservercore-${variant#nanoserver-}"
 			fi
 		fi
+
+		commit="$(dirCommit "$dir")"
 
 		echo
 		echo "Tags: $(join ', ' "${variantAliases[@]}")"
