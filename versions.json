@@ -1,0 +1,108 @@
+{
+  "1.14": {
+    "arches": {
+      "amd64": {
+        "arch": "linux-amd64",
+        "sha256": "4a7fa60f323ee1416a4b1425aefc37ea359e9d64df19c326a58953a97ad41ea5",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-amd64.tar.gz"
+      },
+      "arm32v7": {
+        "arch": "linux-armv6l",
+        "sha256": "6079eb82bcf24b33dda0e32777c7fdddcc3b1ec70e374308cc8311562449b107",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-armv6l.tar.gz"
+      },
+      "arm64v8": {
+        "arch": "linux-arm64",
+        "sha256": "fe5b6f6e441f3cb7b53ebf1a010bbebcb720ac98124984cfe2e51d72b8a58c71",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-arm64.tar.gz"
+      },
+      "i386": {
+        "arch": "linux-386",
+        "sha256": "2f5793f10bb6b08eedecd376aa3d594e10193c6b5cf198ada46200259ff76547",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-386.tar.gz"
+      },
+      "ppc64le": {
+        "arch": "linux-ppc64le",
+        "sha256": "bd1f12a2271a6d1689bcf3ec01d123c81cbaca5d16c3f7df294a2d725ac4d3d1",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-ppc64le.tar.gz"
+      },
+      "s390x": {
+        "arch": "linux-s390x",
+        "sha256": "ea570b3caa0c271da440f568ab646cfea80d712c51fb4d08189bb66bd5eb949c",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.linux-s390x.tar.gz"
+      },
+      "src": {
+        "arch": "src",
+        "sha256": "064392433563660c73186991c0a315787688e7c38a561e26647686f89b6c30e3",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.src.tar.gz"
+      },
+      "windows-amd64": {
+        "arch": "windows-amd64",
+        "sha256": "ddf35c01f444f5698dee7b265c172abe29dd7138bef4415e6b60bf322ddcffa5",
+        "url": "https://storage.googleapis.com/golang/go1.14.7.windows-amd64.zip"
+      }
+    },
+    "variants": [
+      "buster",
+      "stretch",
+      "alpine3.12",
+      "alpine3.11",
+      "windows/windowsservercore-1809",
+      "windows/windowsservercore-ltsc2016",
+      "windows/nanoserver-1809"
+    ],
+    "version": "1.14.7"
+  },
+  "1.15": {
+    "arches": {
+      "amd64": {
+        "arch": "linux-amd64",
+        "sha256": "2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-amd64.tar.gz"
+      },
+      "arm32v7": {
+        "arch": "linux-armv6l",
+        "sha256": "6d8914ddd25f85f2377c269ccfb359acf53adf71a42cdbf53434a7c76fa7a9bd",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-armv6l.tar.gz"
+      },
+      "arm64v8": {
+        "arch": "linux-arm64",
+        "sha256": "7e18d92f61ddf480a4f9a57db09389ae7b9dadf68470d0cb9c00d734a0c57f8d",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-arm64.tar.gz"
+      },
+      "i386": {
+        "arch": "linux-386",
+        "sha256": "68ce979083126694ceef60233f69efe870f54af24d81a120f76265107a9e9aab",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-386.tar.gz"
+      },
+      "ppc64le": {
+        "arch": "linux-ppc64le",
+        "sha256": "4603736a158b3d8ac52b9245f39bf715936c801e05bb5ad7c44b1edd6d5ef6a2",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-ppc64le.tar.gz"
+      },
+      "s390x": {
+        "arch": "linux-s390x",
+        "sha256": "8825f93caaf87465e32f298408c48b98d4180f3ddb885bd027f2926e711d23e8",
+        "url": "https://storage.googleapis.com/golang/go1.15.linux-s390x.tar.gz"
+      },
+      "src": {
+        "arch": "src",
+        "sha256": "69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a",
+        "url": "https://storage.googleapis.com/golang/go1.15.src.tar.gz"
+      },
+      "windows-amd64": {
+        "arch": "windows-amd64",
+        "sha256": "dc491314dff5b87ad50bf1cf56715de8f8c54489be30f3e19239bc2ad1af25e3",
+        "url": "https://storage.googleapis.com/golang/go1.15.windows-amd64.zip"
+      }
+    },
+    "variants": [
+      "buster",
+      "alpine3.12",
+      "windows/windowsservercore-1809",
+      "windows/windowsservercore-ltsc2016",
+      "windows/nanoserver-1809"
+    ],
+    "version": "1.15"
+  }
+}

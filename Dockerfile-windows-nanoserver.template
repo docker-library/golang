@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/nanoserver:%%MICROSOFT-TAG%%
+FROM mcr.microsoft.com/windows/{{ env.windowsVariant }}:{{ env.windowsRelease }}
 
 SHELL ["cmd", "/S", "/C"]
 
@@ -14,9 +14,9 @@ RUN setx /m PATH "%GOPATH%\bin;C:\go\bin;%PATH%"
 USER ContainerUser
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION %%VERSION%%
+ENV GOLANG_VERSION {{ .version }}
 
-COPY --from=golang:%%VERSION%%-windowsservercore-%%MICROSOFT-TAG%% C:\\go C:\\go
+COPY --from=golang:{{ .version }}-windowsservercore-{{ env.windowsRelease }} C:\\go C:\\go
 RUN go version
 
 WORKDIR $GOPATH

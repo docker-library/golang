@@ -1,3 +1,9 @@
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
 FROM buildpack-deps:buster-scm
 
 # gcc for cgo
@@ -15,27 +21,64 @@ ENV GOLANG_VERSION 1.15
 
 RUN set -eux; \
 	\
-# this "case" statement is generated via "update.sh"
 	dpkgArch="$(dpkg --print-architecture)"; \
 	case "${dpkgArch##*-}" in \
-		amd64) goRelArch='linux-amd64'; goRelSha256='2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602' ;; \
-		armhf) goRelArch='linux-armv6l'; goRelSha256='6d8914ddd25f85f2377c269ccfb359acf53adf71a42cdbf53434a7c76fa7a9bd' ;; \
-		arm64) goRelArch='linux-arm64'; goRelSha256='7e18d92f61ddf480a4f9a57db09389ae7b9dadf68470d0cb9c00d734a0c57f8d' ;; \
-		i386) goRelArch='linux-386'; goRelSha256='68ce979083126694ceef60233f69efe870f54af24d81a120f76265107a9e9aab' ;; \
-		ppc64el) goRelArch='linux-ppc64le'; goRelSha256='4603736a158b3d8ac52b9245f39bf715936c801e05bb5ad7c44b1edd6d5ef6a2' ;; \
-		s390x) goRelArch='linux-s390x'; goRelSha256='8825f93caaf87465e32f298408c48b98d4180f3ddb885bd027f2926e711d23e8' ;; \
-		*) goRelArch='src'; goRelSha256='69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a'; \
-			echo >&2; echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; echo >&2 ;; \
+		'amd64') \
+			arch='linux-amd64'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-amd64.tar.gz'; \
+			sha256='2d75848ac606061efe52a8068d0e647b35ce487a15bb52272c427df485193602'; \
+			;; \
+		'armhf') \
+			arch='linux-armv6l'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-armv6l.tar.gz'; \
+			sha256='6d8914ddd25f85f2377c269ccfb359acf53adf71a42cdbf53434a7c76fa7a9bd'; \
+			;; \
+		'arm64') \
+			arch='linux-arm64'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-arm64.tar.gz'; \
+			sha256='7e18d92f61ddf480a4f9a57db09389ae7b9dadf68470d0cb9c00d734a0c57f8d'; \
+			;; \
+		'i386') \
+			arch='linux-386'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-386.tar.gz'; \
+			sha256='68ce979083126694ceef60233f69efe870f54af24d81a120f76265107a9e9aab'; \
+			;; \
+		'ppc64el') \
+			arch='linux-ppc64le'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-ppc64le.tar.gz'; \
+			sha256='4603736a158b3d8ac52b9245f39bf715936c801e05bb5ad7c44b1edd6d5ef6a2'; \
+			;; \
+		's390x') \
+			arch='linux-s390x'; \
+			url='https://storage.googleapis.com/golang/go1.15.linux-s390x.tar.gz'; \
+			sha256='8825f93caaf87465e32f298408c48b98d4180f3ddb885bd027f2926e711d23e8'; \
+			;; \
+		*) \
+# https://github.com/golang/go/issues/38536#issuecomment-616897960
+			arch='src'; \
+			url='https://storage.googleapis.com/golang/go1.15.src.tar.gz'; \
+			sha256='69438f7ed4f532154ffaf878f3dfd83747e7a00b70b3556eddabf7aaee28ac3a'; \
+			echo >&2; \
+			echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
+			echo >&2; \
+			;; \
 	esac; \
 	\
-	url="https://golang.org/dl/go${GOLANG_VERSION}.${goRelArch}.tar.gz"; \
+	wget -O go.tgz.asc "$url.asc" --progress=dot:giga; \
 	wget -O go.tgz "$url" --progress=dot:giga; \
-	echo "${goRelSha256} *go.tgz" | sha256sum -c -; \
+	echo "$sha256 *go.tgz" | sha256sum --strict --check -; \
+	\
+# https://github.com/golang/go/issues/14739#issuecomment-324767697
+	export GNUPGHOME="$(mktemp -d)"; \
+# https://www.google.com/linuxrepositories/
+	gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
+	gpg --batch --verify go.tgz.asc go.tgz; \
+	rm -rf "$GNUPGHOME" go.tgz.asc; \
+	\
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-	if [ "$goRelArch" = 'src' ]; then \
+	if [ "$arch" = 'src' ]; then \
 		savedAptMark="$(apt-mark showmanual)"; \
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
