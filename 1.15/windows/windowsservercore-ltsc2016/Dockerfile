@@ -52,13 +52,13 @@ RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
 	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine);
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.15
+ENV GOLANG_VERSION 1.15.1
 
-RUN $url = 'https://storage.googleapis.com/golang/go1.15.windows-amd64.zip'; \
+RUN $url = 'https://storage.googleapis.com/golang/go1.15.1.windows-amd64.zip'; \
 	Write-Host ('Downloading {0} ...' -f $url); \
 	Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
 	\
-	$sha256 = 'dc491314dff5b87ad50bf1cf56715de8f8c54489be30f3e19239bc2ad1af25e3'; \
+	$sha256 = '8e3e1e35e03af28d974ad872883884a4c544f6bdb2e2edb1126d6b528d017696'; \
 	Write-Host ('Verifying sha256 ({0}) ...' -f $sha256); \
 	if ((Get-FileHash go.zip -Algorithm sha256).Hash -ne $sha256) { \
 		Write-Host 'FAILED!'; \
