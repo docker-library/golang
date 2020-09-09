@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.14.8
+ENV GOLANG_VERSION 1.14.9
 
 RUN set -eux; \
 	\
@@ -25,39 +25,39 @@ RUN set -eux; \
 	case "${dpkgArch##*-}" in \
 		'amd64') \
 			arch='linux-amd64'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-amd64.tar.gz'; \
-			sha256='5504e077a29d0bd6649ca7b66e317f1a4b264e960f74115d6f0f405c49a8e738'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-amd64.tar.gz'; \
+			sha256='f0d26ff572c72c9823ae752d3c81819a81a60c753201f51f89637482531c110a'; \
 			;; \
 		'armhf') \
 			arch='linux-armv6l'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-armv6l.tar.gz'; \
-			sha256='5d0c7a1cf79b044ad14414676c945a0e2ed61ae8167142d4e493118a66fafcb5'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-armv6l.tar.gz'; \
+			sha256='e85dc09608dc9fc245ebc5daea0826898ac0eb0d48ed24e2300427850876c442'; \
 			;; \
 		'arm64') \
 			arch='linux-arm64'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-arm64.tar.gz'; \
-			sha256='52219e5508cbd8c93070d85f5ac8f1049eac5e89399666c46aa9edd9b1112725'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-arm64.tar.gz'; \
+			sha256='65e6cef5c474a3514e754f6a7987c49388bb85a7b370370c1318087ac35427fa'; \
 			;; \
 		'i386') \
 			arch='linux-386'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-386.tar.gz'; \
-			sha256='8176ebc3a61caba3d7955cf28461268c987fea1fc11611e7031fcdf8e112a62d'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-386.tar.gz'; \
+			sha256='14982ef997ec323023a11cffe1a4afc3aacd1b5edebf70a00e17b67f888d8cdb'; \
 			;; \
 		'ppc64el') \
 			arch='linux-ppc64le'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-ppc64le.tar.gz'; \
-			sha256='4a5ad85db2039d8b6fa6c27aa3ccc8522b0116780fbaf3c6804e579b33edf098'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-ppc64le.tar.gz'; \
+			sha256='5880a37faf93b2396edc3ff231e0f8df14d0520505cc13d01116e24d7d1d0147'; \
 			;; \
 		's390x') \
 			arch='linux-s390x'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.linux-s390x.tar.gz'; \
-			sha256='e31d92496ac01af2c6f31023123430f0d143c4a05cc680cc91b446c5a4e4a664'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.linux-s390x.tar.gz'; \
+			sha256='381fc24aff153c4affcb00f4547683212157af29b8f9e3de5952d78ac35f5a0f'; \
 			;; \
 		*) \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 			arch='src'; \
-			url='https://storage.googleapis.com/golang/go1.14.8.src.tar.gz'; \
-			sha256='d9a613fb55f508cf84e753456a7c6a113c8265839d5b7fe060da335c93d6e36a'; \
+			url='https://storage.googleapis.com/golang/go1.14.9.src.tar.gz'; \
+			sha256='c687c848cc09bcabf2b5e534c3fc4259abebbfc9014dd05a1a2dc6106f404554'; \
 			echo >&2; \
 			echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
 			echo >&2; \
