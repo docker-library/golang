@@ -24,6 +24,7 @@ RUN set -eux; \
 		gcc \
 		gnupg \
 		go \
+		git \
 		musl-dev \
 		openssl \
 	; \
