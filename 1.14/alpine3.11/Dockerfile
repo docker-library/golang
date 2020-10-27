@@ -26,6 +26,7 @@ RUN set -eux; \
 		go \
 		musl-dev \
 		openssl \
+		git \
 	; \
 	export \
 # set GOROOT_BOOTSTRAP such that we can actually build Go
