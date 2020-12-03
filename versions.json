@@ -3,43 +3,43 @@
     "arches": {
       "amd64": {
         "arch": "linux-amd64",
-        "sha256": "fb26f951c88c0685d7df393611189c58e6eabd3c17bdaef37df11355ab8db9d3",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-amd64.tar.gz"
+        "sha256": "bfea0c8d7b70c1ad99b0266b321608db57df75820e8f4333efa448a43da01992",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-amd64.tar.gz"
       },
       "arm32v7": {
         "arch": "linux-armv6l",
-        "sha256": "548d0d93884d4c30684125a19ea169acf6195cf0fe467efb325adb595fffeacf",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-armv6l.tar.gz"
+        "sha256": "cee8785fad978693c7b68ea635e76412a0a44917c3d58efa82b2edbf538a2868",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-armv6l.tar.gz"
       },
       "arm64v8": {
         "arch": "linux-arm64",
-        "sha256": "833c762bf205ae5caaca246d5c2205ae919bad7484f7c38db72941937e28fa24",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-arm64.tar.gz"
+        "sha256": "445b719ebf46d8825360dabad65226db154ca8053de60609bc20f80a17452cbb",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-arm64.tar.gz"
       },
       "i386": {
         "arch": "linux-386",
-        "sha256": "80d1aa5c2a22cf57da97c71bbb3ee96f2600f15212f0fe8d6e07c7fc2744cf82",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-386.tar.gz"
+        "sha256": "a168c7e03e305d33a5651acb5bfdbfb5141053a0d98f06af3e1e5081167af963",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-386.tar.gz"
       },
       "ppc64le": {
         "arch": "linux-ppc64le",
-        "sha256": "7c51a32851ae8331e1bc9ebc439a71f430053bd3c8e739a72df4354a377982e8",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-ppc64le.tar.gz"
+        "sha256": "1bd057adc1004b22e530ac738ccb077b56f89e84209df9bb755aacb37668c547",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-ppc64le.tar.gz"
       },
       "s390x": {
         "arch": "linux-s390x",
-        "sha256": "e0d3cd0112edcd820d4860c2b95d7b32ef8900ca7f7207f15cc7675de7efe7cf",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.linux-s390x.tar.gz"
+        "sha256": "263a9bef1b8d695cc459b83fd7c4cee06f7e435adec0d0c948309b0655d0770e",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.linux-s390x.tar.gz"
       },
       "src": {
         "arch": "src",
-        "sha256": "b34f4b7ad799eab4c1a52bdef253602ce957125a512f5a1b28dce43c6841b971",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.src.tar.gz"
+        "sha256": "ba1d244c6b5c0ed04aa0d7856d06aceb89ed31b895de6ff783efb1cc8ab6b177",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.src.tar.gz"
       },
       "windows-amd64": {
         "arch": "windows-amd64",
-        "sha256": "46879d5bdf9c8f74101cce040b61067d31cb37a5e5e11a4189f00d3e06d0784d",
-        "url": "https://storage.googleapis.com/golang/go1.14.12.windows-amd64.zip"
+        "sha256": "18c5597d7648ce3872f4a0a7bc73a70c01b56b77feac5e5f80b2ecba0d231473",
+        "url": "https://storage.googleapis.com/golang/go1.14.13.windows-amd64.zip"
       }
     },
     "variants": [
@@ -51,7 +51,7 @@
       "windows/windowsservercore-ltsc2016",
       "windows/nanoserver-1809"
     ],
-    "version": "1.14.12"
+    "version": "1.14.13"
   },
   "1.15": {
     "arches": {
