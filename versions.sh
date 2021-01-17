@@ -133,6 +133,7 @@ for version in "${versions[@]}"; do
 		buster \
 		stretch \
 		\
+		alpine3.13 \
 		alpine3.12 \
 		alpine3.11 \
 		\

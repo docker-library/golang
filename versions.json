@@ -45,6 +45,7 @@
     "variants": [
       "buster",
       "stretch",
+      "alpine3.13",
       "alpine3.12",
       "alpine3.11",
       "windows/windowsservercore-1809",
@@ -98,6 +99,7 @@
     },
     "variants": [
       "buster",
+      "alpine3.13",
       "alpine3.12",
       "windows/windowsservercore-1809",
       "windows/windowsservercore-ltsc2016",
@@ -150,6 +152,7 @@
     },
     "variants": [
       "buster",
+      "alpine3.13",
       "alpine3.12",
       "windows/windowsservercore-1809",
       "windows/windowsservercore-ltsc2016",
