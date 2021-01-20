@@ -43,7 +43,7 @@ RUN set -eux; \
 	case "$apkArch" in \
 		armhf) export GOARM='6' ;; \
 		armv7) export GOARM='7' ;; \
-		x86) export GO386='387' ;; \
+		x86) export GO386='softfloat' ;; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960

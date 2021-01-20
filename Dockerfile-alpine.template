@@ -37,7 +37,7 @@ RUN set -eux; \
 	case "$apkArch" in \
 		armhf) export GOARM='6' ;; \
 		armv7) export GOARM='7' ;; \
-		x86) export GO386='387' ;; \
+		x86) export GO386='{{ if env.version == "1.14" or env.version == "1.15" then "387" else "softfloat" end }}' ;; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
