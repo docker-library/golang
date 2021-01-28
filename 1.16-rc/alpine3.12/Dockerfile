@@ -16,7 +16,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.16beta1
+ENV GOLANG_VERSION 1.16rc1
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -47,8 +47,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://storage.googleapis.com/golang/go1.16beta1.src.tar.gz'; \
-	sha256='48e032c8cf71af4dc8119a29ee829c4fbd5265e32fd012564d4a70bb207695c1'; \
+	url='https://storage.googleapis.com/golang/go1.16rc1.src.tar.gz'; \
+	sha256='6a33569f9d0d21db31614086cc2a4f0fbc683b41c1c53fb512a1341ce5763ff5'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
