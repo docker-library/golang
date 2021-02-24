@@ -16,44 +16,52 @@ ENV GOLANG_VERSION {{ .version }}
 RUN set -eux; \
 	\
 	dpkgArch="$(dpkg --print-architecture)"; \
+	url=; \
 	case "${dpkgArch##*-}" in \
 {{
 	[
 		.arches | to_entries[]
-		| select(.value.arch | startswith("linux-"))
 		| .key as $bashbrewArch
 		| (
 			{
+				amd64: "amd64",
 				arm32v5: "armel",
 				arm32v7: "armhf",
 				arm64v8: "arm64",
+				i386: "i386",
 				mips64le: "mips64el",
 				ppc64le: "ppc64el",
-			}
-			| .[$bashbrewArch] // $bashbrewArch
+				s390x: "s390x",
+			} | .[$bashbrewArch] // ""
 		) as $dpkgArch
+		| select($dpkgArch != "")
 		| .value
 		| (
 -}}
 		{{ $dpkgArch | @sh }}) \
-			arch={{ .arch | @sh }}; \
+{{ if .url then ( -}}
 			url={{ .url | @sh }}; \
 			sha256={{ .sha256 | @sh }}; \
+{{ ) else ( -}}
+			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
+{{ ) end -}}
 			;; \
 {{
 		)
 	] | add
 -}}
-		*) \
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-			arch='src'; \
-			url={{ .arches.src.url | @sh }}; \
-			sha256={{ .arches.src.sha256 | @sh }}; \
-			echo >&2; \
-			echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
-			echo >&2; \
-			;; \
+		*) echo >&2 "error: unsupported architecture '$dpkgArch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
+	build=; \
+	if [ -z "$url" ]; then \
+# https://github.com/golang/go/issues/38536#issuecomment-616897960
+		build=1; \
+		url={{ .arches.src.url | @sh }}; \
+		sha256={{ .arches.src.sha256 | @sh }}; \
+		echo >&2; \
+		echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
+		echo >&2; \
+	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc" --progress=dot:giga; \
 	wget -O go.tgz "$url" --progress=dot:giga; \
@@ -70,17 +78,15 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	if [ "$arch" = 'src' ]; then \
+	if [ -n "$build" ]; then \
 		savedAptMark="$(apt-mark showmanual)"; \
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
 		\
-		goEnv="$(go env | sed -rn -e '/^GO(OS|ARCH|ARM|386)=/s//export \0/p')"; \
-		eval "$goEnv"; \
-		[ -n "$GOOS" ]; \
-		[ -n "$GOARCH" ]; \
 		( \
 			cd /usr/local/go/src; \
+# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
+			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
 			./make.bash; \
 		); \
 		\

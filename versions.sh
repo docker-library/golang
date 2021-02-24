@@ -4,7 +4,7 @@ set -Eeuo pipefail
 # see https://golang.org/dl/
 declare -A golangArches=(
 	['amd64']='linux-amd64'
-	['arm32v7']='linux-armv6l'
+	['arm32v7']='linux-armv6l' # the published binaries only support glibc, which translates to Debian, so the "correct" binary for v7 is v6 (TODO find some way to reasonably benchmark the compiler on a proper v7 chip and determine whether recompiling for GOARM=7 is worthwhile)
 	['arm64v8']='linux-arm64'
 	['i386']='linux-386'
 	['ppc64le']='linux-ppc64le'
@@ -97,13 +97,44 @@ for version in "${versions[@]}"; do
 	echo "$version: $fullVersion"
 
 	export fullVersion
-	doc="$(
-		jq -nc '{
+	doc="$(jq -nc '
+		{
 			version: env.fullVersion,
-			arches: {},
+			arches: (
+				[
+					# the full list of *potentially* supported architectures
+					"amd64",
+					"arm32v5",
+					"arm32v6",
+					"arm32v7",
+					"arm64v8",
+					"i386",
+					"mips64le",
+					"ppc64le",
+					"s390x",
+					"windows-amd64"
+				] | map({
+					(.): {
+						env: (
+							{ GOOS: "linux" }
+							+ if startswith("windows-") then
+								{ GOOS: "windows", GOARCH: ltrimstr("windows-") }
+							elif. == "i386" then
+								{ GOARCH: "386", GO386: (if env.rcVersion == "1.15" then "387" else "softfloat" end) }
+							elif . == "arm64v8" then
+								{ GOARCH: "arm64" }
+							elif startswith("arm32v") then
+								{ GOARCH: "arm", GOARM: ltrimstr("arm32v") }
+							else
+								{ GOARCH: . }
+							end
+						),
+					},
+				}) | add
+			),
 			variants: [],
-		}'
-	)"
+		}
+	')"
 
 	arches="$(jq <<<"$allGoVersions" -c '.[env.fullVersion]')"
 
@@ -118,8 +149,7 @@ for version in "${versions[@]}"; do
 			if sha256="$(curl -fsSL "$url.sha256")"; then
 				export bashbrewArch arch url sha256
 				doc="$(
-					jq <<<"$doc" -c '.arches[env.bashbrewArch] = {
-						arch: env.arch,
+					jq <<<"$doc" -c '.arches[env.bashbrewArch] += {
 						url: env.url,
 						sha256: env.sha256,
 					}'
