@@ -27,23 +27,30 @@ RUN set -eux; \
 		musl-dev \
 		openssl \
 	; \
-	export \
-# set GOROOT_BOOTSTRAP such that we can actually build Go
-		GOROOT_BOOTSTRAP="$(go env GOROOT)" \
-# ... and set "cross-building" related vars to the installed system's values so that we create a build targeting the proper arch
-# (for example, if our build host is GOARCH=amd64, but our build env/image is GOARCH=386, our build needs GOARCH=386)
-		GOOS="$(go env GOOS)" \
-		GOARCH="$(go env GOARCH)" \
-		GOHOSTOS="$(go env GOHOSTOS)" \
-		GOHOSTARCH="$(go env GOHOSTARCH)" \
-	; \
-# also explicitly set GO386 and GOARM if appropriate
-# https://github.com/docker-library/golang/issues/184
 	apkArch="$(apk --print-arch)"; \
 	case "$apkArch" in \
-		armhf) export GOARM='6' ;; \
-		armv7) export GOARM='7' ;; \
-		x86) export GO386='387' ;; \
+		'x86_64') \
+			export GOARCH='amd64' GOOS='linux'; \
+			;; \
+		'armhf') \
+			export GOARCH='arm' GOARM='6' GOOS='linux'; \
+			;; \
+		'armv7') \
+			export GOARCH='arm' GOARM='7' GOOS='linux'; \
+			;; \
+		'aarch64') \
+			export GOARCH='arm64' GOOS='linux'; \
+			;; \
+		'x86') \
+			export GO386='387' GOARCH='386' GOOS='linux'; \
+			;; \
+		'ppc64le') \
+			export GOARCH='ppc64le' GOOS='linux'; \
+			;; \
+		's390x') \
+			export GOARCH='s390x' GOOS='linux'; \
+			;; \
+		*) echo >&2 "error: unsupported architecture '$apkArch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
@@ -65,13 +72,21 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	goEnv="$(go env | sed -rn -e '/^GO(OS|ARCH|ARM|386)=/s//export \0/p')"; \
-	eval "$goEnv"; \
-	[ -n "$GOOS" ]; \
-	[ -n "$GOARCH" ]; \
 	( \
 		cd /usr/local/go/src; \
+# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
+		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+		if [ "${GO386:-}" = 'softfloat' ]; then \
+# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
+# (once our Alpine base has Go 1.16, we can remove this hack)
+			GO386= ./bootstrap.bash; \
+			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
+			"$GOROOT_BOOTSTRAP/bin/go" version; \
+		fi; \
 		./make.bash; \
+		if [ "${GO386:-}" = 'softfloat' ]; then \
+			rm -rf "$GOROOT_BOOTSTRAP"; \
+		fi; \
 	); \
 	\
 	apk del --no-network .build-deps; \

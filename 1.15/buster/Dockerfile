@@ -22,47 +22,50 @@ ENV GOLANG_VERSION 1.15.8
 RUN set -eux; \
 	\
 	dpkgArch="$(dpkg --print-architecture)"; \
+	url=; \
 	case "${dpkgArch##*-}" in \
 		'amd64') \
-			arch='linux-amd64'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-amd64.tar.gz'; \
 			sha256='d3379c32a90fdf9382166f8f48034c459a8cc433730bc9476d39d9082c94583b'; \
 			;; \
+		'armel') \
+			export GOARCH='arm' GOARM='5' GOOS='linux'; \
+			;; \
 		'armhf') \
-			arch='linux-armv6l'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-armv6l.tar.gz'; \
 			sha256='708c398cb9e5029cfd5b654370978bf0e797d4d4a71153c06c7378db7e249a53'; \
 			;; \
 		'arm64') \
-			arch='linux-arm64'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-arm64.tar.gz'; \
 			sha256='0e31ea4bf53496b0f0809730520dee98c0ae5c530f3701a19df0ba0a327bf3d2'; \
 			;; \
 		'i386') \
-			arch='linux-386'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-386.tar.gz'; \
 			sha256='a0cc9df6d04f89af8396278d171087894a453a03a950b0f60a4ac18b480f758f'; \
 			;; \
+		'mips64el') \
+			export GOARCH='mips64le' GOOS='linux'; \
+			;; \
 		'ppc64el') \
-			arch='linux-ppc64le'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-ppc64le.tar.gz'; \
 			sha256='c6ddeab22b23ee33f5e8f06f9667e2092f48dbc6d5db553a66f7fe21da73fbfa'; \
 			;; \
 		's390x') \
-			arch='linux-s390x'; \
 			url='https://storage.googleapis.com/golang/go1.15.8.linux-s390x.tar.gz'; \
 			sha256='ba922f54fe99dee3246705bacbfac27fa88375439025429297aa1e9caf3f2297'; \
 			;; \
-		*) \
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-			arch='src'; \
-			url='https://storage.googleapis.com/golang/go1.15.8.src.tar.gz'; \
-			sha256='540c0ab7781084d124991321ed1458e479982de94454a98afab6acadf38497c2'; \
-			echo >&2; \
-			echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
-			echo >&2; \
-			;; \
+		*) echo >&2 "error: unsupported architecture '$dpkgArch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
+	build=; \
+	if [ -z "$url" ]; then \
+# https://github.com/golang/go/issues/38536#issuecomment-616897960
+		build=1; \
+		url='https://storage.googleapis.com/golang/go1.15.8.src.tar.gz'; \
+		sha256='540c0ab7781084d124991321ed1458e479982de94454a98afab6acadf38497c2'; \
+		echo >&2; \
+		echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
+		echo >&2; \
+	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc" --progress=dot:giga; \
 	wget -O go.tgz "$url" --progress=dot:giga; \
@@ -79,17 +82,15 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	if [ "$arch" = 'src' ]; then \
+	if [ -n "$build" ]; then \
 		savedAptMark="$(apt-mark showmanual)"; \
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
 		\
-		goEnv="$(go env | sed -rn -e '/^GO(OS|ARCH|ARM|386)=/s//export \0/p')"; \
-		eval "$goEnv"; \
-		[ -n "$GOOS" ]; \
-		[ -n "$GOARCH" ]; \
 		( \
 			cd /usr/local/go/src; \
+# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
+			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
 			./make.bash; \
 		); \
 		\
