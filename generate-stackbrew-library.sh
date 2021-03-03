@@ -128,9 +128,9 @@ for version; do
 				variantArches="${parentRepoToArches[$variantParent]}"
 
 				if [ "$variant" = 'stretch' ]; then
-					# stretch's "golang-go" package doesn't include GOARM for arm32v5
+					# stretch's "golang-go" package fails to build (TODO try backports?)
 					variantArches="$(sed <<<" $variantArches " -e 's/ arm32v5 / /g')"
-					# ... and "gccgo" in stretch can't build mips64le
+					# "gccgo" in stretch can't build mips64le
 					variantArches="$(sed <<<" $variantArches " -e 's/ mips64le / /g')"
 				fi
 				;;
