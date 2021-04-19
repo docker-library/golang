@@ -136,6 +136,20 @@ for version; do
 				;;
 		esac
 
+		# cross-reference with supported architectures
+		for arch in $variantArches; do
+			if ! jq -e --arg arch "$arch" '.[env.version].arches[$arch].supported' versions.json &> /dev/null; then
+				variantArches="$(sed <<<" $variantArches " -e "s/ $arch / /g")"
+			fi
+		done
+		# TODO rewrite this whole loop into a single jq expression :)
+		variantArches="${variantArches% }"
+		variantArches="${variantArches# }"
+		if [ -z "$variantArches" ]; then
+			echo >&2 "error: '$dir' has no supported architectures!"
+			exit 1
+		fi
+
 		sharedTags=()
 		for windowsShared in windowsservercore nanoserver; do
 			if [[ "$variant" == "$windowsShared"* ]]; then

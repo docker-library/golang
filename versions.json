@@ -7,21 +7,26 @@
           "GOOS": "linux"
         },
         "sha256": "8825b72d74b14e82b54ba3697813772eb94add3abf70f021b6bdebe193ed01ec",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-amd64.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-amd64.tar.gz"
       },
       "arm32v5": {
         "env": {
           "GOARCH": "arm",
           "GOARM": "5",
           "GOOS": "linux"
-        }
+        },
+        "supported": true
       },
       "arm32v6": {
         "env": {
           "GOARCH": "arm",
           "GOARM": "6",
           "GOOS": "linux"
-        }
+        },
+        "sha256": "dba11ed018fc7b5774ca996c4bdb847f8f9535cdc4932eb09a43c390813af4c9",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-armv6l.tar.gz"
       },
       "arm32v7": {
         "env": {
@@ -30,7 +35,8 @@
           "GOOS": "linux"
         },
         "sha256": "dba11ed018fc7b5774ca996c4bdb847f8f9535cdc4932eb09a43c390813af4c9",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-armv6l.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-armv6l.tar.gz"
       },
       "arm64v8": {
         "env": {
@@ -38,7 +44,35 @@
           "GOOS": "linux"
         },
         "sha256": "bfc8f07945296e97c6d28c7999d86b5cab51c7a87eb2b22ca6781c41a6bb6f2d",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-arm64.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-arm64.tar.gz"
+      },
+      "darwin-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "darwin"
+        },
+        "sha256": "651c78408b2c047b7ccccb6b244c5de9eab927c87594ff6bd9540d43c9706671",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.15.11.darwin-amd64.tar.gz"
+      },
+      "freebsd-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "freebsd"
+        },
+        "sha256": "38fb5516e86934dc385d1b06433692034f38ed38117e8017e211a0efe55ed44e",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.15.11.freebsd-amd64.tar.gz"
+      },
+      "freebsd-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "freebsd"
+        },
+        "sha256": "c9ac9e8e12b9a4639d8a164815d2ccab86f7c1534672c1d03933e7180d2ace5d",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.15.11.freebsd-386.tar.gz"
       },
       "i386": {
         "env": {
@@ -47,13 +81,15 @@
           "GOOS": "linux"
         },
         "sha256": "2de51fc6873d8b688d7451cfc87443ef49404af98bbab9c8a36fb6c4bc95e4de",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-386.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-386.tar.gz"
       },
       "mips64le": {
         "env": {
           "GOARCH": "mips64le",
           "GOOS": "linux"
-        }
+        },
+        "supported": true
       },
       "ppc64le": {
         "env": {
@@ -61,7 +97,8 @@
           "GOOS": "linux"
         },
         "sha256": "4916ef0fc4c40db2dcc503a3473b325ed21d100cc77f1cc7e0a3aede19eec628",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-ppc64le.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-ppc64le.tar.gz"
       },
       "s390x": {
         "env": {
@@ -69,11 +106,13 @@
           "GOOS": "linux"
         },
         "sha256": "2fb25504fa525e24dbba7e8e7fa2d91c42c66272dc176d5270dec77099124c75",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.linux-s390x.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.linux-s390x.tar.gz"
       },
       "src": {
         "sha256": "f25b2441d4c76cf63cde94d59bab237cc33e8a2a139040d904c8630f46d061e5",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.src.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.src.tar.gz"
       },
       "windows-amd64": {
         "env": {
@@ -81,7 +120,17 @@
           "GOOS": "windows"
         },
         "sha256": "56f63de17cd739287de6d9f3cfdad3b781ad3e4a18aae20ece994ee97c1819fd",
-        "url": "https://storage.googleapis.com/golang/go1.15.11.windows-amd64.zip"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.15.11.windows-amd64.zip"
+      },
+      "windows-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "windows"
+        },
+        "sha256": "b0a64a2a2dedefd1559acf866e393c8e00294dbde113875ee9d8cf3561886123",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.15.11.windows-386.zip"
       }
     },
     "variants": [
@@ -103,21 +152,26 @@
           "GOOS": "linux"
         },
         "sha256": "951a3c7c6ce4e56ad883f97d9db74d3d6d80d5fec77455c6ada6c1f7ac4776d2",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-amd64.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-amd64.tar.gz"
       },
       "arm32v5": {
         "env": {
           "GOARCH": "arm",
           "GOARM": "5",
           "GOOS": "linux"
-        }
+        },
+        "supported": true
       },
       "arm32v6": {
         "env": {
           "GOARCH": "arm",
           "GOARM": "6",
           "GOOS": "linux"
-        }
+        },
+        "sha256": "0dae30385e3564a557dac7f12a63eedc73543e6da0f6017990e214ce8cc8797c",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-armv6l.tar.gz"
       },
       "arm32v7": {
         "env": {
@@ -126,7 +180,8 @@
           "GOOS": "linux"
         },
         "sha256": "0dae30385e3564a557dac7f12a63eedc73543e6da0f6017990e214ce8cc8797c",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-armv6l.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-armv6l.tar.gz"
       },
       "arm64v8": {
         "env": {
@@ -134,7 +189,44 @@
           "GOOS": "linux"
         },
         "sha256": "566b1d6f17d2bc4ad5f81486f0df44f3088c3ed47a3bec4099d8ed9939e90d5d",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-arm64.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-arm64.tar.gz"
+      },
+      "darwin-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "darwin"
+        },
+        "sha256": "6bb1cf421f8abc2a9a4e39140b7397cdae6aca3e8d36dcff39a1a77f4f1170ac",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.16.3.darwin-amd64.tar.gz"
+      },
+      "darwin-arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "darwin"
+        },
+        "sha256": "f4e96bbcd5d2d1942f5b55d9e4ab19564da4fad192012f6d7b0b9b055ba4208f",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.16.3.darwin-arm64.tar.gz"
+      },
+      "freebsd-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "freebsd"
+        },
+        "sha256": "ffbd920b309e62e807457b11d80e8c17fefe3ef6de423aaba4b1e270b2ca4c3d",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.16.3.freebsd-amd64.tar.gz"
+      },
+      "freebsd-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "freebsd"
+        },
+        "sha256": "31ecd11d497684fa8b0f01ba784590c4c760943665fdc4fe0adaa1405c71736c",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.16.3.freebsd-386.tar.gz"
       },
       "i386": {
         "env": {
@@ -143,13 +235,15 @@
           "GOOS": "linux"
         },
         "sha256": "48b2d1481db756c88c18b1f064dbfc3e265ce4a775a23177ca17e25d13a24c5d",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-386.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-386.tar.gz"
       },
       "mips64le": {
         "env": {
           "GOARCH": "mips64le",
           "GOOS": "linux"
-        }
+        },
+        "supported": true
       },
       "ppc64le": {
         "env": {
@@ -157,7 +251,8 @@
           "GOOS": "linux"
         },
         "sha256": "5eb046bbbbc7fe2591846a4303884cb5a01abb903e3e61e33459affe7874e811",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-ppc64le.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-ppc64le.tar.gz"
       },
       "s390x": {
         "env": {
@@ -165,11 +260,13 @@
           "GOOS": "linux"
         },
         "sha256": "3e8bd7bde533a73fd6fa75b5288678ef397e76c198cfb26b8ae086035383b1cf",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.linux-s390x.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.linux-s390x.tar.gz"
       },
       "src": {
         "sha256": "b298d29de9236ca47a023e382313bcc2d2eed31dfa706b60a04103ce83a71a25",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.src.tar.gz"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.src.tar.gz"
       },
       "windows-amd64": {
         "env": {
@@ -177,7 +274,17 @@
           "GOOS": "windows"
         },
         "sha256": "a4400345135b36cb7942e52bbaf978b66814738b855eeff8de879a09fd99de7f",
-        "url": "https://storage.googleapis.com/golang/go1.16.3.windows-amd64.zip"
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.16.3.windows-amd64.zip"
+      },
+      "windows-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "windows"
+        },
+        "sha256": "a3c16e1531bf9726f47911c4a9ed7cb665a6207a51c44f10ebad4db63b4bcc5a",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.16.3.windows-386.zip"
       }
     },
     "variants": [

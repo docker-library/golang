@@ -25,33 +25,33 @@ RUN set -eux; \
 	url=; \
 	case "${dpkgArch##*-}" in \
 		'amd64') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-amd64.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-amd64.tar.gz'; \
 			sha256='951a3c7c6ce4e56ad883f97d9db74d3d6d80d5fec77455c6ada6c1f7ac4776d2'; \
 			;; \
 		'armel') \
 			export GOARCH='arm' GOARM='5' GOOS='linux'; \
 			;; \
 		'armhf') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-armv6l.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-armv6l.tar.gz'; \
 			sha256='0dae30385e3564a557dac7f12a63eedc73543e6da0f6017990e214ce8cc8797c'; \
 			;; \
 		'arm64') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-arm64.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-arm64.tar.gz'; \
 			sha256='566b1d6f17d2bc4ad5f81486f0df44f3088c3ed47a3bec4099d8ed9939e90d5d'; \
 			;; \
 		'i386') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-386.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-386.tar.gz'; \
 			sha256='48b2d1481db756c88c18b1f064dbfc3e265ce4a775a23177ca17e25d13a24c5d'; \
 			;; \
 		'mips64el') \
 			export GOARCH='mips64le' GOOS='linux'; \
 			;; \
 		'ppc64el') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-ppc64le.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-ppc64le.tar.gz'; \
 			sha256='5eb046bbbbc7fe2591846a4303884cb5a01abb903e3e61e33459affe7874e811'; \
 			;; \
 		's390x') \
-			url='https://storage.googleapis.com/golang/go1.16.3.linux-s390x.tar.gz'; \
+			url='https://dl.google.com/go/go1.16.3.linux-s390x.tar.gz'; \
 			sha256='3e8bd7bde533a73fd6fa75b5288678ef397e76c198cfb26b8ae086035383b1cf'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$dpkgArch' (likely packaging update needed)"; exit 1 ;; \
@@ -60,7 +60,7 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://storage.googleapis.com/golang/go1.16.3.src.tar.gz'; \
+		url='https://dl.google.com/go/go1.16.3.src.tar.gz'; \
 		sha256='b298d29de9236ca47a023e382313bcc2d2eed31dfa706b60a04103ce83a71a25'; \
 		echo >&2; \
 		echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \

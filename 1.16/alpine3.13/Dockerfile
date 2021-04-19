@@ -54,7 +54,7 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://storage.googleapis.com/golang/go1.16.3.src.tar.gz'; \
+	url='https://dl.google.com/go/go1.16.3.src.tar.gz'; \
 	sha256='b298d29de9236ca47a023e382313bcc2d2eed31dfa706b60a04103ce83a71a25'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
