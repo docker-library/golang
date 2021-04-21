@@ -21,6 +21,7 @@ RUN set -eux; \
 {{
 	[
 		.arches | to_entries[]
+		| select(.value.supported)
 		| .key as $bashbrewArch
 		| (
 			{

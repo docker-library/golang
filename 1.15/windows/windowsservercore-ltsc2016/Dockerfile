@@ -54,7 +54,7 @@ RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
 
 ENV GOLANG_VERSION 1.15.11
 
-RUN $url = 'https://storage.googleapis.com/golang/go1.15.11.windows-amd64.zip'; \
+RUN $url = 'https://dl.google.com/go/go1.15.11.windows-amd64.zip'; \
 	Write-Host ('Downloading {0} ...' -f $url); \
 	Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
 	\
