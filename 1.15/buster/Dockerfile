@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.11
+ENV GOLANG_VERSION 1.15.12
 
 RUN set -eux; \
 	\
@@ -25,34 +25,34 @@ RUN set -eux; \
 	url=; \
 	case "${dpkgArch##*-}" in \
 		'amd64') \
-			url='https://dl.google.com/go/go1.15.11.linux-amd64.tar.gz'; \
-			sha256='8825b72d74b14e82b54ba3697813772eb94add3abf70f021b6bdebe193ed01ec'; \
+			url='https://dl.google.com/go/go1.15.12.linux-amd64.tar.gz'; \
+			sha256='bbdb935699e0b24d90e2451346da76121b2412d30930eabcd80907c230d098b7'; \
 			;; \
 		'armel') \
 			export GOARCH='arm' GOARM='5' GOOS='linux'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.15.11.linux-armv6l.tar.gz'; \
-			sha256='dba11ed018fc7b5774ca996c4bdb847f8f9535cdc4932eb09a43c390813af4c9'; \
+			url='https://dl.google.com/go/go1.15.12.linux-armv6l.tar.gz'; \
+			sha256='6a20048f7061d06f590d869a5298e8c0ffc325e8faf0bb8b6a622ad007a53028'; \
 			;; \
 		'arm64') \
-			url='https://dl.google.com/go/go1.15.11.linux-arm64.tar.gz'; \
-			sha256='bfc8f07945296e97c6d28c7999d86b5cab51c7a87eb2b22ca6781c41a6bb6f2d'; \
+			url='https://dl.google.com/go/go1.15.12.linux-arm64.tar.gz'; \
+			sha256='a10161e6f0389c45ecd810e114acaba967ea3a4def551fcbb0b1e270996103ed'; \
 			;; \
 		'i386') \
-			url='https://dl.google.com/go/go1.15.11.linux-386.tar.gz'; \
-			sha256='2de51fc6873d8b688d7451cfc87443ef49404af98bbab9c8a36fb6c4bc95e4de'; \
+			url='https://dl.google.com/go/go1.15.12.linux-386.tar.gz'; \
+			sha256='d186ccaa0080e301d35fa49a244877da6f08a1aeda3ed90438fee835538f7ece'; \
 			;; \
 		'mips64el') \
 			export GOARCH='mips64le' GOOS='linux'; \
 			;; \
 		'ppc64el') \
-			url='https://dl.google.com/go/go1.15.11.linux-ppc64le.tar.gz'; \
-			sha256='4916ef0fc4c40db2dcc503a3473b325ed21d100cc77f1cc7e0a3aede19eec628'; \
+			url='https://dl.google.com/go/go1.15.12.linux-ppc64le.tar.gz'; \
+			sha256='c94c105e4e985b5675aa434845cced73a64bb050a8a96fa0e9b17dbea3ac6684'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.15.11.linux-s390x.tar.gz'; \
-			sha256='2fb25504fa525e24dbba7e8e7fa2d91c42c66272dc176d5270dec77099124c75'; \
+			url='https://dl.google.com/go/go1.15.12.linux-s390x.tar.gz'; \
+			sha256='9f1daa296e44ec0ce6b648e4e6d63210584b6c1ae2e46c77c8030b77514e8a8e'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$dpkgArch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -60,8 +60,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.15.11.src.tar.gz'; \
-		sha256='f25b2441d4c76cf63cde94d59bab237cc33e8a2a139040d904c8630f46d061e5'; \
+		url='https://dl.google.com/go/go1.15.12.src.tar.gz'; \
+		sha256='1c6911937df4a277fa74e7b7efc3d08594498c4c4adc0b6c4ae3566137528091'; \
 		echo >&2; \
 		echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
 		echo >&2; \
