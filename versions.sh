@@ -31,8 +31,9 @@ fi
 versions=( "${versions[@]%/}" )
 
 # https://github.com/golang/go/issues/23746
+# https://github.com/golang/website/blob/dd8acb4c96edcd69706f19304941679dcb3822b0/internal/dl/server.go#L102-L107 ...
 goVersions="$(
-	wget -qO- 'https://golang.org/dl/?mode=json' | jq -c --argjson potentiallySupportedArches "$potentiallySupportedArches" '
+	wget -qO- 'https://golang.org/dl/?mode=json&include=all' | jq -c --argjson potentiallySupportedArches "$potentiallySupportedArches" '
 		[
 			.[]
 			| ( .version | ltrimstr("go") ) as $version
