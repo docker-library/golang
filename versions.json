@@ -297,5 +297,168 @@
       "windows/nanoserver-1809"
     ],
     "version": "1.16.5"
+  },
+  "1.17-rc": {
+    "arches": {
+      "amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "linux"
+        },
+        "sha256": "a479681705b65971f9db079bfce53c4393bfa241d952eb09de88fb40677d3c4c",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-amd64.tar.gz"
+      },
+      "arm32v5": {
+        "env": {
+          "GOARCH": "arm",
+          "GOARM": "5",
+          "GOOS": "linux"
+        },
+        "supported": true
+      },
+      "arm32v6": {
+        "env": {
+          "GOARCH": "arm",
+          "GOARM": "6",
+          "GOOS": "linux"
+        },
+        "sha256": "f4ab69c75a1f9e43b07ca9a0bfdf68ca1e2b0b51d4ebfb8c79f60ed14629f4e6",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-armv6l.tar.gz"
+      },
+      "arm32v7": {
+        "env": {
+          "GOARCH": "arm",
+          "GOARM": "7",
+          "GOOS": "linux"
+        },
+        "sha256": "f4ab69c75a1f9e43b07ca9a0bfdf68ca1e2b0b51d4ebfb8c79f60ed14629f4e6",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-armv6l.tar.gz"
+      },
+      "arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "linux"
+        },
+        "sha256": "ede56f79c5061146929ab4a128e8ee7bc713d141e87b3df4e0aa670938e128b3",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-arm64.tar.gz"
+      },
+      "darwin-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "darwin"
+        },
+        "sha256": "50046983ccd66180d1b6fbf39b4e5acb61dd08f1b53803661d86b60ba304bf80",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.darwin-amd64.tar.gz"
+      },
+      "darwin-arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "darwin"
+        },
+        "sha256": "14f477d7c8d6ced879318257a57fc5f39e23aa4502a0f595c0103039e0a4abc0",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.darwin-arm64.tar.gz"
+      },
+      "freebsd-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "freebsd"
+        },
+        "sha256": "7673f5b0478ac7cac0bfa97ad8757fdba1c3630378c5b667a6013b339c7d08aa",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.freebsd-amd64.tar.gz"
+      },
+      "freebsd-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "freebsd"
+        },
+        "sha256": "d3ea61c33445c6f9cfa5543b199badf6a9953cfb8fa825986fd6f2cba4355e63",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.freebsd-386.tar.gz"
+      },
+      "i386": {
+        "env": {
+          "GO386": "softfloat",
+          "GOARCH": "386",
+          "GOOS": "linux"
+        },
+        "sha256": "cebbf75985ba7e6f1a5b137916a6019685d52ecf36c262092ffc3f714cd85974",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-386.tar.gz"
+      },
+      "mips64le": {
+        "env": {
+          "GOARCH": "mips64le",
+          "GOOS": "linux"
+        },
+        "supported": true
+      },
+      "ppc64le": {
+        "env": {
+          "GOARCH": "ppc64le",
+          "GOOS": "linux"
+        },
+        "sha256": "0a6e5034fcbd4b38642b56841a042135aec1e87f61258d2d70aafc0a667bdd11",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-ppc64le.tar.gz"
+      },
+      "s390x": {
+        "env": {
+          "GOARCH": "s390x",
+          "GOOS": "linux"
+        },
+        "sha256": "3501d139a9433775001730f1d9c3fb60d7b93b969fe16bd80fc7387a3d5259b1",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.linux-s390x.tar.gz"
+      },
+      "src": {
+        "sha256": "02b8973725f9bc545955865576e8c8f6ca672312f69fd9e5549c25b0ce1d75f0",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.src.tar.gz"
+      },
+      "windows-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "windows"
+        },
+        "sha256": "7a2154c1a35d3e6441e649c81a30817f8f669aea9029f5d1010e1a264dfd264f",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.17beta1.windows-amd64.zip"
+      },
+      "windows-arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "windows"
+        },
+        "sha256": "f0b6a3ccdf5b3e1ec72f5dabf7e9659f371e0faa2a5290c23afa6f5eae7a90a8",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.windows-arm64.zip"
+      },
+      "windows-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "windows"
+        },
+        "sha256": "da7ca16de51e8fbc9a982216361959d245fd83479d602de214667e8319279c6b",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.17beta1.windows-386.zip"
+      }
+    },
+    "variants": [
+      "buster",
+      "stretch",
+      "alpine3.13",
+      "alpine3.12",
+      "windows/windowsservercore-1809",
+      "windows/windowsservercore-ltsc2016",
+      "windows/nanoserver-1809"
+    ],
+    "version": "1.17beta1"
   }
 }

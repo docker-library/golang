@@ -16,7 +16,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.13
+ENV GOLANG_VERSION 1.17beta1
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -42,7 +42,7 @@ RUN set -eux; \
 			export GOARCH='arm64' GOOS='linux'; \
 			;; \
 		'x86') \
-			export GO386='387' GOARCH='386' GOOS='linux'; \
+			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
 			;; \
 		'ppc64le') \
 			export GOARCH='ppc64le' GOOS='linux'; \
@@ -54,8 +54,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://dl.google.com/go/go1.15.13.src.tar.gz'; \
-	sha256='99069e7223479cce4553f84f874b9345f6f4045f27cf5089489b546da619a244'; \
+	url='https://dl.google.com/go/go1.17beta1.src.tar.gz'; \
+	sha256='02b8973725f9bc545955865576e8c8f6ca672312f69fd9e5549c25b0ce1d75f0'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
