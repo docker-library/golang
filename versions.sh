@@ -131,8 +131,8 @@ for version in "${versions[@]}"; do
 			"buster",
 			"stretch",
 			(
-				"3.13",
-				"3.12"
+				"3.14",
+				"3.13"
 			| "alpine" + .),
 			if .arches | has("windows-amd64") then
 				(
