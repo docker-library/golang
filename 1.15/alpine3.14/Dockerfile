@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.12
+FROM alpine:3.14
 
 RUN apk add --no-cache \
 		ca-certificates
@@ -16,7 +16,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.16.5
+ENV GOLANG_VERSION 1.15.13
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -42,7 +42,7 @@ RUN set -eux; \
 			export GOARCH='arm64' GOOS='linux'; \
 			;; \
 		'x86') \
-			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
+			export GO386='387' GOARCH='386' GOOS='linux'; \
 			;; \
 		'ppc64le') \
 			export GOARCH='ppc64le' GOOS='linux'; \
@@ -54,8 +54,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://dl.google.com/go/go1.16.5.src.tar.gz'; \
-	sha256='7bfa7e5908c7cc9e75da5ddf3066d7cbcf3fd9fa51945851325eebc17f50ba80'; \
+	url='https://dl.google.com/go/go1.15.13.src.tar.gz'; \
+	sha256='99069e7223479cce4553f84f874b9345f6f4045f27cf5089489b546da619a244'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
@@ -76,15 +76,17 @@ RUN set -eux; \
 		cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
+		if [ -n "${GO386:-}" ]; then \
 # https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# (once our Alpine base has Go 1.16, we can remove this hack)
+# Go 1.15 + Alpine 3.14 == Go 1.16 bootstrap
+# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
+# (once Go 1.15 *and* Alpine 3.13 go away, we can remove this)
 			GO386= ./bootstrap.bash; \
 			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
 			"$GOROOT_BOOTSTRAP/bin/go" version; \
 		fi; \
 		./make.bash; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
+		if [ -n "${GO386:-}" ]; then \
 			rm -rf "$GOROOT_BOOTSTRAP"; \
 		fi; \
 	); \

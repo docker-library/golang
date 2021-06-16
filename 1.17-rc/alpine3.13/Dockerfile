@@ -76,15 +76,17 @@ RUN set -eux; \
 		cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
+		if [ -n "${GO386:-}" ]; then \
 # https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# (once our Alpine base has Go 1.16, we can remove this hack)
+# Go 1.15 + Alpine 3.14 == Go 1.16 bootstrap
+# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
+# (once Go 1.15 *and* Alpine 3.13 go away, we can remove this)
 			GO386= ./bootstrap.bash; \
 			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
 			"$GOROOT_BOOTSTRAP/bin/go" version; \
 		fi; \
 		./make.bash; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
+		if [ -n "${GO386:-}" ]; then \
 			rm -rf "$GOROOT_BOOTSTRAP"; \
 		fi; \
 	); \

@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.12
+FROM alpine:3.14
 
 RUN apk add --no-cache \
 		ca-certificates
@@ -76,17 +76,7 @@ RUN set -eux; \
 		cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
-# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# (once our Alpine base has Go 1.16, we can remove this hack)
-			GO386= ./bootstrap.bash; \
-			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
-			"$GOROOT_BOOTSTRAP/bin/go" version; \
-		fi; \
 		./make.bash; \
-		if [ "${GO386:-}" = 'softfloat' ]; then \
-			rm -rf "$GOROOT_BOOTSTRAP"; \
-		fi; \
 	); \
 	\
 # pre-compile the standard library, just like the official binary release tarballs do
