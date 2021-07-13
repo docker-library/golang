@@ -114,7 +114,17 @@ for version in "${versions[@]}"; do
 	export version
 
 	if \
-		! goJson="$(jq <<<"$goVersions" -c '[ .[] | select(.major == env.version) ][0]')" \
+		! goJson="$(jq <<<"$goVersions" -c '
+			[ .[] | select(.major == env.version) ] | sort_by(
+				.version
+				| split(".")
+				| map(
+					if test("^[0-9]+$") then
+						tonumber
+					else . end
+				)
+			)[-1]
+		')" \
 		|| ! fullVersion="$(jq <<<"$goJson" -r '.version')" \
 		|| [ -z "$fullVersion" ] \
 	; then
