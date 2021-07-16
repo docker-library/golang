@@ -43,8 +43,9 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	\
 	Write-Host 'Complete.';
 
-# ideally, this would be C:\go to match Linux a bit closer, but C:\go is the recommended install path for Go itself on Windows
+# ideally, this would be C:\go to match Linux a bit closer, but C:\go was the default install path for Go itself on Windows
 ENV GOPATH C:\\gopath
+# (https://golang.org/cl/283600)
 
 # PATH isn't actually set in the Docker image, so we have to set it from within the container
 RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \

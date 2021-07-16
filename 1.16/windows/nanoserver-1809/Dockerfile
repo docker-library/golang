@@ -11,8 +11,9 @@ SHELL ["cmd", "/S", "/C"]
 # no Git installed (intentionally)
 #  -- Nano Server is "Windows Slim"
 
-# ideally, this would be C:\go to match Linux a bit closer, but C:\go is the recommended install path for Go itself on Windows
+# ideally, this would be C:\go to match Linux a bit closer, but C:\go was the default install path for Go itself on Windows
 ENV GOPATH C:\\gopath
+# (https://golang.org/cl/283600)
 
 # PATH isn't actually set in the Docker image, so we have to set it from within the container
 USER ContainerAdministrator
@@ -22,7 +23,8 @@ USER ContainerUser
 
 ENV GOLANG_VERSION 1.16.6
 
-COPY --from=golang:1.16.6-windowsservercore-1809 C:\\go C:\\go
+# Docker's Windows path parsing is absolutely *cursed*; please just trust me on this one -Tianon
+COPY --from=golang:1.16.6-windowsservercore-1809 ["C:\\\\go","C:\\\\go"]
 RUN go version
 
 WORKDIR $GOPATH
