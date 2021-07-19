@@ -43,11 +43,12 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	\
 	Write-Host 'Complete.';
 
-# ideally, this would be C:\go to match Linux a bit closer, but C:\go is the recommended install path for Go itself on Windows
-ENV GOPATH C:\\gopath
+# for 1.17+, we'll follow the (new) Go upstream default for install (https://golang.org/cl/283600), which frees up C:\go to be the default GOPATH and thus match the Linux images more closely (https://github.com/docker-library/golang/issues/288)
+ENV GOPATH C:\\go
+# HOWEVER, please note that it is the Go upstream intention to remove GOPATH support entirely: https://blog.golang.org/go116-module-changes
 
 # PATH isn't actually set in the Docker image, so we have to set it from within the container
-RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
+RUN $newPath = ('{0}\bin;C:\Program Files\Go\bin;{1}' -f $env:GOPATH, $env:PATH); \
 	Write-Host ('Updating PATH: {0}' -f $newPath); \
 	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine);
 # doing this first to share cache across versions more aggressively
@@ -67,6 +68,9 @@ RUN $url = 'https://dl.google.com/go/go1.17rc1.windows-amd64.zip'; \
 	\
 	Write-Host 'Expanding ...'; \
 	Expand-Archive go.zip -DestinationPath C:\; \
+	\
+	Write-Host 'Moving ...'; \
+	Move-Item -Path C:\go -Destination 'C:\Program Files\Go'; \
 	\
 	Write-Host 'Removing ...'; \
 	Remove-Item go.zip -Force; \
