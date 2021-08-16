@@ -138,6 +138,7 @@ for version in "${versions[@]}"; do
 		version: .version,
 		arches: .arches,
 		variants: [
+			"bullseye",
 			"buster",
 			"stretch",
 			(
