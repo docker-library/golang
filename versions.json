@@ -143,6 +143,7 @@
       }
     },
     "variants": [
+      "bullseye",
       "buster",
       "stretch",
       "alpine3.14",
@@ -306,6 +307,7 @@
       }
     },
     "variants": [
+      "bullseye",
       "buster",
       "stretch",
       "alpine3.14",
