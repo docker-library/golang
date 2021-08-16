@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.14
+FROM alpine:3.13
 
 RUN apk add --no-cache \
 		ca-certificates
@@ -16,7 +16,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.17rc2
+ENV GOLANG_VERSION 1.17
 
 RUN set -eux; \
 	apk add --no-cache --virtual .build-deps \
@@ -54,8 +54,8 @@ RUN set -eux; \
 	esac; \
 	\
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://dl.google.com/go/go1.17rc2.src.tar.gz'; \
-	sha256='5ab21d75552390c63087518e4eba2972fb009aea97ff2bcc42dff264c5f46fe9'; \
+	url='https://dl.google.com/go/go1.17.src.tar.gz'; \
+	sha256='3a70e5055509f347c0fb831ca07a2bf3b531068f349b14a3c652e9b5b67beb5d'; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
@@ -76,7 +76,19 @@ RUN set -eux; \
 		cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+		if [ -n "${GO386:-}" ]; then \
+# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
+# Go 1.15 + Alpine 3.14 == Go 1.16 bootstrap
+# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
+# (once Go 1.15 *and* Alpine 3.13 go away, we can remove this)
+			GO386= ./bootstrap.bash; \
+			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
+			"$GOROOT_BOOTSTRAP/bin/go" version; \
+		fi; \
 		./make.bash; \
+		if [ -n "${GO386:-}" ]; then \
+			rm -rf "$GOROOT_BOOTSTRAP"; \
+		fi; \
 	); \
 	\
 # pre-compile the standard library, just like the official binary release tarballs do
