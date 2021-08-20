@@ -6,8 +6,7 @@
 
 FROM alpine:3.13
 
-RUN apk add --no-cache \
-		ca-certificates
+RUN apk add --no-cache ca-certificates
 
 # set up nsswitch.conf for Go's "netgo" implementation
 # - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
@@ -19,16 +18,10 @@ ENV PATH /usr/local/go/bin:$PATH
 ENV GOLANG_VERSION 1.17
 
 RUN set -eux; \
-	apk add --no-cache --virtual .build-deps \
-		bash \
-		gcc \
-		gnupg \
-		go \
-		musl-dev \
-		openssl \
-	; \
-	apkArch="$(apk --print-arch)"; \
-	case "$apkArch" in \
+	apk add --no-cache --virtual .fetch-deps gnupg; \
+	arch="$(apk --print-arch)"; \
+	url=; \
+	case "$arch" in \
 		'x86_64') \
 			export GOARCH='amd64' GOOS='linux'; \
 			;; \
@@ -50,19 +43,23 @@ RUN set -eux; \
 		's390x') \
 			export GOARCH='s390x' GOOS='linux'; \
 			;; \
-		*) echo >&2 "error: unsupported architecture '$apkArch' (likely packaging update needed)"; exit 1 ;; \
+		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
-	\
+	build=; \
+	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
-	url='https://dl.google.com/go/go1.17.src.tar.gz'; \
-	sha256='3a70e5055509f347c0fb831ca07a2bf3b531068f349b14a3c652e9b5b67beb5d'; \
+		build=1; \
+		url='https://dl.google.com/go/go1.17.src.tar.gz'; \
+		sha256='3a70e5055509f347c0fb831ca07a2bf3b531068f349b14a3c652e9b5b67beb5d'; \
+# the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
+	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
 	echo "$sha256 *go.tgz" | sha256sum -c -; \
 	\
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
-	export GNUPGHOME="$(mktemp -d)"; \
+	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
 # https://www.google.com/linuxrepositories/
 	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
 	gpg --batch --verify go.tgz.asc go.tgz; \
@@ -72,41 +69,51 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	( \
-		cd /usr/local/go/src; \
+	if [ -n "$build" ]; then \
+		apk add --no-cache --virtual .build-deps \
+			bash \
+			gcc \
+			go \
+			musl-dev \
+		; \
+		\
+		( \
+			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
-		export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-		if [ -n "${GO386:-}" ]; then \
+			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+			if [ -n "${GO386:-}" ]; then \
 # https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# Go 1.15 + Alpine 3.14 == Go 1.16 bootstrap
 # Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
-# (once Go 1.15 *and* Alpine 3.13 go away, we can remove this)
-			GO386= ./bootstrap.bash; \
-			export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
-			"$GOROOT_BOOTSTRAP/bin/go" version; \
-		fi; \
-		./make.bash; \
-		if [ -n "${GO386:-}" ]; then \
-			rm -rf "$GOROOT_BOOTSTRAP"; \
-		fi; \
-	); \
-	\
+# (once Alpine 3.13 goes away, we can remove this)
+				GO386= ./bootstrap.bash; \
+				export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
+				"$GOROOT_BOOTSTRAP/bin/go" version; \
+			fi; \
+			./make.bash; \
+			if [ -n "${GO386:-}" ]; then \
+				rm -rf "$GOROOT_BOOTSTRAP"; \
+			fi; \
+		); \
+		\
+		apk del --no-network .build-deps; \
+		\
 # pre-compile the standard library, just like the official binary release tarballs do
-	go install std; \
+		go install std; \
 # go install: -race is only supported on linux/amd64, linux/ppc64le, linux/arm64, freebsd/amd64, netbsd/amd64, darwin/amd64 and windows/amd64
-#	go install -race std; \
-	\
-	apk del --no-network .build-deps; \
-	\
+#		go install -race std; \
+		\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
-	rm -rf \
-		/usr/local/go/pkg/*/cmd \
-		/usr/local/go/pkg/bootstrap \
-		/usr/local/go/pkg/obj \
-		/usr/local/go/pkg/tool/*/api \
-		/usr/local/go/pkg/tool/*/go_bootstrap \
-		/usr/local/go/src/cmd/dist/dist \
-	; \
+		rm -rf \
+			/usr/local/go/pkg/*/cmd \
+			/usr/local/go/pkg/bootstrap \
+			/usr/local/go/pkg/obj \
+			/usr/local/go/pkg/tool/*/api \
+			/usr/local/go/pkg/tool/*/go_bootstrap \
+			/usr/local/go/src/cmd/dist/dist \
+		; \
+	fi; \
+	\
+	apk del --no-network .fetch-deps; \
 	\
 	go version
 
