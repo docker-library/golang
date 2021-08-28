@@ -39,10 +39,6 @@ for version; do
 		export variant
 
 		case "$dir" in
-			alpine*)
-				template='Dockerfile-alpine.template'
-				;;
-
 			windows/*)
 				windowsVariant="${variant%%-*}" # "windowsservercore", "nanoserver"
 				windowsRelease="${variant#$windowsVariant-}" # "1809", "ltsc2016", etc
@@ -52,7 +48,7 @@ for version; do
 				;;
 
 			*)
-				template='Dockerfile-debian.template'
+				template='Dockerfile-linux.template'
 				;;
 		esac
 
