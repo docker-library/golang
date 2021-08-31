@@ -57,6 +57,7 @@ ENV GOLANG_VERSION 1.16.7
 
 RUN $url = 'https://dl.google.com/go/go1.16.7.windows-amd64.zip'; \
 	Write-Host ('Downloading {0} ...' -f $url); \
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
 	Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
 	\
 	$sha256 = '56b3a9024268f226f679c3a8ffb21f4214a75f84050b2c395b362ae2cc8e53e9'; \

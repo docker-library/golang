@@ -65,6 +65,7 @@ ENV GOLANG_VERSION {{ .version }}
 
 RUN $url = '{{ .arches["windows-amd64"].url }}'; \
 	Write-Host ('Downloading {0} ...' -f $url); \
+	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
 	Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
 	\
 	$sha256 = '{{ .arches["windows-amd64"].sha256 }}'; \
