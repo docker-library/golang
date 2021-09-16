@@ -4,75 +4,77 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:buster-scm
+FROM buildpack-deps:bullseye-scm
 
-# gcc for cgo
-RUN apt-get update && apt-get install -y --no-install-recommends \
+# install cgo-related dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		g++ \
 		gcc \
 		libc6-dev \
 		make \
 		pkg-config \
-	&& rm -rf /var/lib/apt/lists/*
+	; \
+	rm -rf /var/lib/apt/lists/*
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.15.15
+ENV GOLANG_VERSION 1.16.8
 
 RUN set -eux; \
-	\
-	dpkgArch="$(dpkg --print-architecture)"; \
+	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
 	url=; \
-	case "${dpkgArch##*-}" in \
+	case "$arch" in \
 		'amd64') \
-			url='https://dl.google.com/go/go1.15.15.linux-amd64.tar.gz'; \
-			sha256='0885cf046a9f099e260d98d9ec5d19ea9328f34c8dc4956e1d3cd87daaddb345'; \
+			url='https://dl.google.com/go/go1.16.8.linux-amd64.tar.gz'; \
+			sha256='f32501aeb8b7b723bc7215f6c373abb6981bbc7e1c7b44e9f07317e1a300dce2'; \
 			;; \
 		'armel') \
 			export GOARCH='arm' GOARM='5' GOOS='linux'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.15.15.linux-armv6l.tar.gz'; \
-			sha256='7192603af50afb23c9d8cd14d2b2c19e0985a34d3eca685fa098df7893000d19'; \
+			url='https://dl.google.com/go/go1.16.8.linux-armv6l.tar.gz'; \
+			sha256='9c03d32e6b9622de4f4ce6e46bc1b7f8c738389ab70e1270282f488cd89079ee'; \
 			;; \
 		'arm64') \
-			url='https://dl.google.com/go/go1.15.15.linux-arm64.tar.gz'; \
-			sha256='714abb01af210473dd6af331094ad6847162eff81a7fc7241d24f5a85496c9fa'; \
+			url='https://dl.google.com/go/go1.16.8.linux-arm64.tar.gz'; \
+			sha256='430dbe185417204f6788913197ab3b189b6deae9c9b524f262858e53dab239c2'; \
 			;; \
 		'i386') \
-			url='https://dl.google.com/go/go1.15.15.linux-386.tar.gz'; \
-			sha256='3310fb0e48b0907bb520f6e3c6dcff63cc0913b92a76456f12980d0eb13b77d4'; \
+			url='https://dl.google.com/go/go1.16.8.linux-386.tar.gz'; \
+			sha256='ae5efe038fdc5d9f5bcef82389af8d070c3e753dc3ba3711d9368a9d5f9c957f'; \
 			;; \
 		'mips64el') \
 			export GOARCH='mips64le' GOOS='linux'; \
 			;; \
 		'ppc64el') \
-			url='https://dl.google.com/go/go1.15.15.linux-ppc64le.tar.gz'; \
-			sha256='37f3b99e21d0324a6583159e14e42e57e56561abbf7bf68bef3d8f57b29e39c0'; \
+			url='https://dl.google.com/go/go1.16.8.linux-ppc64le.tar.gz'; \
+			sha256='ab379b6c87e2940a54f63f1a55b4ad2fad486e5d804fa8a6d8b595e8dd6ccb8c'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.15.15.linux-s390x.tar.gz'; \
-			sha256='eae39d97df6b758636d5427be0b083dbf9d49007b302825ac6c8645de039aaab'; \
+			url='https://dl.google.com/go/go1.16.8.linux-s390x.tar.gz'; \
+			sha256='d311d0637b49c0debb34efb229ab0272f26709bc64e27fda2c3470a55426f980'; \
 			;; \
-		*) echo >&2 "error: unsupported architecture '$dpkgArch' (likely packaging update needed)"; exit 1 ;; \
+		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
 	build=; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.15.15.src.tar.gz'; \
-		sha256='0662ae3813330280d5f1a97a2ee23bbdbe3a5a7cfa6001b24a9873a19a0dc7ec'; \
+		url='https://dl.google.com/go/go1.16.8.src.tar.gz'; \
+		sha256='8f2a8c24b793375b3243df82fdb0c8387486dcc8a892ca1c991aa99ace086b98'; \
 		echo >&2; \
-		echo >&2 "warning: current architecture ($dpkgArch) does not have a corresponding Go binary release; will be building from source"; \
+		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
 		echo >&2; \
 	fi; \
 	\
-	wget -O go.tgz.asc "$url.asc" --progress=dot:giga; \
+	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url" --progress=dot:giga; \
-	echo "$sha256 *go.tgz" | sha256sum --strict --check -; \
+	echo "$sha256 *go.tgz" | sha256sum -c -; \
 	\
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
-	export GNUPGHOME="$(mktemp -d)"; \
+	GNUPGHOME="$(mktemp -d)"; export GNUPGHOME; \
 # https://www.google.com/linuxrepositories/
 	gpg --batch --keyserver keyserver.ubuntu.com --recv-keys 'EB4C 1BFD 4F04 2F6D DDCC EC91 7721 F63B D38B 4796'; \
 	gpg --batch --verify go.tgz.asc go.tgz; \

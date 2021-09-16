@@ -138,6 +138,7 @@ for version in "${versions[@]}"; do
 		version: .version,
 		arches: .arches,
 		variants: [
+			"bullseye",
 			"buster",
 			"stretch",
 			(
@@ -146,10 +147,12 @@ for version in "${versions[@]}"; do
 			| "alpine" + .),
 			if .arches | has("windows-amd64") then
 				(
+					"ltsc2022",
 					"1809",
 					"ltsc2016"
 				| "windows/windowsservercore-" + .),
 				(
+					"ltsc2022",
 					"1809"
 				| "windows/nanoserver-" + .)
 			else empty end
