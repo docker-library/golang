@@ -72,8 +72,7 @@ cat <<-EOH
 # this file is generated via https://github.com/docker-library/golang/blob/$(fileCommit "$self")/$self
 
 Maintainers: Tianon Gravi <admwiggin@gmail.com> (@tianon),
-             Joseph Ferguson <yosifkit@gmail.com> (@yosifkit),
-             Johan Euphrosine <proppy@google.com> (@proppy)
+             Joseph Ferguson <yosifkit@gmail.com> (@yosifkit)
 GitRepo: https://github.com/docker-library/golang.git
 EOH
 
