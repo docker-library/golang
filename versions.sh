@@ -141,6 +141,7 @@ for version in "${versions[@]}"; do
 			"bullseye",
 			"buster",
 			"stretch",
+                        "focal",
 			(
 				"3.14",
 				"3.13"
