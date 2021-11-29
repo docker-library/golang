@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.13
+FROM alpine:3.15
 
 RUN apk add --no-cache ca-certificates
 
@@ -15,7 +15,7 @@ RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.16.10
+ENV GOLANG_VERSION 1.17.3
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps gnupg; \
@@ -49,8 +49,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.16.10.src.tar.gz'; \
-		sha256='a905472011585e403d00d2a41de7ced29b8884309d73482a307f689fd0f320b5'; \
+		url='https://dl.google.com/go/go1.17.3.src.tar.gz'; \
+		sha256='705c64251e5b25d5d55ede1039c6aa22bea40a7a931d14c370339853643c3df0'; \
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 	fi; \
 	\
@@ -83,18 +83,7 @@ RUN set -eux; \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-			if [ -n "${GO386:-}" ]; then \
-# https://github.com/docker-library/golang/issues/359 -> https://github.com/golang/go/issues/44500
-# Go 1.16 + Alpine 3.13 == Go 1.15 bootstrap
-# (once Alpine 3.13 goes away, we can remove this)
-				GO386= ./bootstrap.bash; \
-				export GOROOT_BOOTSTRAP="/usr/local/go-$GOOS-$GOARCH-bootstrap"; \
-				"$GOROOT_BOOTSTRAP/bin/go" version; \
-			fi; \
 			./make.bash; \
-			if [ -n "${GO386:-}" ]; then \
-				rm -rf "$GOROOT_BOOTSTRAP"; \
-			fi; \
 		); \
 		\
 		apk del --no-network .build-deps; \

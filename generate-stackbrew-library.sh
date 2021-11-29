@@ -10,7 +10,7 @@ defaultDebianSuite='bullseye'
 declare -A debianSuite=(
 	#[1.13-rc]='buster'
 )
-defaultAlpineVersion='3.14'
+defaultAlpineVersion='3.15'
 declare -A alpineVersion=(
 	#[1.9]='3.7'
 )
