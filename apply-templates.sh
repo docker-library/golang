@@ -43,7 +43,7 @@ for version; do
 		case "$dir" in
 			windows/*)
 				windowsVariant="${variant%%-*}" # "windowsservercore", "nanoserver"
-				windowsRelease="${variant#$windowsVariant-}" # "1809", "ltsc2016", etc
+				windowsRelease="${variant#$windowsVariant-}" # "ltsc2022", "1809", etc
 				windowsVariant="${windowsVariant#windows}" # "servercore", "nanoserver"
 				export windowsVariant windowsRelease
 				template="Dockerfile-windows-$windowsVariant.template"
