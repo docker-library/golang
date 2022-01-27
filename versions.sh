@@ -134,29 +134,56 @@ for version in "${versions[@]}"; do
 
 	echo "$version: $fullVersion"
 
-	doc="$(jq <<<"$goJson" -c '{
-		version: .version,
-		arches: .arches,
-		variants: [
-			"bullseye",
-			"buster",
-			"stretch",
-			(
-				"3.15",
-				"3.14"
-			| "alpine" + .),
-			if .arches | has("windows-amd64") then
-				(
-					"ltsc2022",
-					"1809"
-				| "windows/windowsservercore-" + .),
-				(
-					"ltsc2022",
-					"1809"
-				| "windows/nanoserver-" + .)
-			else empty end
-		],
-	}')"
+	case "$version" in
+	1.18*)
+			# skip EOL distro variants
+			doc="$(jq <<<"$goJson" -c '{
+				version: .version,
+				arches: .arches,
+				variants: [
+					"bullseye",
+					(
+						"3.15"
+					| "alpine" + .),
+					if .arches | has("windows-amd64") then
+						(
+							"ltsc2022",
+							"1809"
+						| "windows/windowsservercore-" + .),
+						(
+							"ltsc2022",
+							"1809"
+						| "windows/nanoserver-" + .)
+					else empty end
+				],
+			}')"
+			;;
+	*)
+			doc="$(jq <<<"$goJson" -c '{
+				version: .version,
+				arches: .arches,
+				variants: [
+					"bullseye",
+					"buster",
+					"stretch",
+					(
+						"3.15",
+						"3.14"
+					| "alpine" + .),
+					if .arches | has("windows-amd64") then
+						(
+							"ltsc2022",
+							"1809"
+						| "windows/windowsservercore-" + .),
+						(
+							"ltsc2022",
+							"1809"
+						| "windows/nanoserver-" + .)
+					else empty end
+				],
+			}')"
+			;;
+	esac
 
 	json="$(jq <<<"$json" -c --argjson doc "$doc" '.[env.version] = $doc')"
 done
