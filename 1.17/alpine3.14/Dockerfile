@@ -88,11 +88,6 @@ RUN set -eux; \
 		\
 		apk del --no-network .build-deps; \
 		\
-# pre-compile the standard library, just like the official binary release tarballs do
-		go install std; \
-# go install: -race is only supported on linux/amd64, linux/ppc64le, linux/arm64, freebsd/amd64, netbsd/amd64, darwin/amd64 and windows/amd64
-#		go install -race std; \
-		\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
 		rm -rf \
 			/usr/local/go/pkg/*/cmd \
