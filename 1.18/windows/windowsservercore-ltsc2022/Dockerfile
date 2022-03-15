@@ -43,24 +43,24 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	\
 	Write-Host 'Complete.';
 
-# ideally, this would be C:\go to match Linux a bit closer, but C:\go was the default install path for Go itself on Windows
-ENV GOPATH C:\\gopath
-# (https://golang.org/cl/283600)
+# for 1.17+, we'll follow the (new) Go upstream default for install (https://golang.org/cl/283600), which frees up C:\go to be the default GOPATH and thus match the Linux images more closely (https://github.com/docker-library/golang/issues/288)
+ENV GOPATH C:\\go
+# HOWEVER, please note that it is the Go upstream intention to remove GOPATH support entirely: https://blog.golang.org/go116-module-changes
 
 # PATH isn't actually set in the Docker image, so we have to set it from within the container
-RUN $newPath = ('{0}\bin;C:\go\bin;{1}' -f $env:GOPATH, $env:PATH); \
+RUN $newPath = ('{0}\bin;C:\Program Files\Go\bin;{1}' -f $env:GOPATH, $env:PATH); \
 	Write-Host ('Updating PATH: {0}' -f $newPath); \
 	[Environment]::SetEnvironmentVariable('PATH', $newPath, [EnvironmentVariableTarget]::Machine);
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.16.15
+ENV GOLANG_VERSION 1.18
 
-RUN $url = 'https://dl.google.com/go/go1.16.15.windows-amd64.zip'; \
+RUN $url = 'https://dl.google.com/go/go1.18.windows-amd64.zip'; \
 	Write-Host ('Downloading {0} ...' -f $url); \
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
 	Invoke-WebRequest -Uri $url -OutFile 'go.zip'; \
 	\
-	$sha256 = '0d6e551206b6d744d1286e62abf46aa2f17fed90f07ec4624a0448d71380407d'; \
+	$sha256 = '65c5c0c709a7ca1b357091b10b795b439d8b50e579d3893edab4c7e9b384f435'; \
 	Write-Host ('Verifying sha256 ({0}) ...' -f $sha256); \
 	if ((Get-FileHash go.zip -Algorithm sha256).Hash -ne $sha256) { \
 		Write-Host 'FAILED!'; \
@@ -69,6 +69,9 @@ RUN $url = 'https://dl.google.com/go/go1.16.15.windows-amd64.zip'; \
 	\
 	Write-Host 'Expanding ...'; \
 	Expand-Archive go.zip -DestinationPath C:\; \
+	\
+	Write-Host 'Moving ...'; \
+	Move-Item -Path C:\go -Destination 'C:\Program Files\Go'; \
 	\
 	Write-Host 'Removing ...'; \
 	Remove-Item go.zip -Force; \
