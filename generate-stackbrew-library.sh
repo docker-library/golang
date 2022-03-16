@@ -2,8 +2,7 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[1.17]='1 latest'
-	[1.18-rc]='rc'
+	[1.18]='1 latest'
 )
 
 defaultDebianSuite='bullseye'
