@@ -78,6 +78,14 @@ RUN set -eux; \
 			go \
 			musl-dev \
 		; \
+		if [ "$GOARCH" = 'ppc64le' ]; then \
+# https://github.com/golang/go/issues/51787
+			wget -O ppc64le-alpine.patch 'https://github.com/golang/go/commit/946167906ed8646c433c257b074a10e01f0a7dab.patch'; \
+			apk add --no-cache --virtual .build-patch patch; \
+			patch --strip=1 --input="$PWD/ppc64le-alpine.patch" --directory=/usr/local/go; \
+			apk del --no-network .build-patch; \
+			rm ppc64le-alpine.patch; \
+		fi; \
 		\
 		( \
 			cd /usr/local/go/src; \
