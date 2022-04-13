@@ -212,6 +212,24 @@
         "supported": true,
         "url": "https://dl.google.com/go/go1.18.1.linux-arm64.tar.gz"
       },
+      "darwin-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "darwin"
+        },
+        "sha256": "3703e9a0db1000f18c0c7b524f3d378aac71219b4715a6a4c5683eb639f41a4d",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.18.1.darwin-amd64.tar.gz"
+      },
+      "darwin-arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "darwin"
+        },
+        "sha256": "6d5641a06edba8cd6d425fb0adad06bad80e2afe0fa91b4aa0e5aed1bc78f58e",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.18.1.darwin-arm64.tar.gz"
+      },
       "freebsd-amd64": {
         "env": {
           "GOARCH": "amd64",
