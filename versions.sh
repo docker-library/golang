@@ -71,6 +71,9 @@ goVersions="$(
 									+ if .arch == "386" and .os == "linux" then
 										# i386 in Debian is non-SSE2, Alpine appears to be similar (but interesting, not FreeBSD?)
 										{ GO386: "softfloat" }
+									elif .arch == "amd64" and .os == "linux" and $major != "1.17" then
+										# https://tip.golang.org/doc/go1.18#amd64
+										{ GOAMD64: "v1" }
 									elif $bashbrewArch | startswith("arm32v") then
 										{ GOARCH: "arm", GOARM: ($bashbrewArch | ltrimstr("arm32v")) }
 									else {} end

@@ -168,6 +168,7 @@
     "arches": {
       "amd64": {
         "env": {
+          "GOAMD64": "v1",
           "GOARCH": "amd64",
           "GOOS": "linux"
         },

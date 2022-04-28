@@ -23,7 +23,7 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'x86_64') \
-			export GOARCH='amd64' GOOS='linux'; \
+			export GOAMD64='v1' GOARCH='amd64' GOOS='linux'; \
 			;; \
 		'armhf') \
 			export GOARCH='arm' GOARM='6' GOOS='linux'; \
