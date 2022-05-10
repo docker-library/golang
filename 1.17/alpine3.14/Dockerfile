@@ -79,6 +79,8 @@ RUN set -eux; \
 			musl-dev \
 		; \
 		\
+		export GOCACHE='/tmp/gocache'; \
+		\
 		( \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
@@ -96,6 +98,7 @@ RUN set -eux; \
 			/usr/local/go/pkg/tool/*/api \
 			/usr/local/go/pkg/tool/*/go_bootstrap \
 			/usr/local/go/src/cmd/dist/dist \
+			"$GOCACHE" \
 		; \
 	fi; \
 	\
