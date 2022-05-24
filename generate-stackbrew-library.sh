@@ -5,15 +5,6 @@ declare -A aliases=(
 	[1.18]='1 latest'
 )
 
-defaultDebianSuite='bullseye'
-declare -A debianSuite=(
-	#[1.13-rc]='buster'
-)
-defaultAlpineVersion='3.16'
-declare -A alpineVersion=(
-	#[1.9]='3.7'
-)
-
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
@@ -93,12 +84,29 @@ for version; do
 		${aliases[$version]:-}
 	)
 
+	defaultDebianVariant="$(jq -r '
+		.[env.version].variants
+		| map(select(
+			startswith("alpine")
+			or startswith("slim-")
+			or startswith("windows/")
+			| not
+		))
+		| .[0]
+	' versions.json)"
+	defaultAlpineVariant="$(jq -r '
+		.[env.version].variants
+		| map(select(
+			startswith("alpine")
+		))
+		| .[0]
+	' versions.json)"
+
 	for v in "${variants[@]}"; do
 		dir="$version/$v"
 		[ -f "$dir/Dockerfile" ] || continue
 
 		variant="$(basename "$v")"
-		versionSuite="${debianSuite[$version]:-$defaultDebianSuite}"
 
 		fullVersion="$(jq -r '.[env.version].version' versions.json)"
 
@@ -112,7 +120,7 @@ for version; do
 		variantAliases=( "${baseAliases[@]/%/-$variant}" )
 		variantAliases=( "${variantAliases[@]//latest-/}" )
 
-		if [ "${variant#alpine}" = "${alpineVersion[$version]:-$defaultAlpineVersion}" ]; then
+		if [ "$variant" = "$defaultAlpineVariant" ]; then
 			variantAliases+=( "${baseAliases[@]/%/-alpine}" )
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 		fi
@@ -157,7 +165,7 @@ for version; do
 				break
 			fi
 		done
-		if [ "$variant" = "$versionSuite" ] || [[ "$variant" == 'windowsservercore'* ]]; then
+		if [ "$variant" = "$defaultDebianVariant" ] || [[ "$variant" == 'windowsservercore'* ]]; then
 			sharedTags+=( "${baseAliases[@]}" )
 		fi
 
