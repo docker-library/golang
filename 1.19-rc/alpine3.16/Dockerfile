@@ -1,12 +1,10 @@
-{{
-	def is_alpine:
-		env.variant | startswith("alpine")
-	;
-	def alpine_version:
-		env.variant | ltrimstr("alpine")
--}}
-{{ if is_alpine then ( -}}
-FROM alpine:{{ alpine_version }}
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "apply-templates.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+FROM alpine:3.16
 
 RUN apk add --no-cache ca-certificates
 
@@ -14,103 +12,50 @@ RUN apk add --no-cache ca-certificates
 # - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
 # - docker run --rm debian:stretch grep '^hosts:' /etc/nsswitch.conf
 RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
-{{ ) else ( -}}
-FROM buildpack-deps:{{ env.variant }}-scm
-
-# install cgo-related dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-	; \
-	rm -rf /var/lib/apt/lists/*
-{{ ) end -}}
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION {{ .version }}
+ENV GOLANG_VERSION 1.19beta1
 
-{{
-	def os_arches:
-		if is_alpine then
-			{
-				amd64: "x86_64",
-				arm32v6: "armhf",
-				arm32v7: "armv7",
-				arm64v8: "aarch64",
-				i386: "x86",
-				ppc64le: "ppc64le",
-				s390x: "s390x",
-			}
-		else
-			{
-				amd64: "amd64",
-				arm32v5: "armel",
-				arm32v7: "armhf",
-				arm64v8: "arm64",
-				i386: "i386",
-				mips64le: "mips64el",
-				ppc64le: "ppc64el",
-				s390x: "s390x",
-			}
-		end
--}}
 RUN set -eux; \
-{{ if is_alpine then ( -}}
 	apk add --no-cache --virtual .fetch-deps gnupg; \
 	arch="$(apk --print-arch)"; \
-{{ ) else ( -}}
-	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
-{{ ) end -}}
 	url=; \
 	case "$arch" in \
-{{
-	[
-		.arches | to_entries[]
-		| select(.value.supported)
-		| .key as $bashbrewArch
-		| (
-			os_arches
-			| .[$bashbrewArch] // empty
-		) as $osArch
-		| .value
-		| (
--}}
-		{{ $osArch | @sh }}) \
-{{ if .url and (is_alpine | not) then ( -}}
-			url={{ .url | @sh }}; \
-			sha256={{ .sha256 | @sh }}; \
-{{ ) else ( -}}
-			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
-{{ ) end -}}
+		'x86_64') \
+			export GOAMD64='v1' GOARCH='amd64' GOOS='linux'; \
 			;; \
-{{
-		)
-	] | add
--}}
+		'armhf') \
+			export GOARCH='arm' GOARM='6' GOOS='linux'; \
+			;; \
+		'armv7') \
+			export GOARCH='arm' GOARM='7' GOOS='linux'; \
+			;; \
+		'aarch64') \
+			export GOARCH='arm64' GOOS='linux'; \
+			;; \
+		'x86') \
+			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
+			;; \
+		'ppc64le') \
+			export GOARCH='ppc64le' GOOS='linux'; \
+			;; \
+		's390x') \
+			export GOARCH='s390x' GOOS='linux'; \
+			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
 	build=; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url={{ .arches.src.url | @sh }}; \
-		sha256={{ .arches.src.sha256 | @sh }}; \
-{{ if is_alpine then ( -}}
+		url='https://dl.google.com/go/go1.19beta1.src.tar.gz'; \
+		sha256='f463e5a5c25eebdea06d7ae3890c91de2f3795304e9fa350505804d826ec2683'; \
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
-{{ ) else ( -}}
-		echo >&2; \
-		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
-		echo >&2; \
-{{ ) end -}}
 	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
-	wget -O go.tgz "$url"{{ if is_alpine then "" else " --progress=dot:giga" end }}; \
+	wget -O go.tgz "$url"; \
 	echo "$sha256 *go.tgz" | sha256sum -c -; \
 	\
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
@@ -127,18 +72,12 @@ RUN set -eux; \
 	rm go.tgz; \
 	\
 	if [ -n "$build" ]; then \
-{{ if is_alpine then ( -}}
 		apk add --no-cache --virtual .build-deps \
 			bash \
 			gcc \
 			go \
 			musl-dev \
 		; \
-{{ ) else ( -}}
-		savedAptMark="$(apt-mark showmanual)"; \
-		apt-get update; \
-		apt-get install -y --no-install-recommends golang-go; \
-{{ ) end -}}
 		\
 		export GOCACHE='/tmp/gocache'; \
 		\
@@ -146,23 +85,14 @@ RUN set -eux; \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-{{ if is_alpine and ([ "1.17", "1.18" ] | index(env.version) | not) then ( -}}
 			if [ "${GOARCH:-}" = '386' ]; then \
 # https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
 				export CGO_CFLAGS='-fno-stack-protector'; \
 			fi; \
-{{ ) else "" end -}}
 			./make.bash; \
 		); \
 		\
-{{ if is_alpine then ( -}}
 		apk del --no-network .build-deps; \
-{{ ) else ( -}}
-		apt-mark auto '.*' > /dev/null; \
-		apt-mark manual $savedAptMark > /dev/null; \
-		apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-		rm -rf /var/lib/apt/lists/*; \
-{{ ) end -}}
 		\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
 		rm -rf \
@@ -176,10 +106,8 @@ RUN set -eux; \
 		; \
 	fi; \
 	\
-{{ if is_alpine then ( -}}
 	apk del --no-network .fetch-deps; \
 	\
-{{ ) else "" end -}}
 	go version
 
 ENV GOPATH /go
