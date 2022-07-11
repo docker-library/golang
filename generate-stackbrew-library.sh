@@ -133,13 +133,6 @@ for version; do
 			*)
 				variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
 				variantArches="${parentRepoToArches[$variantParent]}"
-
-				if [ "$variant" = 'stretch' ]; then
-					# stretch's "golang-go" package fails to build (TODO try backports?)
-					variantArches="$(sed <<<" $variantArches " -e 's/ arm32v5 / /g')"
-					# "gccgo" in stretch can't build mips64le
-					variantArches="$(sed <<<" $variantArches " -e 's/ mips64le / /g')"
-				fi
 				;;
 		esac
 

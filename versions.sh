@@ -143,7 +143,6 @@ for version in "${versions[@]}"; do
 		variants: [
 			"bullseye",
 			"buster",
-			"stretch",
 			(
 				"3.16",
 				"3.15"
