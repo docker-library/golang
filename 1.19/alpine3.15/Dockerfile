@@ -4,57 +4,44 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:buster-scm
+FROM alpine:3.15
 
-# install cgo-related dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-	; \
-	rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache ca-certificates
+
+# set up nsswitch.conf for Go's "netgo" implementation
+# - https://github.com/golang/go/blob/go1.9.1/src/net/conf.go#L194-L275
+# - docker run --rm debian grep '^hosts:' /etc/nsswitch.conf
+RUN [ ! -e /etc/nsswitch.conf ] && echo 'hosts: files dns' > /etc/nsswitch.conf
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.17.13
+ENV GOLANG_VERSION 1.19
 
 RUN set -eux; \
-	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
+	apk add --no-cache --virtual .fetch-deps gnupg; \
+	arch="$(apk --print-arch)"; \
 	url=; \
 	case "$arch" in \
-		'amd64') \
-			url='https://dl.google.com/go/go1.17.13.linux-amd64.tar.gz'; \
-			sha256='4cdd2bc664724dc7db94ad51b503512c5ae7220951cac568120f64f8e94399fc'; \
-			;; \
-		'armel') \
-			export GOARCH='arm' GOARM='5' GOOS='linux'; \
+		'x86_64') \
+			export GOAMD64='v1' GOARCH='amd64' GOOS='linux'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.17.13.linux-armv6l.tar.gz'; \
-			sha256='260431d7deeb8893c21e71fcbbb1fde3258616d8eba584c8d72060228ab42c86'; \
+			export GOARCH='arm' GOARM='6' GOOS='linux'; \
 			;; \
-		'arm64') \
-			url='https://dl.google.com/go/go1.17.13.linux-arm64.tar.gz'; \
-			sha256='914daad3f011cc2014dea799bb7490442677e4ad6de0b2ac3ded6cee7e3f493d'; \
+		'armv7') \
+			export GOARCH='arm' GOARM='7' GOOS='linux'; \
 			;; \
-		'i386') \
-			url='https://dl.google.com/go/go1.17.13.linux-386.tar.gz'; \
-			sha256='5e02f35aecc6b89679f631e0edf12c49922dd31c8140cf8dd725c5797a9f2425'; \
+		'aarch64') \
+			export GOARCH='arm64' GOOS='linux'; \
 			;; \
-		'mips64el') \
-			export GOARCH='mips64le' GOOS='linux'; \
+		'x86') \
+			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
 			;; \
-		'ppc64el') \
-			url='https://dl.google.com/go/go1.17.13.linux-ppc64le.tar.gz'; \
-			sha256='bd0763fb130f8412672ffe1e4a8e65888ebe2419e5caa9a67ac21e8c298aa254'; \
+		'ppc64le') \
+			export GOARCH='ppc64le' GOOS='linux'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.17.13.linux-s390x.tar.gz'; \
-			sha256='08f6074e1e106cbe5d78622357db71a93648c7a4c4e4b02e3b5f2a1828914c76'; \
+			export GOARCH='s390x' GOOS='linux'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -62,15 +49,13 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.17.13.src.tar.gz'; \
-		sha256='a1a48b23afb206f95e7bbaa9b898d965f90826f6f1d1fc0c1d784ada0cd300fd'; \
-		echo >&2; \
-		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
-		echo >&2; \
+		url='https://dl.google.com/go/go1.19.src.tar.gz'; \
+		sha256='9419cc70dc5a2523f29a77053cafff658ed21ef3561d9b6b020280ebceab28b9'; \
+# the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
-	wget -O go.tgz "$url" --progress=dot:giga; \
+	wget -O go.tgz "$url"; \
 	echo "$sha256 *go.tgz" | sha256sum -c -; \
 	\
 # https://github.com/golang/go/issues/14739#issuecomment-324767697
@@ -87,9 +72,12 @@ RUN set -eux; \
 	rm go.tgz; \
 	\
 	if [ -n "$build" ]; then \
-		savedAptMark="$(apt-mark showmanual)"; \
-		apt-get update; \
-		apt-get install -y --no-install-recommends golang-go; \
+		apk add --no-cache --virtual .build-deps \
+			bash \
+			gcc \
+			go \
+			musl-dev \
+		; \
 		\
 		export GOCACHE='/tmp/gocache'; \
 		\
@@ -97,13 +85,14 @@ RUN set -eux; \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+			if [ "${GOARCH:-}" = '386' ]; then \
+# https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
+				export CGO_CFLAGS='-fno-stack-protector'; \
+			fi; \
 			./make.bash; \
 		); \
 		\
-		apt-mark auto '.*' > /dev/null; \
-		apt-mark manual $savedAptMark > /dev/null; \
-		apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-		rm -rf /var/lib/apt/lists/*; \
+		apk del --no-network .build-deps; \
 		\
 # remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
 		rm -rf \
@@ -116,6 +105,8 @@ RUN set -eux; \
 			"$GOCACHE" \
 		; \
 	fi; \
+	\
+	apk del --no-network .fetch-deps; \
 	\
 	go version
 

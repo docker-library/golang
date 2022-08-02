@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM mcr.microsoft.com/windows/nanoserver:1809
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
 
 SHELL ["cmd", "/S", "/C"]
 
@@ -21,10 +21,10 @@ RUN setx /m PATH "%GOPATH%\bin;C:\Program Files\Go\bin;%PATH%"
 USER ContainerUser
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.19rc2
+ENV GOLANG_VERSION 1.19
 
 # Docker's Windows path parsing is absolutely *cursed*; please just trust me on this one -Tianon
-COPY --from=golang:1.19rc2-windowsservercore-1809 ["C:\\\\Program Files\\\\Go","C:\\\\Program Files\\\\Go"]
+COPY --from=golang:1.19-windowsservercore-ltsc2022 ["C:\\\\Program Files\\\\Go","C:\\\\Program Files\\\\Go"]
 RUN go version
 
 WORKDIR $GOPATH
