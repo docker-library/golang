@@ -4,19 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:bookworm-scm
-
-# install cgo-related dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-	; \
-	rm -rf /var/lib/apt/lists/*
+FROM buildpack-deps:bookworm-scm AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
@@ -78,13 +66,40 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
-	go version
+# save the timestamp from the tarball so we can restore it for reproducibility, if necessary (see below)
+	SOURCE_DATE_EPOCH="$(stat -c '%Y' /usr/local/go)"; \
+	export SOURCE_DATE_EPOCH; \
+# for logging validation/edification
+	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
+	\
+# smoke test
+	go version; \
+# make sure our reproducibile timestamp is probably still correct (best-effort inline reproducibility test)
+	epoch="$(stat -c '%Y' /usr/local/go)"; \
+	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]
+
+FROM buildpack-deps:bookworm-scm
+
+# install cgo-related dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		g++ \
+		gcc \
+		libc6-dev \
+		make \
+		pkg-config \
+	; \
+	rm -rf /var/lib/apt/lists/*
+
+ENV GOLANG_VERSION 1.21.6
 
 # don't auto-upgrade the gotoolchain
 # https://github.com/docker-library/golang/issues/472
 ENV GOTOOLCHAIN=local
 
 ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+COPY --from=build --link /usr/local/go/ /usr/local/go/
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
 WORKDIR $GOPATH
