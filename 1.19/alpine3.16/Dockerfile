@@ -8,17 +8,6 @@ FROM alpine:3.16
 
 RUN apk add --no-cache ca-certificates
 
-# ensure that nsswitch.conf is set up for Go's "netgo" implementation
-# - https://github.com/golang/go/blob/go1.19.3/src/net/conf.go#L227-L303
-# - docker run --rm debian grep '^hosts:' /etc/nsswitch.conf
-# Alpine 3.16 includes nsswitch.conf
-RUN set -eux; \
-	if [ -e /etc/nsswitch.conf ]; then \
-		grep '^hosts: files dns' /etc/nsswitch.conf; \
-	else \
-		echo 'hosts: files dns' > /etc/nsswitch.conf; \
-	fi
-
 ENV PATH /usr/local/go/bin:$PATH
 
 ENV GOLANG_VERSION 1.19.3
