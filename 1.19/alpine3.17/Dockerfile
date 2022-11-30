@@ -4,24 +4,13 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.15
+FROM alpine:3.17
 
 RUN apk add --no-cache ca-certificates
 
-# ensure that nsswitch.conf is set up for Go's "netgo" implementation
-# - https://github.com/golang/go/blob/go1.19.3/src/net/conf.go#L227-L303
-# - docker run --rm debian grep '^hosts:' /etc/nsswitch.conf
-# Alpine 3.16 includes nsswitch.conf
-RUN set -eux; \
-	if [ -e /etc/nsswitch.conf ]; then \
-		grep '^hosts: files dns' /etc/nsswitch.conf; \
-	else \
-		echo 'hosts: files dns' > /etc/nsswitch.conf; \
-	fi
-
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.18.8
+ENV GOLANG_VERSION 1.19.3
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps gnupg; \
@@ -55,8 +44,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.18.8.src.tar.gz'; \
-		sha256='1f79802305015479e77d8c641530bc54ec994657d5c5271e0172eb7118346a12'; \
+		url='https://dl.google.com/go/go1.19.3.src.tar.gz'; \
+		sha256='18ac263e39210bcf68d85f4370e97fb1734166995a1f63fb38b4f6e07d90d212'; \
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 	fi; \
 	\
@@ -91,6 +80,10 @@ RUN set -eux; \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
+			if [ "${GOARCH:-}" = '386' ]; then \
+# https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
+				export CGO_CFLAGS='-fno-stack-protector'; \
+			fi; \
 			./make.bash; \
 		); \
 		\
