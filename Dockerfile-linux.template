@@ -131,8 +131,19 @@ RUN set -eux; \
 		; \
 {{ ) else ( -}}
 		savedAptMark="$(apt-mark showmanual)"; \
+{{ if [ "1.18", "1.19" ] | index(env.version) then ( -}}
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
+{{ ) else ( -}}
+# add backports for newer go version for bootstrap build: https://github.com/golang/go/issues/44505
+		( \
+			. /etc/os-release; \
+			echo "deb https://deb.debian.org/debian $VERSION_CODENAME-backports main" > /etc/apt/sources.list.d/backports.list; \
+			\
+			apt-get update; \
+			apt-get install -y --no-install-recommends -t "$VERSION_CODENAME-backports" golang-go; \
+		); \
+{{ ) end -}}
 {{ ) end -}}
 		\
 		export GOCACHE='/tmp/gocache'; \
