@@ -10,7 +10,7 @@ RUN apk add --no-cache ca-certificates
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.20rc1
+ENV GOLANG_VERSION 1.20rc2
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps gnupg; \
@@ -44,8 +44,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.20rc1.src.tar.gz'; \
-		sha256='1731054ca984f25fdd083d048edfa08210cc9167f5a086a71deba128c713b414'; \
+		url='https://dl.google.com/go/go1.20rc2.src.tar.gz'; \
+		sha256='57522a2a2e295ca6292494501f131f8893b5911a8c0f85737e78aa74e0b9fcf6'; \
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 	fi; \
 	\
