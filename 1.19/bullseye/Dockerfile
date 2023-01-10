@@ -20,41 +20,41 @@ RUN set -eux; \
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.19.4
+ENV GOLANG_VERSION 1.19.5
 
 RUN set -eux; \
 	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
 	url=; \
 	case "$arch" in \
 		'amd64') \
-			url='https://dl.google.com/go/go1.19.4.linux-amd64.tar.gz'; \
-			sha256='c9c08f783325c4cf840a94333159cc937f05f75d36a8b307951d5bd959cf2ab8'; \
+			url='https://dl.google.com/go/go1.19.5.linux-amd64.tar.gz'; \
+			sha256='36519702ae2fd573c9869461990ae550c8c0d955cd28d2827a6b159fda81ff95'; \
 			;; \
 		'armel') \
 			export GOARCH='arm' GOARM='5' GOOS='linux'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.19.4.linux-armv6l.tar.gz'; \
-			sha256='7a51dae4f3a52d2dfeaf59367cc0b8a296deddc87e95aa619bf87d24661d2370'; \
+			url='https://dl.google.com/go/go1.19.5.linux-armv6l.tar.gz'; \
+			sha256='ec14f04bdaf4a62bdcf8b55b9b6434cc27c2df7d214d0bb7076a7597283b026a'; \
 			;; \
 		'arm64') \
-			url='https://dl.google.com/go/go1.19.4.linux-arm64.tar.gz'; \
-			sha256='9df122d6baf6f2275270306b92af3b09d7973fb1259257e284dba33c0db14f1b'; \
+			url='https://dl.google.com/go/go1.19.5.linux-arm64.tar.gz'; \
+			sha256='fc0aa29c933cec8d76f5435d859aaf42249aa08c74eb2d154689ae44c08d23b3'; \
 			;; \
 		'i386') \
-			url='https://dl.google.com/go/go1.19.4.linux-386.tar.gz'; \
-			sha256='e5f0b0551e120bf3d1246cb960ec58032d7ca69e1adcf0fdb91c07da620e0c61'; \
+			url='https://dl.google.com/go/go1.19.5.linux-386.tar.gz'; \
+			sha256='f68331aa7458a3598060595f5601d5731fd452bb2c62ff23095ddad68854e510'; \
 			;; \
 		'mips64el') \
 			export GOARCH='mips64le' GOOS='linux'; \
 			;; \
 		'ppc64el') \
-			url='https://dl.google.com/go/go1.19.4.linux-ppc64le.tar.gz'; \
-			sha256='fbc6c7d1d169bbdc82223d861d2fadc6add01c126533d3efbba3fdca9b362035'; \
+			url='https://dl.google.com/go/go1.19.5.linux-ppc64le.tar.gz'; \
+			sha256='e4032e7c52ebc48bad5c58ba8de0759b6091d9b1e59581a8a521c8c9d88dbe93'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.19.4.linux-s390x.tar.gz'; \
-			sha256='4b8d25acbdca8010c31ea8c5fd4aba93471ff6ada7a8b4fb04b935baee873dc8'; \
+			url='https://dl.google.com/go/go1.19.5.linux-s390x.tar.gz'; \
+			sha256='764871cbca841a99a24e239b63c68a4aaff4104658e3165e9ca450cac1fcbea3'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -62,8 +62,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.19.4.src.tar.gz'; \
-		sha256='eda74db4ac494800a3e66ee784e495bfbb9b8e535df924a8b01b1a8028b7f368'; \
+		url='https://dl.google.com/go/go1.19.5.src.tar.gz'; \
+		sha256='8e486e8e85a281fc5ce3f0bedc5b9d2dbf6276d7db0b25d3ec034f313da0375f'; \
 		echo >&2; \
 		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
 		echo >&2; \
