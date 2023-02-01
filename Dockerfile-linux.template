@@ -131,7 +131,7 @@ RUN set -eux; \
 		; \
 {{ ) else ( -}}
 		savedAptMark="$(apt-mark showmanual)"; \
-{{ if [ "1.18", "1.19" ] | index(env.version) then ( -}}
+{{ if [ "1.19" ] | index(env.version) then ( -}}
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
 {{ ) else ( -}}
@@ -152,7 +152,7 @@ RUN set -eux; \
 			cd /usr/local/go/src; \
 # set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
 			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-{{ if is_alpine and ([ "1.18" ] | index(env.version) | not) then ( -}}
+{{ if is_alpine then ( -}}
 			if [ "${GOARCH:-}" = '386' ]; then \
 # https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
 				export CGO_CFLAGS='-fno-stack-protector'; \
