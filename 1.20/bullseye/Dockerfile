@@ -49,7 +49,8 @@ RUN set -eux; \
 			export GOARCH='mips64le' GOOS='linux'; \
 			;; \
 		'ppc64el') \
-			export GOARCH='ppc64le' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.20.1.linux-ppc64le.tar.gz'; \
+			sha256='85cfd4b89b48c94030783b6e9e619e35557862358b846064636361421d0b0c52'; \
 			;; \
 		's390x') \
 			url='https://dl.google.com/go/go1.20.1.linux-s390x.tar.gz'; \

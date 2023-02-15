@@ -213,6 +213,24 @@
         "supported": true,
         "url": "https://dl.google.com/go/go1.20.1.linux-arm64.tar.gz"
       },
+      "darwin-amd64": {
+        "env": {
+          "GOARCH": "amd64",
+          "GOOS": "darwin"
+        },
+        "sha256": "a300a45e801ab459f3008aae5bb9efbe9a6de9bcd12388f5ca9bbd14f70236de",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.20.1.darwin-amd64.tar.gz"
+      },
+      "darwin-arm64v8": {
+        "env": {
+          "GOARCH": "arm64",
+          "GOOS": "darwin"
+        },
+        "sha256": "f1a8e06c7f1ba1c008313577f3f58132eb166a41ceb95ce6e9af30bc5a3efca4",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.20.1.darwin-arm64.tar.gz"
+      },
       "freebsd-amd64": {
         "env": {
           "GOARCH": "amd64",
@@ -253,7 +271,9 @@
           "GOARCH": "ppc64le",
           "GOOS": "linux"
         },
-        "supported": true
+        "sha256": "85cfd4b89b48c94030783b6e9e619e35557862358b846064636361421d0b0c52",
+        "supported": true,
+        "url": "https://dl.google.com/go/go1.20.1.linux-ppc64le.tar.gz"
       },
       "s390x": {
         "env": {
@@ -286,6 +306,15 @@
         "sha256": "62d14ddb44bcda27c9b1f5ad9ffd4463013374ed325d762417e2adefd59a802f",
         "supported": false,
         "url": "https://dl.google.com/go/go1.20.1.windows-arm64.zip"
+      },
+      "windows-i386": {
+        "env": {
+          "GOARCH": "386",
+          "GOOS": "windows"
+        },
+        "sha256": "61259b5a346193e30b7b3c3f8d108062db25bbb80cf290ee251eeb855965f6ee",
+        "supported": false,
+        "url": "https://dl.google.com/go/go1.20.1.windows-386.zip"
       }
     },
     "variants": [
