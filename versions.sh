@@ -30,8 +30,10 @@ else
 fi
 versions=( "${versions[@]%/}" )
 
+# https://pkg.go.dev/golang.org/x/website/internal/dl
 # https://github.com/golang/go/issues/23746
-# https://github.com/golang/website/blob/dd8acb4c96edcd69706f19304941679dcb3822b0/internal/dl/server.go#L102-L107 ...
+# https://github.com/golang/go/issues/34864
+# https://github.com/golang/website/blob/41e922072f17ab2826d9479338314c025602a3a1/internal/dl/server.go#L174-L182 ... (the only way to get "unstable" releases is via "all", so we get to sort through "archive" releases too)
 goVersions="$(
 	wget -qO- 'https://golang.org/dl/?mode=json&include=all' | jq -c --argjson potentiallySupportedArches "$potentiallySupportedArches" '
 		[
