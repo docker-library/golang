@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:buster-scm
+FROM buildpack-deps:bookworm-scm
 
 # install cgo-related dependencies
 RUN set -eux; \
