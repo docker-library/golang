@@ -52,6 +52,9 @@ RUN set -eux; \
 			url='https://dl.google.com/go/go1.19.10.linux-ppc64le.tar.gz'; \
 			sha256='726256cd435a39aba76e5e8ea7e6e7cc4bca0fbe023d00f11690d7c95a9648dd'; \
 			;; \
+		'riscv64') \
+			export GOARCH='riscv64' GOOS='linux'; \
+			;; \
 		's390x') \
 			url='https://dl.google.com/go/go1.19.10.linux-s390x.tar.gz'; \
 			sha256='3c6598e8a4db1cb87847c4698e5774303a21c8849584419f16d760a8093e0b5e'; \

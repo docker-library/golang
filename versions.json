@@ -110,6 +110,13 @@
         "supported": true,
         "url": "https://dl.google.com/go/go1.19.10.linux-ppc64le.tar.gz"
       },
+      "riscv64": {
+        "env": {
+          "GOARCH": "riscv64",
+          "GOOS": "linux"
+        },
+        "supported": true
+      },
       "s390x": {
         "env": {
           "GOARCH": "s390x",
@@ -274,6 +281,13 @@
         "sha256": "049b8ab07d34077b90c0642138e10207f6db14bdd1743ea994a21e228f8ca53d",
         "supported": true,
         "url": "https://dl.google.com/go/go1.20.5.linux-ppc64le.tar.gz"
+      },
+      "riscv64": {
+        "env": {
+          "GOARCH": "riscv64",
+          "GOOS": "linux"
+        },
+        "supported": true
       },
       "s390x": {
         "env": {
@@ -646,7 +660,7 @@
           "GOOS": "linux"
         },
         "sha256": "33ea0c09d1f10f034d9e4fbef4eaceb785f3433ba631eaacb01a0af40773b673",
-        "supported": false,
+        "supported": true,
         "url": "https://dl.google.com/go/go1.21rc2.linux-riscv64.tar.gz"
       },
       "s390x": {

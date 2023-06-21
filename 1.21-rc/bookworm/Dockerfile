@@ -53,6 +53,10 @@ RUN set -eux; \
 			url='https://dl.google.com/go/go1.21rc2.linux-ppc64le.tar.gz'; \
 			sha256='8c3a2674cf57c304ed1a8f4e0a6184ad85fd5760a04dea608fdcaca7ad863027'; \
 			;; \
+		'riscv64') \
+			url='https://dl.google.com/go/go1.21rc2.linux-riscv64.tar.gz'; \
+			sha256='33ea0c09d1f10f034d9e4fbef4eaceb785f3433ba631eaacb01a0af40773b673'; \
+			;; \
 		's390x') \
 			url='https://dl.google.com/go/go1.21rc2.linux-s390x.tar.gz'; \
 			sha256='3fd1640c1f4c50dff412643cd61577d53c8241f1f2789605b1ff1048d2b36f95'; \
