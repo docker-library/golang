@@ -18,25 +18,32 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'x86_64') \
-			export GOAMD64='v1' GOARCH='amd64' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-amd64.tar.gz'; \
+			sha256='8fe90332727c606019e80a7368e23f5e65ad59520e45ee4010692f15572e45c6'; \
 			;; \
 		'armhf') \
-			export GOARCH='arm' GOARM='6' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-armv6l.tar.gz'; \
+			sha256='0f82199e49978db858a8ed2c6b8d842b9674fd577c4ab91cc4b6b11672375993'; \
 			;; \
 		'armv7') \
-			export GOARCH='arm' GOARM='7' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-armv6l.tar.gz'; \
+			sha256='0f82199e49978db858a8ed2c6b8d842b9674fd577c4ab91cc4b6b11672375993'; \
 			;; \
 		'aarch64') \
-			export GOARCH='arm64' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-arm64.tar.gz'; \
+			sha256='30a6518ca5f816c0fef5b2cc16b960e999b98b16f7d69f995f74236cc00aa292'; \
 			;; \
 		'x86') \
-			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-386.tar.gz'; \
+			sha256='cf330c82e41cf766af5629772600d5ecd3d24faeacdba8ac1f5f33acc6590175'; \
 			;; \
 		'ppc64le') \
-			export GOARCH='ppc64le' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-ppc64le.tar.gz'; \
+			sha256='8c3a2674cf57c304ed1a8f4e0a6184ad85fd5760a04dea608fdcaca7ad863027'; \
 			;; \
 		's390x') \
-			export GOARCH='s390x' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.21rc2.linux-s390x.tar.gz'; \
+			sha256='3fd1640c1f4c50dff412643cd61577d53c8241f1f2789605b1ff1048d2b36f95'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -46,7 +53,9 @@ RUN set -eux; \
 		build=1; \
 		url='https://dl.google.com/go/go1.21rc2.src.tar.gz'; \
 		sha256='91596dce22d91f2d7be6d2b49829f39bdd8573e777d95c1b3c6b0d42b613076e'; \
-# the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
+		echo >&2; \
+		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
+		echo >&2; \
 	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
