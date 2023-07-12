@@ -4,6 +4,10 @@
 	;
 	def alpine_version:
 		env.variant | ltrimstr("alpine")
+	;
+	def always_build_from_source:
+		# https://github.com/golang/go/issues/57007! (as of Go 1.21, the upstream release binaries are fully static and thus appropriate for Alpine)
+		is_alpine and ([ "1.19", "1.20" ] | index(env.version | rtrimstr("-rc")))
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }}
@@ -77,11 +81,11 @@ RUN set -eux; \
 		| (
 -}}
 		{{ $osArch | @sh }}) \
-{{ if .url and (is_alpine | not) then ( -}}
+{{ if always_build_from_source or (.url | not) then ( -}}
+			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
+{{ ) else ( -}}
 			url={{ .url | @sh }}; \
 			sha256={{ .sha256 | @sh }}; \
-{{ ) else ( -}}
-			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
 {{ ) end -}}
 			;; \
 {{
@@ -96,7 +100,7 @@ RUN set -eux; \
 		build=1; \
 		url={{ .arches.src.url | @sh }}; \
 		sha256={{ .arches.src.sha256 | @sh }}; \
-{{ if is_alpine then ( -}}
+{{ if always_build_from_source then ( -}}
 # the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
 {{ ) else ( -}}
 		echo >&2; \
