@@ -36,7 +36,7 @@ versions=( "${versions[@]%/}" )
 # https://github.com/golang/go/issues/34864
 # https://github.com/golang/website/blob/41e922072f17ab2826d9479338314c025602a3a1/internal/dl/server.go#L174-L182 ... (the only way to get "unstable" releases is via "all", so we get to sort through "archive" releases too)
 goVersions="$(
-	wget -qO- 'https://golang.org/dl/?mode=json&include=all' | jq -c --argjson potentiallySupportedArches "$potentiallySupportedArches" '
+	wget -qO- 'https://golang.org/dl/?mode=json&include=all' | jq -c '
 		[
 			.[]
 			| ( .version | ltrimstr("go") ) as $version
@@ -67,21 +67,8 @@ goVersions="$(
 							{
 								sha256: .sha256,
 								url: ("https://dl.google.com/go/" + .filename),
-								supported: ($potentiallySupportedArches | index($bashbrewArch) != null),
-							} + if $bashbrewArch == "src" then {} else {
-								env: (
-									{ GOOS: .os, GOARCH: .arch }
-									+ if .arch == "386" and .os == "linux" then
-										# i386 in Debian is non-SSE2, Alpine appears to be similar (but interesting, not FreeBSD?)
-										{ GO386: "softfloat" }
-									elif .arch == "amd64" and .os == "linux" then
-										# https://tip.golang.org/doc/go1.18#amd64
-										{ GOAMD64: "v1" }
-									elif $bashbrewArch | startswith("arm32v") then
-										{ GOARCH: "arm", GOARM: ($bashbrewArch | ltrimstr("arm32v")) }
-									else {} end
-								),
-							} end
+								env: { GOOS: .os, GOARCH: .arch },
+							}
 						),
 					}
 				] | add)
@@ -91,27 +78,6 @@ goVersions="$(
 			| if (.arches | has("arm32v7") | not) and (.arches | has("arm32v6")) then
 				.arches["arm32v7"] = (.arches["arm32v6"] | .env.GOARM = "7")
 			else . end
-
-			| ( $potentiallySupportedArches - (.arches | keys) ) as $missingArches
-			| .arches = ([
-				.arches, (
-					$missingArches[]
-					| {
-						(.): {
-							supported: true,
-							env: (
-								{
-									GOOS: "linux",
-									GOARCH: .,
-								}
-								+ if startswith("arm32v") then
-									{ GOARCH: "arm", GOARM: ltrimstr("arm32v") }
-								else {} end
-							)
-						},
-					}
-				)
-			] | add)
 		]
 	'
 )"
@@ -140,9 +106,44 @@ for version in "${versions[@]}"; do
 
 	echo "$version: $fullVersion"
 
-	doc="$(jq <<<"$goJson" -c '{
+	doc="$(jq <<<"$goJson" -c --argjson potentiallySupportedArches "$potentiallySupportedArches" '{
 		version: .version,
-		arches: .arches,
+		arches: (
+			.arches
+			| . += (
+				( $potentiallySupportedArches - keys ) # "missing" arches that we ought to include in our list
+				| map(
+					{
+						(.): {
+							env: (
+								# hacky, but probably close enough (cleaned up in the next block)
+								capture("^((?<GOOS>[^-]+)-)?(?<GOARCH>.+)$")
+								| .GOOS //= "linux"
+							)
+						},
+					}
+				)
+				| add
+			)
+			| with_entries(
+				.key as $bashbrewArch
+				| .value.supported = ($potentiallySupportedArches | index($bashbrewArch) != null)
+				| .value.env +=
+						if $bashbrewArch == "i386" then
+							# i386 in Debian is non-SSE2, Alpine appears to be similar (but interesting, not FreeBSD?)
+							{ GOARCH: "386", GO386: "softfloat" }
+						elif $bashbrewArch == "amd64" then
+							# https://tip.golang.org/doc/go1.18#amd64
+							{ GOAMD64: "v1" }
+						# TODO ^^ figure out what to do with GOAMD64 / GO386 if/when the OS baselines change and these choices needs to be per-variant /o\ (probably move it to the template instead, in fact, since that is where we can most easily toggle based on variant)
+						elif $bashbrewArch | startswith("arm64v") then
+							{ GOARCH: "arm64" } # TODO do something with arm64 variant
+						elif $bashbrewArch | startswith("arm32v") then
+							{ GOARCH: "arm", GOARM: ($bashbrewArch | ltrimstr("arm32v")) }
+						else {} end
+				| if $bashbrewArch == "src" then del(.value.env) else . end
+			)
+		),
 		variants: [
 			"bookworm",
 			"bullseye",
@@ -150,7 +151,7 @@ for version in "${versions[@]}"; do
 				"3.18",
 				"3.17"
 			| "alpine" + .),
-			if .arches | has("windows-amd64") then
+			if .arches | has("windows-amd64") and .["windows-amd64"].url then
 				(
 					"ltsc2022",
 					"1809"
