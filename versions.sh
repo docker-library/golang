@@ -58,7 +58,7 @@ goVersions="$(
 								.arch
 								| sub("^386$"; "i386")
 								| sub("^arm64$"; "arm64v8")
-								| sub("^armv(?<v>[0-9]+)l?$"; "arm32v\(.v)")
+								| sub("^arm-?v?(?<v>[0-9]+)l?$"; "arm32v\(.v)")
 							)
 						end
 					) as $bashbrewArch

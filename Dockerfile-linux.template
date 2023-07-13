@@ -37,16 +37,24 @@ ENV GOLANG_VERSION {{ .version }}
 	def os_arches:
 		if is_alpine then
 			{
+				# https://dl-cdn.alpinelinux.org/alpine/edge/main/
+				# https://dl-cdn.alpinelinux.org/alpine/latest-stable/main/
 				amd64: "x86_64",
 				arm32v6: "armhf",
 				arm32v7: "armv7",
 				arm64v8: "aarch64",
 				i386: "x86",
 				ppc64le: "ppc64le",
+				riscv64: "riscv64",
 				s390x: "s390x",
 			}
 		else
 			{
+				# https://salsa.debian.org/dpkg-team/dpkg/-/blob/main/data/cputable
+				# https://wiki.debian.org/ArchitectureSpecificsMemo#Architecture_baselines
+				# http://deb.debian.org/debian/dists/unstable/main/
+				# http://deb.debian.org/debian/dists/stable/main/
+				# https://deb.debian.org/debian-ports/dists/unstable/main/
 				amd64: "amd64",
 				arm32v5: "armel",
 				arm32v7: "armhf",
