@@ -10,7 +10,7 @@ RUN apk add --no-cache ca-certificates
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.21rc2
+ENV GOLANG_VERSION 1.21rc3
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps gnupg; \
@@ -18,36 +18,36 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'x86_64') \
-			url='https://dl.google.com/go/go1.21rc2.linux-amd64.tar.gz'; \
-			sha256='8fe90332727c606019e80a7368e23f5e65ad59520e45ee4010692f15572e45c6'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-amd64.tar.gz'; \
+			sha256='b5e3a28d10ba1109cf0549237f2739284a0db2ce6bdc76cd03c4b26304c1a921'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.21rc2.linux-armv6l.tar.gz'; \
-			sha256='0f82199e49978db858a8ed2c6b8d842b9674fd577c4ab91cc4b6b11672375993'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-armv6l.tar.gz'; \
+			sha256='928b43cde3485005d30dad132142bea733a7227a3942d9832b896d9282ef8dc1'; \
 			;; \
 		'armv7') \
-			url='https://dl.google.com/go/go1.21rc2.linux-armv6l.tar.gz'; \
-			sha256='0f82199e49978db858a8ed2c6b8d842b9674fd577c4ab91cc4b6b11672375993'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-armv6l.tar.gz'; \
+			sha256='928b43cde3485005d30dad132142bea733a7227a3942d9832b896d9282ef8dc1'; \
 			;; \
 		'aarch64') \
-			url='https://dl.google.com/go/go1.21rc2.linux-arm64.tar.gz'; \
-			sha256='30a6518ca5f816c0fef5b2cc16b960e999b98b16f7d69f995f74236cc00aa292'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-arm64.tar.gz'; \
+			sha256='8891193758aed49daedff3f519b12f81e15a947170437a9109e3ff8c11d7f7e2'; \
 			;; \
 		'x86') \
-			url='https://dl.google.com/go/go1.21rc2.linux-386.tar.gz'; \
-			sha256='cf330c82e41cf766af5629772600d5ecd3d24faeacdba8ac1f5f33acc6590175'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-386.tar.gz'; \
+			sha256='96a0b0fb4b65db37a265d5758d007ad25c6ba9d29470c0012c6cb9c714be813f'; \
 			;; \
 		'ppc64le') \
-			url='https://dl.google.com/go/go1.21rc2.linux-ppc64le.tar.gz'; \
-			sha256='8c3a2674cf57c304ed1a8f4e0a6184ad85fd5760a04dea608fdcaca7ad863027'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-ppc64le.tar.gz'; \
+			sha256='10af108730b75174cd1db9919781de9119018a818c02588e2299554378428c6a'; \
 			;; \
 		'riscv64') \
-			url='https://dl.google.com/go/go1.21rc2.linux-riscv64.tar.gz'; \
-			sha256='33ea0c09d1f10f034d9e4fbef4eaceb785f3433ba631eaacb01a0af40773b673'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-riscv64.tar.gz'; \
+			sha256='9b341bbea1ba2c75c06d1b903a7f398ed4b8e6ed31557f64397728d16068bfaf'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.21rc2.linux-s390x.tar.gz'; \
-			sha256='3fd1640c1f4c50dff412643cd61577d53c8241f1f2789605b1ff1048d2b36f95'; \
+			url='https://dl.google.com/go/go1.21rc3.linux-s390x.tar.gz'; \
+			sha256='c6dc855976b74f21168f413be46d448de1fbb545cc9fb47895c4b62581e33724'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -55,8 +55,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.21rc2.src.tar.gz'; \
-		sha256='91596dce22d91f2d7be6d2b49829f39bdd8573e777d95c1b3c6b0d42b613076e'; \
+		url='https://dl.google.com/go/go1.21rc3.src.tar.gz'; \
+		sha256='9de96a2f15196a9c69cb9ab122c9c2aaecca30ec9448caa71543eaeb19ca91ab'; \
 		echo >&2; \
 		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
 		echo >&2; \
