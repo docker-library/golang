@@ -7,7 +7,7 @@
 	;
 	def always_build_from_source:
 		# https://github.com/golang/go/issues/57007! (as of Go 1.21, the upstream release binaries are fully static and thus appropriate for Alpine)
-		is_alpine and ([ "1.19", "1.20" ] | index(env.version | rtrimstr("-rc")))
+		is_alpine and ([ "1.20" ] | index(env.version | rtrimstr("-rc")))
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }}
@@ -144,7 +144,7 @@ RUN set -eux; \
 		; \
 {{ ) else ( -}}
 		savedAptMark="$(apt-mark showmanual)"; \
-{{ if [ "1.19" ] | index(env.version) or env.variant != "bullseye" then ( -}}
+{{ if env.variant != "bullseye" then ( -}}
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
 {{ ) else ( -}}
