@@ -147,6 +147,7 @@ for version in "${versions[@]}"; do
 		variants: [
 			"bookworm",
 			"bullseye",
+			"debian-stable",
 			(
 				"3.18",
 				"3.17"

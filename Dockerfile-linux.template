@@ -8,13 +8,23 @@
 	def always_build_from_source:
 		# https://github.com/golang/go/issues/57007! (as of Go 1.21, the upstream release binaries are fully static and thus appropriate for Alpine)
 		is_alpine and ([ "1.20" ] | index(env.version | rtrimstr("-rc")))
+	;
+	def is_debian_but_not_one_to_one:
+		env.variant | startswith("debian")
+	;
+	def get_debian_channel:
+		env.variant | ltrimstr("debian-")
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }}
 
 RUN apk add --no-cache ca-certificates
 {{ ) else ( -}}
+{{ if is_debian_but_not_one_to_one then ( -}}
+FROM buildpack-deps:{{ get_debian_channel }}-scm
+{{ ) else ( -}}
 FROM buildpack-deps:{{ env.variant }}-scm
+{{ ) end -}}
 
 # install cgo-related dependencies
 RUN set -eux; \
