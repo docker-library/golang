@@ -122,6 +122,12 @@ RUN set -eux; \
 	\
 	go version
 
+# install git-lfs for Go modules with LFS committed files
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends git-lfs; \
+	rm -rf /var/lib/apt/lists/*
+
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"

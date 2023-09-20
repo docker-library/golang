@@ -108,6 +108,9 @@ RUN set -eux; \
 	\
 	go version
 
+# install git-lfs for Go modules with LFS committed files
+RUN apk add --no-cache git-lfs
+
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
