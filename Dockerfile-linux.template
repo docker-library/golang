@@ -201,6 +201,12 @@ RUN set -eux; \
 {{ ) else "" end -}}
 	go version
 
+{{ if [ "1.20" ] | index(env.version | rtrimstr("-rc")) then "" else ( -}}
+# don't auto-upgrade the gotoolchain
+# https://github.com/docker-library/golang/issues/472
+ENV GOTOOLCHAIN=local
+
+{{ ) end -}}
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:$PATH
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
