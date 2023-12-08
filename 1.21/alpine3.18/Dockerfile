@@ -112,6 +112,15 @@ RUN set -eux; \
 			/usr/local/go/src/cmd/dist/dist \
 			"$GOCACHE" \
 		; \
+	elif [ "$arch" = 'armv7' ]; then \
+		[ -s /usr/local/go/go.env ]; \
+		before="$(go env GOARM)"; [ "$before" != '7' ]; \
+		{ \
+			echo; \
+			echo '# https://github.com/docker-library/golang/issues/494'; \
+			echo 'GOARM=7'; \
+		} >> /usr/local/go/go.env; \
+		after="$(go env GOARM)"; [ "$after" = '7' ]; \
 	fi; \
 	\
 	apk del --no-network .fetch-deps; \
