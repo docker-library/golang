@@ -193,6 +193,17 @@ RUN set -eux; \
 			/usr/local/go/src/cmd/dist/dist \
 			"$GOCACHE" \
 		; \
+{{ if [ "1.20" ] | index(env.version) then "" elif .arches["arm32v7"].url // "" | contains("armv6") then ( -}}
+	elif [ "$arch" = {{ os_arches["arm32v7"] | @sh }} ]; then \
+		[ -s /usr/local/go/go.env ]; \
+		before="$(go env GOARM)"; [ "$before" != {{ .arches["arm32v7"].env["GOARM"] | @sh }} ]; \
+		{ \
+			echo; \
+			echo '# https://github.com/docker-library/golang/issues/494'; \
+			echo {{ "GOARM=\(.arches["arm32v7"].env["GOARM"])" | @sh }}; \
+		} >> /usr/local/go/go.env; \
+		after="$(go env GOARM)"; [ "$after" = {{ .arches["arm32v7"].env["GOARM"] | @sh }} ]; \
+{{ ) else "" end -}}
 	fi; \
 	\
 {{ if is_alpine then ( -}}
