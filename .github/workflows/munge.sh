@@ -10,8 +10,6 @@ jq '
 		.matrix.include[]
 		| select(.name | test(" (.+)") | not) # ignore any existing munged builds
 		| select(.os | startswith("windows-") | not) # ignore Windows (always downloads)
-		| select(.meta.froms[] | test("^alpine:") | not) # ignore Alpine (already always builds from source)
-		| select(.meta.froms[] | test("buster") | not) # ignore Debian Buster (not new enough Go, only supports architectures that download)
 		| .name += " (force build)"
 		| .runs.build = ([
 			"# update versions.json to force us to build Go instead of downloading it",
