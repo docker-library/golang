@@ -10,6 +10,7 @@ jq '
 		.matrix.include[]
 		| select(.name | test(" (.+)") | not) # ignore any existing munged builds
 		| select(.os | startswith("windows-") | not) # ignore Windows (always downloads)
+		| select(any(.meta.entries[].tags[]; contains("golang:1.20"))) # https://github.com/docker-library/golang/pull/500#issuecomment-1863578601
 		| .name += " (force build)"
 		| .runs.build = ([
 			"# update versions.json to force us to build Go instead of downloading it",

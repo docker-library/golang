@@ -198,7 +198,7 @@
           "GOARM": "5",
           "GOOS": "linux"
         },
-        "supported": true
+        "supported": false
       },
       "arm32v6": {
         "env": {
@@ -590,7 +590,7 @@
           "GOARM": "5",
           "GOOS": "linux"
         },
-        "supported": true
+        "supported": false
       },
       "arm32v6": {
         "env": {

@@ -30,9 +30,6 @@ RUN set -eux; \
 			url='https://dl.google.com/go/go1.21.5.linux-amd64.tar.gz'; \
 			sha256='e2bc0b3e4b64111ec117295c088bde5f00eeed1567999ff77bc859d7df70078e'; \
 			;; \
-		'armel') \
-			export GOARCH='arm' GOARM='5' GOOS='linux'; \
-			;; \
 		'armhf') \
 			url='https://dl.google.com/go/go1.21.5.linux-armv6l.tar.gz'; \
 			sha256='837f4bf4e22fcdf920ffeaa4abf3d02d1314e03725431065f4d44c46a01b42fe'; \
@@ -63,16 +60,6 @@ RUN set -eux; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
-	build=; \
-	if [ -z "$url" ]; then \
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-		build=1; \
-		url='https://dl.google.com/go/go1.21.5.src.tar.gz'; \
-		sha256='285cbbdf4b6e6e62ed58f370f3f6d8c30825d6e56c5853c66d3c23bcdb09db19'; \
-		echo >&2; \
-		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
-		echo >&2; \
-	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url" --progress=dot:giga; \
@@ -90,52 +77,6 @@ RUN set -eux; \
 	\
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
-	\
-	if [ -n "$build" ]; then \
-		savedAptMark="$(apt-mark showmanual)"; \
-# add backports for newer go version for bootstrap build: https://github.com/golang/go/issues/44505
-		( \
-			. /etc/os-release; \
-			echo "deb https://deb.debian.org/debian $VERSION_CODENAME-backports main" > /etc/apt/sources.list.d/backports.list; \
-			\
-			apt-get update; \
-			apt-get install -y --no-install-recommends -t "$VERSION_CODENAME-backports" golang-go; \
-		); \
-		\
-		export GOCACHE='/tmp/gocache'; \
-		\
-		( \
-			cd /usr/local/go/src; \
-# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
-			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-			./make.bash; \
-		); \
-		\
-		apt-mark auto '.*' > /dev/null; \
-		apt-mark manual $savedAptMark > /dev/null; \
-		apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-		rm -rf /var/lib/apt/lists/*; \
-		\
-# remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
-		rm -rf \
-			/usr/local/go/pkg/*/cmd \
-			/usr/local/go/pkg/bootstrap \
-			/usr/local/go/pkg/obj \
-			/usr/local/go/pkg/tool/*/api \
-			/usr/local/go/pkg/tool/*/go_bootstrap \
-			/usr/local/go/src/cmd/dist/dist \
-			"$GOCACHE" \
-		; \
-	elif [ "$arch" = 'armhf' ]; then \
-		[ -s /usr/local/go/go.env ]; \
-		before="$(go env GOARM)"; [ "$before" != '7' ]; \
-		{ \
-			echo; \
-			echo '# https://github.com/docker-library/golang/issues/494'; \
-			echo 'GOARM=7'; \
-		} >> /usr/local/go/go.env; \
-		after="$(go env GOARM)"; [ "$after" = '7' ]; \
-	fi; \
 	\
 	go version
 

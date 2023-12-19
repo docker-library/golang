@@ -44,40 +44,43 @@ goVersions="$(
 			| {
 				version: $version,
 				major: ( $major + if .stable then "" else "-rc" end ),
-				arches: ([
-					.files[]
-					| select(.kind == "archive" or .kind == "source")
-					| (
-						if .kind == "source" then
-							"src"
-						else
-							if .os != "linux" then
-								.os + "-"
-							else "" end
-							+ (
-								.arch
-								| sub("^386$"; "i386")
-								| sub("^arm64$"; "arm64v8")
-								| sub("^arm-?v?(?<v>[0-9]+)l?$"; "arm32v\(.v)")
-							)
-						end
-					) as $bashbrewArch
-					| {
-						( $bashbrewArch ): (
-							{
-								sha256: .sha256,
-								url: ("https://dl.google.com/go/" + .filename),
-								env: { GOOS: .os, GOARCH: .arch },
-							}
-						),
-					}
-				] | add)
-			}
+				arches: (
+					[
+						.files[]
+						| select(.kind == "archive" or .kind == "source")
+						| (
+							if .kind == "source" then
+								"src"
+							else
+								if .os != "linux" then
+									.os + "-"
+								else "" end
+								+ (
+									.arch
+									| sub("^386$"; "i386")
+									| sub("^arm64$"; "arm64v8")
+									| sub("^arm-?v?(?<v>[0-9]+)l?$"; "arm32v\(.v)")
+								)
+							end
+						) as $bashbrewArch
+						| {
+							( $bashbrewArch ): (
+								{
+									sha256: .sha256,
+									url: ("https://dl.google.com/go/" + .filename),
+									env: { GOOS: .os, GOARCH: .arch },
+								}
+							),
+						}
+					]
+					| add
 
-			# the published binaries only support glibc, which translates to Debian, so the "correct" binary for v7 is v6 (TODO find some way to reasonably benchmark the compiler on a proper v7 chip and determine whether recompiling for GOARM=7 is worthwhile)
-			| if (.arches | has("arm32v7") | not) and (.arches | has("arm32v6")) then
-				.arches["arm32v7"] = (.arches["arm32v6"] | .env.GOARM = "7")
-			else . end
+					# upstream (still as of 2023-12-19) only publishes "armv6" binaries, which are appropriate for v7 as well
+					| if (has("arm32v7") | not) and has("arm32v6") then
+						.["arm32v7"] = .["arm32v6"]
+					else . end
+				)
+			}
 		]
 	'
 )"
@@ -127,7 +130,11 @@ for version in "${versions[@]}"; do
 			)
 			| with_entries(
 				.key as $bashbrewArch
-				| .value.supported = ($potentiallySupportedArches | index($bashbrewArch) != null)
+				| .value.supported = (
+					# https://github.com/docker-library/golang/pull/500#issuecomment-1863578601 - as of Go 1.21+, we no longer build from source
+					(.value.url or ([ "1.20" ] | index(env.version | rtrimstr("-rc"))))
+					and ($potentiallySupportedArches | index($bashbrewArch))
+				)
 				| .value.env +=
 						if $bashbrewArch == "i386" then
 							# i386 in Debian is non-SSE2, Alpine appears to be similar (but interesting, not FreeBSD?)
@@ -149,16 +156,19 @@ for version in "${versions[@]}"; do
 			"bullseye",
 			(
 				"3.19",
-				"3.18"
+				"3.18",
+				empty
 			| "alpine" + .),
 			if .arches | has("windows-amd64") and .["windows-amd64"].url then
 				(
 					"ltsc2022",
-					"1809"
+					"1809",
+					empty
 				| "windows/windowsservercore-" + .),
 				(
 					"ltsc2022",
-					"1809"
+					"1809",
+					empty
 				| "windows/nanoserver-" + .)
 			else empty end
 		],
