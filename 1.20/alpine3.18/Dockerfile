@@ -49,7 +49,7 @@ RUN set -eux; \
 		build=1; \
 		url='https://dl.google.com/go/go1.20.12.src.tar.gz'; \
 		sha256='c5bf934751d31c315c1d0bb5fb02296545fa6d08923566f7a5afec81f2ed27d6'; \
-# the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
+# the precompiled binaries published by Go upstream were not compatible with Alpine in Go 1.20, so we always build from source here 😅
 	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \

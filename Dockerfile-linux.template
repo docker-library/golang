@@ -5,9 +5,13 @@
 	def alpine_version:
 		env.variant | ltrimstr("alpine")
 	;
+	def sometimes_build_from_source:
+		# https://github.com/docker-library/golang/pull/500#issuecomment-1863578601
+		[ "1.20" ] | index(env.version | rtrimstr("-rc"))
+	;
 	def always_build_from_source:
 		# https://github.com/golang/go/issues/57007! (as of Go 1.21, the upstream release binaries are fully static and thus appropriate for Alpine)
-		is_alpine and ([ "1.20" ] | index(env.version | rtrimstr("-rc")))
+		is_alpine and sometimes_build_from_source
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }}
@@ -52,6 +56,7 @@ ENV GOLANG_VERSION {{ .version }}
 			{
 				# https://salsa.debian.org/dpkg-team/dpkg/-/blob/main/data/cputable
 				# https://wiki.debian.org/ArchitectureSpecificsMemo#Architecture_baselines
+				# https://deb.debian.org/debian/dists/unstable/Release ("Architectures:")
 				# http://deb.debian.org/debian/dists/unstable/main/
 				# http://deb.debian.org/debian/dists/stable/main/
 				# https://deb.debian.org/debian-ports/dists/unstable/main/
@@ -89,7 +94,8 @@ RUN set -eux; \
 		| (
 -}}
 		{{ $osArch | @sh }}) \
-{{ if always_build_from_source or (.url | not) then ( -}}
+{{ # TODO remove this "build-from-source" logic when 1.20 is EOL / 1.22 is GA -}}
+{{ if (.url | not) or always_build_from_source then ( -}}
 			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
 {{ ) else ( -}}
 			url={{ .url | @sh }}; \
@@ -102,6 +108,7 @@ RUN set -eux; \
 -}}
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
+{{ if sometimes_build_from_source then ( -}}
 	build=; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
@@ -109,13 +116,14 @@ RUN set -eux; \
 		url={{ .arches.src.url | @sh }}; \
 		sha256={{ .arches.src.sha256 | @sh }}; \
 {{ if always_build_from_source then ( -}}
-# the precompiled binaries published by Go upstream are not compatible with Alpine, so we always build from source here 😅
+# the precompiled binaries published by Go upstream were not compatible with Alpine in Go 1.20, so we always build from source here 😅
 {{ ) else ( -}}
 		echo >&2; \
 		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
 		echo >&2; \
 {{ ) end -}}
 	fi; \
+{{ ) else "" end -}}
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"{{ if is_alpine then "" else " --progress=dot:giga" end }}; \
@@ -134,6 +142,7 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
+{{ if sometimes_build_from_source then ( -}}
 	if [ -n "$build" ]; then \
 {{ if is_alpine then ( -}}
 		apk add --no-cache --virtual .build-deps \
@@ -206,6 +215,7 @@ RUN set -eux; \
 {{ ) else "" end -}}
 	fi; \
 	\
+{{ ) else "" end -}}
 {{ if is_alpine then ( -}}
 	apk del --no-network .fetch-deps; \
 	\
