@@ -96,7 +96,7 @@ RUN set -eux; \
 		{{ $osArch | @sh }}) \
 {{ # TODO remove this "build-from-source" logic when 1.20 is EOL / 1.22 is GA -}}
 {{ if (.url | not) or always_build_from_source then ( -}}
-			export {{ .env | to_entries | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
+			export {{ .env | to_entries | sort_by(.key) | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
 {{ ) else ( -}}
 			url={{ .url | @sh }}; \
 			sha256={{ .sha256 | @sh }}; \

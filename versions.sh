@@ -66,8 +66,8 @@ goVersions="$(
 						| {
 							( $bashbrewArch ): (
 								{
-									sha256: .sha256,
 									url: ("https://dl.google.com/go/" + .filename),
+									sha256: .sha256,
 									env: { GOOS: .os, GOARCH: .arch },
 								}
 							),
@@ -177,4 +177,12 @@ for version in "${versions[@]}"; do
 	json="$(jq <<<"$json" -c --argjson doc "$doc" '.[env.version] = $doc')"
 done
 
-jq <<<"$json" -S . > versions.json
+jq <<<"$json" '
+	def sort_keys:
+		to_entries
+		| sort_by(.key)
+		| from_entries
+	;
+	sort_keys
+	| .[].arches |= sort_keys
+' > versions.json
