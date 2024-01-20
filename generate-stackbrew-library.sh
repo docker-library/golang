@@ -65,6 +65,7 @@ Maintainers: Tianon Gravi <admwiggin@gmail.com> (@tianon),
              Joseph Ferguson <yosifkit@gmail.com> (@yosifkit),
              Johan Euphrosine <proppy@google.com> (@proppy)
 GitRepo: https://github.com/docker-library/golang.git
+Builder: buildkit
 EOH
 
 # prints "$2$1$3$1...$N"
@@ -131,7 +132,7 @@ for version; do
 				;;
 
 			*)
-				variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile")"
+				variantParent="$(awk 'toupper($1) == "FROM" { print $2 }' "$dir/Dockerfile" | sort -u)" # TODO this needs to handle multi-parents (we get lucky that they're the same)
 				variantArches="${parentRepoToArches[$variantParent]}"
 				;;
 		esac
@@ -183,6 +184,9 @@ for version; do
 			GitCommit: $commit
 			Directory: $dir
 		EOE
-		[ -z "$constraints" ] || echo "Constraints: $constraints"
+		if [ -n "$constraints" ]; then
+			echo 'Builder: classic'
+			echo "Constraints: $constraints"
+		fi
 	done
 done

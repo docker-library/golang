@@ -14,23 +14,9 @@
 		is_alpine and sometimes_build_from_source
 -}}
 {{ if is_alpine then ( -}}
-FROM alpine:{{ alpine_version }}
-
-RUN apk add --no-cache ca-certificates
+FROM alpine:{{ alpine_version }} AS build
 {{ ) else ( -}}
-FROM buildpack-deps:{{ env.variant }}-scm
-
-# install cgo-related dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-	; \
-	rm -rf /var/lib/apt/lists/*
+FROM buildpack-deps:{{ env.variant }}-scm AS build
 {{ ) end -}}
 
 ENV PATH /usr/local/go/bin:$PATH
@@ -74,7 +60,12 @@ ENV GOLANG_VERSION {{ .version }}
 -}}
 RUN set -eux; \
 {{ if is_alpine then ( -}}
-	apk add --no-cache --virtual .fetch-deps gnupg; \
+	apk add --no-cache --virtual .fetch-deps \
+		ca-certificates \
+		gnupg \
+# busybox's "tar" doesn't handle directory mtime correctly, so our SOURCE_DATE_EPOCH lookup doesn't work (the mtime of "/usr/local/go" always ends up being the extraction timestamp)
+		tar \
+	; \
 	arch="$(apk --print-arch)"; \
 {{ ) else ( -}}
 	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
@@ -142,6 +133,12 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
+# save the timestamp from the tarball so we can restore it for reproducibility, if necessary (see below)
+	SOURCE_DATE_EPOCH="$(stat -c '%Y' /usr/local/go)"; \
+	export SOURCE_DATE_EPOCH; \
+# for logging validation/edification
+	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
+	\
 {{ if sometimes_build_from_source then ( -}}
 	if [ -n "$build" ]; then \
 {{ if is_alpine then ( -}}
@@ -166,6 +163,8 @@ RUN set -eux; \
 			apt-get install -y --no-install-recommends -t "$VERSION_CODENAME-backports" golang-go; \
 		); \
 {{ ) end -}}
+# cgo-related deps (for 1.21+, we should instead use CGO_ENABLED=0; https://github.com/golang/go/blob/b44f6378233ada888f0dc79e0ac56def4673d9ed/src/cmd/dist/build.go#L1312 / https://github.com/golang/go/commit/da0c375c571037ec5ea6f8ef2be8f07593b40eb6)
+		apt-get install -y --no-install-recommends gcc libc6-dev; \
 {{ ) end -}}
 		\
 		export GOCACHE='/tmp/gocache'; \
@@ -202,6 +201,13 @@ RUN set -eux; \
 			/usr/local/go/src/cmd/dist/dist \
 			"$GOCACHE" \
 		; \
+		\
+# clamp timestamps for reproducibility (allows "COPY --link" to be more clever/useful)
+		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
+		touch -t "$date" /usr/local/.go-date-stamp; \
+		find /usr/local/go -depth -newer /usr/local/.go-date-stamp -exec touch -ht "$date" '{}' +; \
+		rm /usr/local/.go-date-stamp; \
+		touch -t "$date" /usr/local; \
 {{ if [ "1.20" ] | index(env.version) then "" elif .arches["arm32v7"].url // "" | contains("armv6") then ( -}}
 	elif [ "$arch" = {{ os_arches["arm32v7"] | @sh }} ]; then \
 		[ -s /usr/local/go/go.env ]; \
@@ -212,6 +218,9 @@ RUN set -eux; \
 			echo {{ "GOARM=\(.arches["arm32v7"].env["GOARM"])" | @sh }}; \
 		} >> /usr/local/go/go.env; \
 		after="$(go env GOARM)"; [ "$after" = {{ .arches["arm32v7"].env["GOARM"] | @sh }} ]; \
+# (re-)clamp timestamp for reproducibility (allows "COPY --link" to be more clever/useful)
+		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
+		touch -t "$date" /usr/local/go/go.env /usr/local/go; \
 {{ ) else "" end -}}
 	fi; \
 	\
@@ -220,7 +229,33 @@ RUN set -eux; \
 	apk del --no-network .fetch-deps; \
 	\
 {{ ) else "" end -}}
-	go version
+# smoke test
+	go version; \
+# make sure our reproducibile timestamp is probably still correct (best-effort inline reproducibility test)
+	epoch="$(stat -c '%Y' /usr/local/go)"; \
+	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]
+
+{{ if is_alpine then ( -}}
+FROM alpine:{{ alpine_version }}
+
+RUN apk add --no-cache ca-certificates
+{{ ) else ( -}}
+FROM buildpack-deps:{{ env.variant }}-scm
+
+# install cgo-related dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		g++ \
+		gcc \
+		libc6-dev \
+		make \
+		pkg-config \
+	; \
+	rm -rf /var/lib/apt/lists/*
+{{ ) end -}}
+
+ENV GOLANG_VERSION {{ .version }}
 
 {{ if [ "1.20" ] | index(env.version | rtrimstr("-rc")) then "" else ( -}}
 # don't auto-upgrade the gotoolchain
@@ -229,6 +264,7 @@ ENV GOTOOLCHAIN=local
 
 {{ ) end -}}
 ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+COPY --from=build --link /usr/local/go/ /usr/local/go/
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
 WORKDIR $GOPATH

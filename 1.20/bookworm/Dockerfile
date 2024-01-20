@@ -4,19 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:bookworm-scm
-
-# install cgo-related dependencies
-RUN set -eux; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		g++ \
-		gcc \
-		libc6-dev \
-		make \
-		pkg-config \
-	; \
-	rm -rf /var/lib/apt/lists/*
+FROM buildpack-deps:bookworm-scm AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
@@ -89,10 +77,18 @@ RUN set -eux; \
 	tar -C /usr/local -xzf go.tgz; \
 	rm go.tgz; \
 	\
+# save the timestamp from the tarball so we can restore it for reproducibility, if necessary (see below)
+	SOURCE_DATE_EPOCH="$(stat -c '%Y' /usr/local/go)"; \
+	export SOURCE_DATE_EPOCH; \
+# for logging validation/edification
+	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
+	\
 	if [ -n "$build" ]; then \
 		savedAptMark="$(apt-mark showmanual)"; \
 		apt-get update; \
 		apt-get install -y --no-install-recommends golang-go; \
+# cgo-related deps (for 1.21+, we should instead use CGO_ENABLED=0; https://github.com/golang/go/blob/b44f6378233ada888f0dc79e0ac56def4673d9ed/src/cmd/dist/build.go#L1312 / https://github.com/golang/go/commit/da0c375c571037ec5ea6f8ef2be8f07593b40eb6)
+		apt-get install -y --no-install-recommends gcc libc6-dev; \
 		\
 		export GOCACHE='/tmp/gocache'; \
 		\
@@ -118,11 +114,39 @@ RUN set -eux; \
 			/usr/local/go/src/cmd/dist/dist \
 			"$GOCACHE" \
 		; \
+		\
+# clamp timestamps for reproducibility (allows "COPY --link" to be more clever/useful)
+		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
+		touch -t "$date" /usr/local/.go-date-stamp; \
+		find /usr/local/go -depth -newer /usr/local/.go-date-stamp -exec touch -ht "$date" '{}' +; \
+		rm /usr/local/.go-date-stamp; \
+		touch -t "$date" /usr/local; \
 	fi; \
 	\
-	go version
+# smoke test
+	go version; \
+# make sure our reproducibile timestamp is probably still correct (best-effort inline reproducibility test)
+	epoch="$(stat -c '%Y' /usr/local/go)"; \
+	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]
+
+FROM buildpack-deps:bookworm-scm
+
+# install cgo-related dependencies
+RUN set -eux; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
+		g++ \
+		gcc \
+		libc6-dev \
+		make \
+		pkg-config \
+	; \
+	rm -rf /var/lib/apt/lists/*
+
+ENV GOLANG_VERSION 1.20.13
 
 ENV GOPATH /go
-ENV PATH $GOPATH/bin:$PATH
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+COPY --from=build --link /usr/local/go/ /usr/local/go/
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
 WORKDIR $GOPATH
