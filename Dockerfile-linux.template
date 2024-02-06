@@ -4,14 +4,6 @@
 	;
 	def alpine_version:
 		env.variant | ltrimstr("alpine")
-	;
-	def sometimes_build_from_source:
-		# https://github.com/docker-library/golang/pull/500#issuecomment-1863578601
-		[ "1.20" ] | index(env.version | rtrimstr("-rc"))
-	;
-	def always_build_from_source:
-		# https://github.com/golang/go/issues/57007! (as of Go 1.21, the upstream release binaries are fully static and thus appropriate for Alpine)
-		is_alpine and sometimes_build_from_source
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }} AS build
@@ -85,13 +77,8 @@ RUN set -eux; \
 		| (
 -}}
 		{{ $osArch | @sh }}) \
-{{ # TODO remove this "build-from-source" logic when 1.20 is EOL / 1.22 is GA -}}
-{{ if (.url | not) or always_build_from_source then ( -}}
-			export {{ .env | to_entries | sort_by(.key) | map(.key + "=" + (.value | @sh)) | join(" ") }}; \
-{{ ) else ( -}}
 			url={{ .url | @sh }}; \
 			sha256={{ .sha256 | @sh }}; \
-{{ ) end -}}
 			;; \
 {{
 		)
@@ -99,22 +86,6 @@ RUN set -eux; \
 -}}
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
-{{ if sometimes_build_from_source then ( -}}
-	build=; \
-	if [ -z "$url" ]; then \
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-		build=1; \
-		url={{ .arches.src.url | @sh }}; \
-		sha256={{ .arches.src.sha256 | @sh }}; \
-{{ if always_build_from_source then ( -}}
-# the precompiled binaries published by Go upstream were not compatible with Alpine in Go 1.20, so we always build from source here 😅
-{{ ) else ( -}}
-		echo >&2; \
-		echo >&2 "warning: current architecture ($arch) does not have a compatible Go binary release; will be building from source"; \
-		echo >&2; \
-{{ ) end -}}
-	fi; \
-{{ ) else "" end -}}
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"{{ if is_alpine then "" else " --progress=dot:giga" end }}; \
@@ -139,77 +110,8 @@ RUN set -eux; \
 # for logging validation/edification
 	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
 	\
-{{ if sometimes_build_from_source then ( -}}
-	if [ -n "$build" ]; then \
-{{ if is_alpine then ( -}}
-		apk add --no-cache --virtual .build-deps \
-			bash \
-			gcc \
-			go \
-			musl-dev \
-		; \
-{{ ) else ( -}}
-		savedAptMark="$(apt-mark showmanual)"; \
-{{ if env.variant != "bullseye" then ( -}}
-		apt-get update; \
-		apt-get install -y --no-install-recommends golang-go; \
-{{ ) else ( -}}
-# add backports for newer go version for bootstrap build: https://github.com/golang/go/issues/44505
-		( \
-			. /etc/os-release; \
-			echo "deb https://deb.debian.org/debian $VERSION_CODENAME-backports main" > /etc/apt/sources.list.d/backports.list; \
-			\
-			apt-get update; \
-			apt-get install -y --no-install-recommends -t "$VERSION_CODENAME-backports" golang-go; \
-		); \
-{{ ) end -}}
-# cgo-related deps (for 1.21+, we should instead use CGO_ENABLED=0; https://github.com/golang/go/blob/b44f6378233ada888f0dc79e0ac56def4673d9ed/src/cmd/dist/build.go#L1312 / https://github.com/golang/go/commit/da0c375c571037ec5ea6f8ef2be8f07593b40eb6)
-		apt-get install -y --no-install-recommends gcc libc6-dev; \
-{{ ) end -}}
-		\
-		export GOCACHE='/tmp/gocache'; \
-		\
-		( \
-			cd /usr/local/go/src; \
-# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
-			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-{{ if is_alpine then ( -}}
-			if [ "${GOARCH:-}" = '386' ]; then \
-# https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
-				export CGO_CFLAGS='-fno-stack-protector'; \
-			fi; \
-{{ ) else "" end -}}
-			./make.bash; \
-		); \
-		\
-{{ if is_alpine then ( -}}
-		apk del --no-network .build-deps; \
-{{ ) else ( -}}
-		apt-mark auto '.*' > /dev/null; \
-		apt-mark manual $savedAptMark > /dev/null; \
-		apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-		rm -rf /var/lib/apt/lists/*; \
-{{ ) end -}}
-		\
-# remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
-		rm -rf \
-			/usr/local/go/pkg/*/cmd \
-			/usr/local/go/pkg/bootstrap \
-			/usr/local/go/pkg/obj \
-			/usr/local/go/pkg/tool/*/api \
-			/usr/local/go/pkg/tool/*/go_bootstrap \
-			/usr/local/go/src/cmd/dist/dist \
-			"$GOCACHE" \
-		; \
-		\
-# clamp timestamps for reproducibility (allows "COPY --link" to be more clever/useful)
-		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
-		touch -t "$date" /usr/local/.go-date-stamp; \
-		find /usr/local/go -depth -newer /usr/local/.go-date-stamp -exec touch -ht "$date" '{}' +; \
-		rm /usr/local/.go-date-stamp; \
-		touch -t "$date" /usr/local; \
-{{ if [ "1.20" ] | index(env.version) then "" elif .arches["arm32v7"].url // "" | contains("armv6") then ( -}}
-	elif [ "$arch" = {{ os_arches["arm32v7"] | @sh }} ]; then \
+{{ if .arches["arm32v7"].url // "" | contains("armv6") then ( -}}
+	if [ "$arch" = {{ os_arches["arm32v7"] | @sh }} ]; then \
 		[ -s /usr/local/go/go.env ]; \
 		before="$(go env GOARM)"; [ "$before" != {{ .arches["arm32v7"].env["GOARM"] | @sh }} ]; \
 		{ \
@@ -221,7 +123,6 @@ RUN set -eux; \
 # (re-)clamp timestamp for reproducibility (allows "COPY --link" to be more clever/useful)
 		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
 		touch -t "$date" /usr/local/go/go.env /usr/local/go; \
-{{ ) else "" end -}}
 	fi; \
 	\
 {{ ) else "" end -}}
@@ -257,12 +158,10 @@ RUN set -eux; \
 
 ENV GOLANG_VERSION {{ .version }}
 
-{{ if [ "1.20" ] | index(env.version | rtrimstr("-rc")) then "" else ( -}}
 # don't auto-upgrade the gotoolchain
 # https://github.com/docker-library/golang/issues/472
 ENV GOTOOLCHAIN=local
 
-{{ ) end -}}
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 COPY --from=build --link /usr/local/go/ /usr/local/go/

@@ -132,7 +132,7 @@ for version in "${versions[@]}"; do
 				.key as $bashbrewArch
 				| .value.supported = (
 					# https://github.com/docker-library/golang/pull/500#issuecomment-1863578601 - as of Go 1.21+, we no longer build from source
-					(.value.url or ([ "1.20" ] | index(env.version | rtrimstr("-rc"))))
+					.value.url
 					and ($potentiallySupportedArches | index($bashbrewArch))
 				)
 				| .value.env +=
