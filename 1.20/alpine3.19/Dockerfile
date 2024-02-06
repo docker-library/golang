@@ -8,7 +8,7 @@ FROM alpine:3.19 AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.20.13
+ENV GOLANG_VERSION 1.20.14
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps \
@@ -50,8 +50,8 @@ RUN set -eux; \
 	if [ -z "$url" ]; then \
 # https://github.com/golang/go/issues/38536#issuecomment-616897960
 		build=1; \
-		url='https://dl.google.com/go/go1.20.13.src.tar.gz'; \
-		sha256='0fe745c530f2f1d67193af3c5ea25246be077989ec5178df266e975f3532449e'; \
+		url='https://dl.google.com/go/go1.20.14.src.tar.gz'; \
+		sha256='1aef321a0e3e38b7e91d2d7eb64040666cabdcc77d383de3c9522d0d69b67f4e'; \
 # the precompiled binaries published by Go upstream were not compatible with Alpine in Go 1.20, so we always build from source here 😅
 	fi; \
 	\
@@ -132,7 +132,7 @@ FROM alpine:3.19
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.20.13
+ENV GOLANG_VERSION 1.20.14
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
