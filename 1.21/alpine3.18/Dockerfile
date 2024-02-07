@@ -78,6 +78,20 @@ RUN set -eux; \
 # for logging validation/edification
 	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
 	\
+	if [ "$arch" = 'armv7' ]; then \
+		[ -s /usr/local/go/go.env ]; \
+		before="$(go env GOARM)"; [ "$before" != '7' ]; \
+		{ \
+			echo; \
+			echo '# https://github.com/docker-library/golang/issues/494'; \
+			echo 'GOARM=7'; \
+		} >> /usr/local/go/go.env; \
+		after="$(go env GOARM)"; [ "$after" = '7' ]; \
+# (re-)clamp timestamp for reproducibility (allows "COPY --link" to be more clever/useful)
+		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
+		touch -t "$date" /usr/local/go/go.env /usr/local/go; \
+	fi; \
+	\
 	apk del --no-network .fetch-deps; \
 	\
 # smoke test

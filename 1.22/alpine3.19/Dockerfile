@@ -8,7 +8,7 @@ FROM alpine:3.19 AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.20.14
+ENV GOLANG_VERSION 1.22.0
 
 RUN set -eux; \
 	apk add --no-cache --virtual .fetch-deps \
@@ -21,39 +21,39 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'x86_64') \
-			export GOAMD64='v1' GOARCH='amd64' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-amd64.tar.gz'; \
+			sha256='f6c8a87aa03b92c4b0bf3d558e28ea03006eb29db78917daec5cfb6ec1046265'; \
 			;; \
 		'armhf') \
-			export GOARCH='arm' GOARM='6' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-armv6l.tar.gz'; \
+			sha256='0525f92f79df7ed5877147bce7b955f159f3962711b69faac66bc7121d36dcc4'; \
 			;; \
 		'armv7') \
-			export GOARCH='arm' GOARM='7' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-armv6l.tar.gz'; \
+			sha256='0525f92f79df7ed5877147bce7b955f159f3962711b69faac66bc7121d36dcc4'; \
 			;; \
 		'aarch64') \
-			export GOARCH='arm64' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-arm64.tar.gz'; \
+			sha256='6a63fef0e050146f275bf02a0896badfe77c11b6f05499bb647e7bd613a45a10'; \
 			;; \
 		'x86') \
-			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-386.tar.gz'; \
+			sha256='1e209c4abde069067ac9afb341c8003db6a210f8173c77777f02d3a524313da3'; \
 			;; \
 		'ppc64le') \
-			export GOARCH='ppc64le' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-ppc64le.tar.gz'; \
+			sha256='0e57f421df9449066f00155ce98a5be93744b3d81b00ee4c2c9b511be2a31d93'; \
 			;; \
 		'riscv64') \
-			export GOARCH='riscv64' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-riscv64.tar.gz'; \
+			sha256='afe9cedcdbd6fdff27c57efd30aa5ce0f666f471fed5fa96cd4fb38d6b577086'; \
 			;; \
 		's390x') \
-			export GOARCH='s390x' GOOS='linux'; \
+			url='https://dl.google.com/go/go1.22.0.linux-s390x.tar.gz'; \
+			sha256='2e546a3583ba7bd3988f8f476245698f6a93dfa9fe206a8ca8f85c1ceecb2446'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
-	build=; \
-	if [ -z "$url" ]; then \
-# https://github.com/golang/go/issues/38536#issuecomment-616897960
-		build=1; \
-		url='https://dl.google.com/go/go1.20.14.src.tar.gz'; \
-		sha256='1aef321a0e3e38b7e91d2d7eb64040666cabdcc77d383de3c9522d0d69b67f4e'; \
-# the precompiled binaries published by Go upstream were not compatible with Alpine in Go 1.20, so we always build from source here 😅
-	fi; \
 	\
 	wget -O go.tgz.asc "$url.asc"; \
 	wget -O go.tgz "$url"; \
@@ -78,46 +78,18 @@ RUN set -eux; \
 # for logging validation/edification
 	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
 	\
-	if [ -n "$build" ]; then \
-		apk add --no-cache --virtual .build-deps \
-			bash \
-			gcc \
-			go \
-			musl-dev \
-		; \
-		\
-		export GOCACHE='/tmp/gocache'; \
-		\
-		( \
-			cd /usr/local/go/src; \
-# set GOROOT_BOOTSTRAP + GOHOST* such that we can build Go successfully
-			export GOROOT_BOOTSTRAP="$(go env GOROOT)" GOHOSTOS="$GOOS" GOHOSTARCH="$GOARCH"; \
-			if [ "${GOARCH:-}" = '386' ]; then \
-# https://github.com/golang/go/issues/52919; https://github.com/docker-library/golang/pull/426#issuecomment-1152623837
-				export CGO_CFLAGS='-fno-stack-protector'; \
-			fi; \
-			./make.bash; \
-		); \
-		\
-		apk del --no-network .build-deps; \
-		\
-# remove a few intermediate / bootstrapping files the official binary release tarballs do not contain
-		rm -rf \
-			/usr/local/go/pkg/*/cmd \
-			/usr/local/go/pkg/bootstrap \
-			/usr/local/go/pkg/obj \
-			/usr/local/go/pkg/tool/*/api \
-			/usr/local/go/pkg/tool/*/go_bootstrap \
-			/usr/local/go/src/cmd/dist/dist \
-			"$GOCACHE" \
-		; \
-		\
-# clamp timestamps for reproducibility (allows "COPY --link" to be more clever/useful)
+	if [ "$arch" = 'armv7' ]; then \
+		[ -s /usr/local/go/go.env ]; \
+		before="$(go env GOARM)"; [ "$before" != '7' ]; \
+		{ \
+			echo; \
+			echo '# https://github.com/docker-library/golang/issues/494'; \
+			echo 'GOARM=7'; \
+		} >> /usr/local/go/go.env; \
+		after="$(go env GOARM)"; [ "$after" = '7' ]; \
+# (re-)clamp timestamp for reproducibility (allows "COPY --link" to be more clever/useful)
 		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
-		touch -t "$date" /usr/local/.go-date-stamp; \
-		find /usr/local/go -depth -newer /usr/local/.go-date-stamp -exec touch -ht "$date" '{}' +; \
-		rm /usr/local/.go-date-stamp; \
-		touch -t "$date" /usr/local; \
+		touch -t "$date" /usr/local/go/go.env /usr/local/go; \
 	fi; \
 	\
 	apk del --no-network .fetch-deps; \
@@ -132,7 +104,11 @@ FROM alpine:3.19
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.20.14
+ENV GOLANG_VERSION 1.22.0
+
+# don't auto-upgrade the gotoolchain
+# https://github.com/docker-library/golang/issues/472
+ENV GOTOOLCHAIN=local
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
