@@ -89,7 +89,7 @@ for version in "${versions[@]}"; do
 	export version
 
 	if \
-		! goJson="$(jq <<<"$goVersions" -c '
+		! goJson="$(jq <<<"$goVersions" -ce '
 			[ .[] | select(.major == env.version) ] | sort_by(
 				.version
 				| split(".")
