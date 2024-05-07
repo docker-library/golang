@@ -21,10 +21,10 @@ RUN setx /m PATH "%GOPATH%\bin;C:\Program Files\Go\bin;%PATH%"
 USER ContainerUser
 # doing this first to share cache across versions more aggressively
 
-ENV GOLANG_VERSION 1.21.9
+ENV GOLANG_VERSION 1.21.10
 
 # Docker's Windows path parsing is absolutely *cursed*; please just trust me on this one -Tianon
-COPY --from=golang:1.21.9-windowsservercore-1809 ["C:\\\\Program Files\\\\Go","C:\\\\Program Files\\\\Go"]
+COPY --from=golang:1.21.10-windowsservercore-1809 ["C:\\\\Program Files\\\\Go","C:\\\\Program Files\\\\Go"]
 RUN go version
 
 WORKDIR $GOPATH
