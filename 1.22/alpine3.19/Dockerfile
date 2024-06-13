@@ -11,6 +11,7 @@ ENV PATH /usr/local/go/bin:$PATH
 ENV GOLANG_VERSION 1.22.4
 
 RUN set -eux; \
+	now="$(date '+%s')"; \
 	apk add --no-cache --virtual .fetch-deps \
 		ca-certificates \
 		gnupg \
@@ -75,8 +76,11 @@ RUN set -eux; \
 # save the timestamp from the tarball so we can restore it for reproducibility, if necessary (see below)
 	SOURCE_DATE_EPOCH="$(stat -c '%Y' /usr/local/go)"; \
 	export SOURCE_DATE_EPOCH; \
+	touchy="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
 # for logging validation/edification
 	date --date "@$SOURCE_DATE_EPOCH" --rfc-2822; \
+# sanity check (detected value should be older than our wall clock)
+	[ "$SOURCE_DATE_EPOCH" -lt "$now" ]; \
 	\
 	if [ "$arch" = 'armv7' ]; then \
 		[ -s /usr/local/go/go.env ]; \
@@ -88,17 +92,23 @@ RUN set -eux; \
 		} >> /usr/local/go/go.env; \
 		after="$(go env GOARM)"; [ "$after" = '7' ]; \
 # (re-)clamp timestamp for reproducibility (allows "COPY --link" to be more clever/useful)
-		date="$(date -d "@$SOURCE_DATE_EPOCH" '+%Y%m%d%H%M.%S')"; \
-		touch -t "$date" /usr/local/go/go.env /usr/local/go; \
+		touch -t "$touchy" /usr/local/go/go.env /usr/local/go; \
 	fi; \
+	\
+# ideally at this point, we would just "COPY --link ... /usr/local/go/ /usr/local/go/" but BuildKit insists on creating the parent directories (perhaps related to https://github.com/opencontainers/image-spec/pull/970), and does so with unreproducible timestamps, so we instead create a whole new "directory tree" that we can "COPY --link" to accomplish what we want
+	mkdir /target /target/usr /target/usr/local; \
+	mv -vT /usr/local/go /target/usr/local/go; \
+	ln -svfT /target/usr/local/go /usr/local/go; \
+	touch -t "$touchy" /target/usr/local /target/usr /target; \
 	\
 	apk del --no-network .fetch-deps; \
 	\
 # smoke test
 	go version; \
 # make sure our reproducibile timestamp is probably still correct (best-effort inline reproducibility test)
-	epoch="$(stat -c '%Y' /usr/local/go)"; \
-	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]
+	epoch="$(stat -c '%Y' /target/usr/local/go)"; \
+	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]; \
+	find /target -newer /target/usr/local/go -exec sh -c 'ls -ld "$@" && exit "$#"' -- '{}' +
 
 FROM alpine:3.19
 
@@ -112,6 +122,7 @@ ENV GOTOOLCHAIN=local
 
 ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
-COPY --from=build --link /usr/local/go/ /usr/local/go/
+# (see notes above about "COPY --link")
+COPY --from=build --link /target/ /
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 1777 "$GOPATH"
 WORKDIR $GOPATH
