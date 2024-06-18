@@ -390,6 +390,7 @@
       }
     },
     "variants": [
+      "buster",
       "bookworm",
       "bullseye",
       "focal",
@@ -805,6 +806,7 @@
       }
     },
     "variants": [
+      "buster",
       "bookworm",
       "bullseye",
       "focal",

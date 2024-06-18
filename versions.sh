@@ -159,6 +159,7 @@ for version in "${versions[@]}"; do
 			)
 		),
 		variants: [
+			"buster",
 			"bookworm",
 			"bullseye",
 			"focal",
