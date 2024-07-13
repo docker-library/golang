@@ -102,6 +102,13 @@ for version; do
 		))
 		| .[0]
 	' versions.json)"
+	defaultRockyLinuxVariant="$(jq -r '
+		.[env.version].variants
+		| map(select(
+			startswith("rockylinux")
+		))
+		| .[0]
+	' versions.json)"
 
 	for v in "${variants[@]}"; do
 		dir="$version/$v"
@@ -123,6 +130,10 @@ for version; do
 
 		if [ "$variant" = "$defaultAlpineVariant" ]; then
 			variantAliases+=( "${baseAliases[@]/%/-alpine}" )
+			variantAliases=( "${variantAliases[@]//latest-/}" )
+		fi
+		if [ "$variant" = "$defaultRockyLinuxVariant" ]; then
+			variantAliases+=( "${baseAliases[@]/%/-rockylinux}" )
 			variantAliases=( "${variantAliases[@]//latest-/}" )
 		fi
 

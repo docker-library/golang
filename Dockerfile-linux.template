@@ -2,11 +2,19 @@
 	def is_alpine:
 		env.variant | startswith("alpine")
 	;
+	def is_rockylinux:
+		env.variant | startswith("rockylinux")
+	;
 	def alpine_version:
 		env.variant | ltrimstr("alpine")
+	;
+	def rockylinux_version:
+		env.variant | ltrimstr("rockylinux")
 -}}
 {{ if is_alpine then ( -}}
 FROM alpine:{{ alpine_version }} AS build
+{{ ) elif is_rockylinux then ( -}}
+FROM rockylinux:{{ rockylinux_version }} AS build
 {{ ) else ( -}}
 FROM buildpack-deps:{{ env.variant }}-scm AS build
 {{ ) end -}}
@@ -28,6 +36,14 @@ ENV GOLANG_VERSION {{ .version }}
 				i386: "x86",
 				ppc64le: "ppc64le",
 				riscv64: "riscv64",
+				s390x: "s390x",
+			}
+		elif is_rockylinux then
+			{
+				# https://rockylinux.org/
+				amd64: "x86_64",
+				arm64v8: "aarch64",
+				ppc64le: "ppc64le",
 				s390x: "s390x",
 			}
 		else
@@ -60,6 +76,15 @@ RUN set -eux; \
 		tar \
 	; \
 	arch="$(apk --print-arch)"; \
+{{ ) elif is_rockylinux then ( -}}
+	dnf update -y; \
+	dnf install -y \
+		ca-certificates \
+		gnupg2 \
+		tar \
+		wget \
+	; \
+	arch="$(uname -m)"; \
 {{ ) else ( -}}
 	arch="$(dpkg --print-architecture)"; arch="${arch##*-}"; \
 {{ ) end -}}
@@ -150,6 +175,10 @@ RUN set -eux; \
 FROM alpine:{{ alpine_version }}
 
 RUN apk add --no-cache ca-certificates
+{{ ) elif is_rockylinux then ( -}}
+FROM rockylinux:{{ rockylinux_version }}
+
+RUN dnf update -y && dnf install -y ca-certificates && dnf clean all
 {{ ) else ( -}}
 FROM buildpack-deps:{{ env.variant }}-scm
 

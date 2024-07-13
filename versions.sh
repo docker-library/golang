@@ -159,6 +159,10 @@ for version in "${versions[@]}"; do
 				"3.19",
 				empty
 			| "alpine" + .),
+			(
+				"9.3",
+				empty
+			| "rockylinux" + .),
 			if .arches | has("windows-amd64") and .["windows-amd64"].url then
 				(
 					"ltsc2022",
