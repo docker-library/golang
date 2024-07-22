@@ -157,6 +157,7 @@ for version in "${versions[@]}"; do
 			(
 				"3.20",
 				"3.19",
+				"3.18",
 				empty
 			| "alpine" + .),
 			if .arches | has("windows-amd64") and .["windows-amd64"].url then
