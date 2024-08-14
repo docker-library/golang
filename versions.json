@@ -455,7 +455,8 @@
         "sha256": "62788056693009bcf7020eedc778cdd1781941c6145eab7688bd087bce0f8659",
         "env": {
           "GOOS": "linux",
-          "GOARCH": "arm64"
+          "GOARCH": "arm64",
+          "GOARM64": "v8.0"
         },
         "supported": true
       },
@@ -735,7 +736,8 @@
         "sha256": "a87726205f1a283247f877ccae8ce147ff4e77ac802382647ac52256eb5642c7",
         "env": {
           "GOOS": "linux",
-          "GOARCH": "riscv64"
+          "GOARCH": "riscv64",
+          "GORISCV64": "rva20u64"
         },
         "supported": true
       },
