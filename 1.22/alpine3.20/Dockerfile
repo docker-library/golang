@@ -12,7 +12,7 @@ ENV GOLANG_VERSION 1.22.8
 
 RUN set -eux; \
 	now="$(date '+%s')"; \
-	apk add --no-cache --virtual .fetch-deps \
+	apk add --no-cache --virtual .fetch-deps=0 \
 		ca-certificates \
 		gnupg \
 # busybox's "tar" doesn't handle directory mtime correctly, so our SOURCE_DATE_EPOCH lookup doesn't work (the mtime of "/usr/local/go" always ends up being the extraction timestamp)

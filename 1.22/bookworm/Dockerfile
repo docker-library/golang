@@ -114,7 +114,9 @@ RUN set -eux; \
 		make \
 		pkg-config \
 	; \
-	rm -rf /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/* ; \
+# clean up for reproducibility
+	rm -rf /var/log/* /var/cache/ldconfig/aux-cache
 
 ENV GOLANG_VERSION 1.22.8
 
