@@ -140,11 +140,18 @@ for version in "${versions[@]}"; do
 							# i386 in Debian is non-SSE2, Alpine appears to be similar (but interesting, not FreeBSD?)
 							{ GOARCH: "386", GO386: "softfloat" }
 						elif $bashbrewArch == "amd64" then
-							# https://tip.golang.org/doc/go1.18#amd64
+							# https://go.dev/doc/go1.18#amd64
 							{ GOAMD64: "v1" }
 						# TODO ^^ figure out what to do with GOAMD64 / GO386 if/when the OS baselines change and these choices needs to be per-variant /o\ (probably move it to the template instead, in fact, since that is where we can most easily toggle based on variant)
+						elif $bashbrewArch == "riscv64" and env.version != "1.22" then
+							# https://go.dev/doc/go1.23#riscv
+							{ GORISCV64: "rva20u64" }
 						elif $bashbrewArch | startswith("arm64v") then
-							{ GOARCH: "arm64" } # TODO do something with arm64 variant
+							{ GOARCH: "arm64" }
+							+ if env.version != "1.22" then {
+								# https://go.dev/doc/go1.23#arm64
+								GOARM64: ($bashbrewArch | ltrimstr("arm64") | if index(".") then . else . + ".0" end),
+							} else {} end
 						elif $bashbrewArch | startswith("arm32v") then
 							{ GOARCH: "arm", GOARM: ($bashbrewArch | ltrimstr("arm32v")) }
 						else {} end
