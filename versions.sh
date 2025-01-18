@@ -168,11 +168,13 @@ for version in "${versions[@]}"; do
 			| "alpine" + .),
 			if .arches | has("windows-amd64") and .["windows-amd64"].url then
 				(
+					"ltsc2025",
 					"ltsc2022",
 					"1809",
 					empty
 				| "windows/windowsservercore-" + .),
 				(
+					"ltsc2025",
 					"ltsc2022",
 					"1809",
 					empty
