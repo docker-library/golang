@@ -361,7 +361,7 @@
       "src": {
         "url": "https://dl.google.com/go/go1.23.6.src.tar.gz",
         "sha256": "039c5b04e65279daceee8a6f71e70bd05cf5b801782b6f77c6e19e2ed0511222",
-        "supported": true
+        "supported": false
       },
       "windows-amd64": {
         "url": "https://dl.google.com/go/go1.23.6.windows-amd64.zip",
@@ -775,7 +775,7 @@
       "src": {
         "url": "https://dl.google.com/go/go1.24.0.src.tar.gz",
         "sha256": "d14120614acb29d12bcab72bd689f257eb4be9e0b6f88a8fb7e41ac65f8556e5",
-        "supported": true
+        "supported": false
       },
       "windows-amd64": {
         "url": "https://dl.google.com/go/go1.24.0.windows-amd64.zip",
@@ -816,6 +816,108 @@
       "windows/nanoserver-ltsc2025",
       "windows/nanoserver-ltsc2022",
       "windows/nanoserver-1809"
+    ]
+  },
+  "tip": {
+    "version": "tip-20250209",
+    "commit": {
+      "version": "ff27d270c9f95178f9749bc8e1f15957b1c1d5b3"
+    },
+    "arches": {
+      "amd64": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "amd64",
+          "GOAMD64": "v1"
+        },
+        "supported": true
+      },
+      "arm32v5": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "arm",
+          "GOARM": "5"
+        },
+        "supported": true
+      },
+      "arm32v6": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "arm",
+          "GOARM": "6"
+        },
+        "supported": true
+      },
+      "arm32v7": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "arm",
+          "GOARM": "7"
+        },
+        "supported": true
+      },
+      "arm64v8": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "arm64",
+          "GOARM64": "v8.0"
+        },
+        "supported": true
+      },
+      "i386": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "386",
+          "GO386": "softfloat"
+        },
+        "supported": true
+      },
+      "mips64le": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "mips64le"
+        },
+        "supported": true
+      },
+      "ppc64le": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "ppc64le"
+        },
+        "supported": true
+      },
+      "riscv64": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "riscv64",
+          "GORISCV64": "rva20u64"
+        },
+        "supported": true
+      },
+      "s390x": {
+        "env": {
+          "GOOS": "linux",
+          "GOARCH": "s390x"
+        },
+        "supported": true
+      },
+      "src": {
+        "url": "https://github.com/golang/go/archive/ff27d270c9f95178f9749bc8e1f15957b1c1d5b3.tar.gz",
+        "supported": false
+      },
+      "windows-amd64": {
+        "env": {
+          "GOOS": "windows",
+          "GOARCH": "amd64"
+        },
+        "supported": true
+      }
+    },
+    "variants": [
+      "bookworm",
+      "bullseye",
+      "alpine3.21",
+      "alpine3.20"
     ]
   }
 }

@@ -113,8 +113,6 @@ for version; do
 
 		fullVersion="$(jq -r '.[env.version].version' versions.json)"
 
-		[[ "$fullVersion" == *.*[^0-9]* ]] || fullVersion+='.0'
-
 		if [ "$version" = "$fullVersion" ]; then
 			baseAliases=( "${versionAliases[@]}" )
 		else
