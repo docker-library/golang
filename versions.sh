@@ -266,11 +266,19 @@ for version in "${versions[@]}"; do
 done
 
 jq <<<"$json" '
-	def sort_keys:
+	to_entries
+	| sort_by(
+		.key
+		| [
+			if . == "tip" then 0 else 1 end, # make sure tip is first so it ends up last when we reverse
+			(split("[.-]"; "") | map(tonumber? // .))
+		]
+	)
+	| reverse
+	| from_entries
+	| .[].arches |= (
 		to_entries
 		| sort_by(.key)
 		| from_entries
-	;
-	sort_keys
-	| .[].arches |= sort_keys
+	)
 ' > versions.json

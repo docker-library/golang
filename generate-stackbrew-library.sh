@@ -2,19 +2,24 @@
 set -Eeuo pipefail
 
 declare -A aliases=(
-	[1.24]='1 latest'
+	#[1.24]='1 latest'
 )
+
+# because we sort in versions.sh, we can assume the first non-rc in versions.json is the "latest" release
+latest="$(jq -r 'first(keys_unsorted - ["tip"] | .[] | select(endswith("-rc") | not))' versions.json)"
+[ -n "$latest" ]
+aliases["$latest"]+=' 1 latest'
+export latest
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 if [ "$#" -eq 0 ]; then
-	versions="$(jq -r 'keys | map(@sh) | join(" ")' versions.json)"
+	versions="$(jq -r 'keys_unsorted | map(@sh) | join(" ")' versions.json)"
 	eval "set -- $versions"
 fi
 
-# sort version numbers with highest first
-IFS=$'\n'; set -- $(sort -rV <<<"$*"); unset IFS
+# no sort because we already sorted the keys in versions.sh (hence "keys_unsorted" above)
 
 # get the most recent commit which modified any of "$@"
 fileCommit() {
@@ -139,7 +144,13 @@ for version; do
 
 		# cross-reference with supported architectures
 		for arch in $variantArches; do
-			if ! jq -e --arg arch "$arch" '.[env.version].arches[$arch].supported' versions.json &> /dev/null; then
+			if ! jq -e --arg arch "$arch" '
+				.[env.version].arches[$arch].supported
+				# if the version we are checking is "tip", we need to cross-reference "latest" also (since it uses latest as GOROOT_BOOTSTRAP via COPY --from)
+				and if env.version == "tip" then
+					.[env.latest].arches[$arch].supported
+				else true end
+			' versions.json &> /dev/null; then
 				variantArches="$(sed <<<" $variantArches " -e "s/ $arch / /g")"
 			fi
 		done
