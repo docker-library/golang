@@ -93,7 +93,7 @@ for version in "${versions[@]}"; do
 			# clamp so we don't update too frequently (https://github.com/docker-library/golang/issues/464#issuecomment-1587758290, https://github.com/docker-library/faq#can-i-use-a-bot-to-make-my-image-update-prs)
 			# https://github.com/golang/go
 			# https://go.googlesource.com/go
-			snapshotDate="$(date --utc --date 'last monday 00:00:00' '+%s')"
+			snapshotDate="$(date --utc --date 'last sunday 23:59:59 UTC + 1 second' '+%s')"
 			snapshotDateStr="$(date --utc --date "@$snapshotDate" '+%Y-%m-%d @ %H:%M:%S')"
 			commit='HEAD' # this is also our iteration variable, so if we don't find a suitable commit each time through this loop, we'll use the last commit of the previous list to get a list of new (older) commits until we find one suitably old enough
 			fullVersion=
