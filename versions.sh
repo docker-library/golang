@@ -238,8 +238,8 @@ for version in "${versions[@]}"; do
 			"bookworm",
 			"bullseye",
 			(
+				"3.22",
 				"3.21",
-				"3.20",
 				empty
 			| "alpine" + .),
 			if .arches | has("windows-amd64") and .["windows-amd64"].url then # TODO consider windows + tip
