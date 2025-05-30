@@ -246,13 +246,11 @@ for version in "${versions[@]}"; do
 				(
 					"ltsc2025",
 					"ltsc2022",
-					"1809",
 					empty
 				| "windows/windowsservercore-" + .),
 				(
 					"ltsc2025",
 					"ltsc2022",
-					"1809",
 					empty
 				| "windows/nanoserver-" + .)
 			else empty end
