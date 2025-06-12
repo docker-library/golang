@@ -397,9 +397,7 @@
       "alpine3.22",
       "alpine3.21",
       "windows/windowsservercore-ltsc2025",
-      "windows/windowsservercore-ltsc2022",
-      "windows/nanoserver-ltsc2025",
-      "windows/nanoserver-ltsc2022"
+      "windows/windowsservercore-ltsc2022"
     ]
   },
   "1.24": {
