@@ -165,6 +165,7 @@ for version in "${versions[@]}"; do
 			"focal",
 			"jammy",
 			"noble",
+			"bionic",
 			(
 				"3.20",
 				"3.19",

@@ -4,7 +4,7 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:focal-scm AS build
+FROM buildpack-deps:bionic-scm AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
@@ -102,7 +102,7 @@ RUN set -eux; \
 	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]; \
 	find /target -newer /target/usr/local/go -exec sh -c 'ls -ld "$@" && exit "$#"' -- '{}' +
 
-FROM buildpack-deps:focal-scm
+FROM buildpack-deps:bionic-scm
 
 # install cgo-related dependencies
 RUN set -eux; \
