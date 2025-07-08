@@ -248,13 +248,11 @@ for version in "${versions[@]}"; do
 					"ltsc2022",
 					empty
 				| "windows/windowsservercore-" + .),
-				if .version != "1.25rc1" then
-					(
-						"ltsc2025",
-						"ltsc2022",
-						empty
-					| "windows/nanoserver-" + .)
-				else empty end
+				(
+					"ltsc2025",
+					"ltsc2022",
+					empty
+				| "windows/nanoserver-" + .)
 			else empty end
 		],
 	}
