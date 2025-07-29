@@ -805,11 +805,11 @@
     ]
   },
   "1.23": {
-    "version": "1.23.10",
+    "version": "1.23.11",
     "arches": {
       "aix-ppc64": {
-        "url": "https://dl.google.com/go/go1.23.10.aix-ppc64.tar.gz",
-        "sha256": "a21ac5e3c056dd233f14924e833a7baa5568fa857209c7a73c39e3dd327cf449",
+        "url": "https://dl.google.com/go/go1.23.11.aix-ppc64.tar.gz",
+        "sha256": "cabf933f78628c020d8719286dd75fd85a9cc8a9b1ec2f91aed2429bccd11e4c",
         "env": {
           "GOOS": "aix",
           "GOARCH": "ppc64"
@@ -817,8 +817,8 @@
         "supported": false
       },
       "amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-amd64.tar.gz",
-        "sha256": "535f9f81802499f2a7dbfa70abb8fda3793725fcc29460f719815f6e10b5fd60",
+        "url": "https://dl.google.com/go/go1.23.11.linux-amd64.tar.gz",
+        "sha256": "80899df77459e0b551d2eb8800ad6eb47023b99cccbf8129e7b5786770b948c5",
         "env": {
           "GOOS": "linux",
           "GOARCH": "amd64",
@@ -835,8 +835,8 @@
         "supported": false
       },
       "arm32v6": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-armv6l.tar.gz",
-        "sha256": "b6e00c9a72406d394b9f167e74670e28b72ed559cca8115b21be1cb9d5316cb4",
+        "url": "https://dl.google.com/go/go1.23.11.linux-armv6l.tar.gz",
+        "sha256": "a41980a86860b2def6c7a2f1f2cbed14018d08319b7191615ebb82827fb8b5c4",
         "env": {
           "GOOS": "linux",
           "GOARCH": "arm",
@@ -845,8 +845,8 @@
         "supported": true
       },
       "arm32v7": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-armv6l.tar.gz",
-        "sha256": "b6e00c9a72406d394b9f167e74670e28b72ed559cca8115b21be1cb9d5316cb4",
+        "url": "https://dl.google.com/go/go1.23.11.linux-armv6l.tar.gz",
+        "sha256": "a41980a86860b2def6c7a2f1f2cbed14018d08319b7191615ebb82827fb8b5c4",
         "env": {
           "GOOS": "linux",
           "GOARCH": "arm",
@@ -855,8 +855,8 @@
         "supported": true
       },
       "arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-arm64.tar.gz",
-        "sha256": "bfb1f1df7173f44648ee070a39ab0481068632f595305a699d89cd56a33b8081",
+        "url": "https://dl.google.com/go/go1.23.11.linux-arm64.tar.gz",
+        "sha256": "1085c6ff805ec1f4893fa92013d16e58f74aeac830b1b9919b6908f3ed1a85c5",
         "env": {
           "GOOS": "linux",
           "GOARCH": "arm64",
@@ -865,8 +865,8 @@
         "supported": true
       },
       "darwin-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.darwin-amd64.tar.gz",
-        "sha256": "1cbd7af6f07bc6fa1f8672f9b913c961986864100e467e0acdc942e0ae46fe68",
+        "url": "https://dl.google.com/go/go1.23.11.darwin-amd64.tar.gz",
+        "sha256": "804538b068ebf449789e060d221c7be94d92d5f3e86842071cc70148d677f84d",
         "env": {
           "GOOS": "darwin",
           "GOARCH": "amd64"
@@ -874,8 +874,8 @@
         "supported": false
       },
       "darwin-arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.darwin-arm64.tar.gz",
-        "sha256": "25c64bfa8a8fd8e7f62fb54afa4354af8409a4bb2358c2699a1003b733e6fce5",
+        "url": "https://dl.google.com/go/go1.23.11.darwin-arm64.tar.gz",
+        "sha256": "d3c2c69a79eb3e2a06e5d8bbca692c9166b27421f7251ccbafcada0ba35a05ee",
         "env": {
           "GOOS": "darwin",
           "GOARCH": "arm64"
@@ -883,8 +883,8 @@
         "supported": false
       },
       "dragonfly-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.dragonfly-amd64.tar.gz",
-        "sha256": "fa10f30b269cc52e8ea39025eb185e836870a770e55c89f272da5ae3c1d3aad5",
+        "url": "https://dl.google.com/go/go1.23.11.dragonfly-amd64.tar.gz",
+        "sha256": "8c8c217d68574574ff3bf22f29106ef21721e81d2bd5e7e3e281a390cc610188",
         "env": {
           "GOOS": "dragonfly",
           "GOARCH": "amd64"
@@ -892,8 +892,8 @@
         "supported": false
       },
       "freebsd-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.freebsd-amd64.tar.gz",
-        "sha256": "926490e5c21f229ace329d93d7b9e1cbd787fb5ca4deb5cfc6f0f6849a585887",
+        "url": "https://dl.google.com/go/go1.23.11.freebsd-amd64.tar.gz",
+        "sha256": "76a6fcfd9a50e7fcc069b2c7d56845f2defac1d3bd3f62f9130b9bbb413c002e",
         "env": {
           "GOOS": "freebsd",
           "GOARCH": "amd64"
@@ -901,8 +901,8 @@
         "supported": false
       },
       "freebsd-arm": {
-        "url": "https://dl.google.com/go/go1.23.10.freebsd-arm.tar.gz",
-        "sha256": "9f08d36dfaf0158d08154a7f8287792eb119df183da4e17ba3e9103ed6ce0ae9",
+        "url": "https://dl.google.com/go/go1.23.11.freebsd-arm.tar.gz",
+        "sha256": "8281f55a42b7090d76292a38055d93a2392dabc02b9c307445a42911de1543ac",
         "env": {
           "GOOS": "freebsd",
           "GOARCH": "arm"
@@ -910,8 +910,8 @@
         "supported": false
       },
       "freebsd-arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.freebsd-arm64.tar.gz",
-        "sha256": "441d73c73759e011c2a2490f3e3ec4bffa6ca698f73d8f3a40736f3f5ee3b6a8",
+        "url": "https://dl.google.com/go/go1.23.11.freebsd-arm64.tar.gz",
+        "sha256": "f8ebb47879bd354d694b01709cf735380f37f9e426ff273845e3e24e20aadc87",
         "env": {
           "GOOS": "freebsd",
           "GOARCH": "arm64"
@@ -919,8 +919,8 @@
         "supported": false
       },
       "freebsd-i386": {
-        "url": "https://dl.google.com/go/go1.23.10.freebsd-386.tar.gz",
-        "sha256": "5b398be0c699791a4862a9e7be233ff3bef477650ae0ec5dd9f61a6961104c93",
+        "url": "https://dl.google.com/go/go1.23.11.freebsd-386.tar.gz",
+        "sha256": "e471e9ef084b111d9c6d25a97e99fb750ceb68572ba664e1bcaabbb5387347ea",
         "env": {
           "GOOS": "freebsd",
           "GOARCH": "386"
@@ -928,8 +928,8 @@
         "supported": false
       },
       "freebsd-riscv64": {
-        "url": "https://dl.google.com/go/go1.23.10.freebsd-riscv64.tar.gz",
-        "sha256": "c818e2a1bf790286842daeb0fe51cad4116cfd22f40b35f54a6960d17267e228",
+        "url": "https://dl.google.com/go/go1.23.11.freebsd-riscv64.tar.gz",
+        "sha256": "0151d2b3389c3a263d95725585bb3d35c6ec747e9a8be67e3ab35dff8de43001",
         "env": {
           "GOOS": "freebsd",
           "GOARCH": "riscv64"
@@ -937,8 +937,8 @@
         "supported": false
       },
       "i386": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-386.tar.gz",
-        "sha256": "ded3c0a8d6d2a0ea5e7599c49678efa05cda139d31baaaf7d8d536a9e4cc19b2",
+        "url": "https://dl.google.com/go/go1.23.11.linux-386.tar.gz",
+        "sha256": "3d3ed184a639e71b91450d24d1a2dab050e7cf0c8ed4c83f6a2daba8cd5fe1be",
         "env": {
           "GOOS": "linux",
           "GOARCH": "386",
@@ -947,8 +947,8 @@
         "supported": true
       },
       "illumos-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.illumos-amd64.tar.gz",
-        "sha256": "a0ea62e1a3521a883cbf4c4193120560e9a708dd1901966ae90530571e02e4ef",
+        "url": "https://dl.google.com/go/go1.23.11.illumos-amd64.tar.gz",
+        "sha256": "5f58694892a648e6abf7eca75cac5d0e1ac878971e40b48f66efc7444ed6111b",
         "env": {
           "GOOS": "illumos",
           "GOARCH": "amd64"
@@ -956,8 +956,8 @@
         "supported": false
       },
       "loong64": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-loong64.tar.gz",
-        "sha256": "98175bc2230509c2a96e9978de3b06fb72afd743768eb547fb7ea51e627cb18c",
+        "url": "https://dl.google.com/go/go1.23.11.linux-loong64.tar.gz",
+        "sha256": "a23b8d274fc562705e79a04cd57799080c9adc50be01d7feb58687e6398b9267",
         "env": {
           "GOOS": "linux",
           "GOARCH": "loong64"
@@ -965,8 +965,8 @@
         "supported": false
       },
       "mips": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-mips.tar.gz",
-        "sha256": "b24f8579ca59c955795edcefd42d5fa262ad9a3c170ca3643cb55846965b21a7",
+        "url": "https://dl.google.com/go/go1.23.11.linux-mips.tar.gz",
+        "sha256": "0d857323a695b179d7997b3126057dbeb277ec8452a13470e6d186cde7fa4c7c",
         "env": {
           "GOOS": "linux",
           "GOARCH": "mips"
@@ -974,8 +974,8 @@
         "supported": false
       },
       "mips64": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-mips64.tar.gz",
-        "sha256": "307823cb0a8d0356fd245b58cc90c95c08a1ff16f8acac03bf02f6ae0f849d0d",
+        "url": "https://dl.google.com/go/go1.23.11.linux-mips64.tar.gz",
+        "sha256": "f934372d3e3937713e7fcae81bc80cc321e9762778a35bbdb8ac01d5cfed719c",
         "env": {
           "GOOS": "linux",
           "GOARCH": "mips64"
@@ -983,8 +983,8 @@
         "supported": false
       },
       "mips64le": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-mips64le.tar.gz",
-        "sha256": "3d9a542d761877bcf46ad7ae900460a6d3d50f4a3691a40c8535128addf45a11",
+        "url": "https://dl.google.com/go/go1.23.11.linux-mips64le.tar.gz",
+        "sha256": "c31e8ec071b57ec181712ce0d8a8e7a928c3bd52aab23aa0d9b3666b4c9ff338",
         "env": {
           "GOOS": "linux",
           "GOARCH": "mips64le"
@@ -992,8 +992,8 @@
         "supported": true
       },
       "mipsle": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-mipsle.tar.gz",
-        "sha256": "e480a7a1667163c81d891bb6291b2b1c1ced62d8bf5fc97547437dee7a40924a",
+        "url": "https://dl.google.com/go/go1.23.11.linux-mipsle.tar.gz",
+        "sha256": "ba9886677a78ce415389ff0d4b508db81a2bc0764ddc073ed682306fcdf5cef8",
         "env": {
           "GOOS": "linux",
           "GOARCH": "mipsle"
@@ -1001,8 +1001,8 @@
         "supported": false
       },
       "netbsd-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.netbsd-amd64.tar.gz",
-        "sha256": "17a0787e08e64446cb0a734522321f93c6ad281dfbecc7d171f5822021d8a05e",
+        "url": "https://dl.google.com/go/go1.23.11.netbsd-amd64.tar.gz",
+        "sha256": "1ed2eb5c97eefc15286f00201688a491f293c29e013b8d095837201995e152ed",
         "env": {
           "GOOS": "netbsd",
           "GOARCH": "amd64"
@@ -1010,8 +1010,8 @@
         "supported": false
       },
       "netbsd-arm": {
-        "url": "https://dl.google.com/go/go1.23.10.netbsd-arm.tar.gz",
-        "sha256": "e31954ef3c38cf19a2858e2bcdf78b0fe77454ca0e24bc504b094788dcd4d4a5",
+        "url": "https://dl.google.com/go/go1.23.11.netbsd-arm.tar.gz",
+        "sha256": "c2c87180ca3aebaff55bb8132de6030f664b2cadcead9c65916220da50bb5e68",
         "env": {
           "GOOS": "netbsd",
           "GOARCH": "arm"
@@ -1019,8 +1019,8 @@
         "supported": false
       },
       "netbsd-arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.netbsd-arm64.tar.gz",
-        "sha256": "13ceb6b4297f22b13dae8230a8205799ccdfb5173b7a7efe85009a6dd0d1a84c",
+        "url": "https://dl.google.com/go/go1.23.11.netbsd-arm64.tar.gz",
+        "sha256": "25b1d3892b94a01ced40138e720b18404820c6bfc9cbfcf6feac6079bafff0a3",
         "env": {
           "GOOS": "netbsd",
           "GOARCH": "arm64"
@@ -1028,8 +1028,8 @@
         "supported": false
       },
       "netbsd-i386": {
-        "url": "https://dl.google.com/go/go1.23.10.netbsd-386.tar.gz",
-        "sha256": "443e47d30f0eb94e394879b05e078b0f8e1978866e2a01db35aec18ece88d90d",
+        "url": "https://dl.google.com/go/go1.23.11.netbsd-386.tar.gz",
+        "sha256": "8f44539f35a540a6dbb0cc03e058860b38c24ac3997dd87e8d0274ab2d0635bf",
         "env": {
           "GOOS": "netbsd",
           "GOARCH": "386"
@@ -1037,8 +1037,8 @@
         "supported": false
       },
       "openbsd-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-amd64.tar.gz",
-        "sha256": "8a19847d25c16f52efbd2c00e7669632febaeb06c6dcf775cb16ccf9fa22f910",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-amd64.tar.gz",
+        "sha256": "1442bdda57357b31f0ec4d54d6c4ffd61564c4d60bac978e7638367f4e18bdb1",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "amd64"
@@ -1046,8 +1046,8 @@
         "supported": false
       },
       "openbsd-arm": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-arm.tar.gz",
-        "sha256": "79b0ebdc59715f87d9ccd3c70361b4f861b276508c506a10e58e61464b74c49c",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-arm.tar.gz",
+        "sha256": "fe6e5f43ecce09e62e49f7dbc9a6d9f48f7a585a5db0d534a7ac9542d568514d",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "arm"
@@ -1055,8 +1055,8 @@
         "supported": false
       },
       "openbsd-arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-arm64.tar.gz",
-        "sha256": "82c256b94897807a12f205488980f2eee9218ea554e9bd7fa208361c97237862",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-arm64.tar.gz",
+        "sha256": "28a44d2a20f9f6ef52cfee71fdb4df6e1c096a9727aca7bb0040b275e59f244d",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "arm64"
@@ -1064,8 +1064,8 @@
         "supported": false
       },
       "openbsd-i386": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-386.tar.gz",
-        "sha256": "73bf985dc92ff9acea91b212219746e8d5a5dfa1e26917b2638620b0a1445863",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-386.tar.gz",
+        "sha256": "2feee4e5f071de9b72e938cb96650a15a3c903d55b5d4b2650f269cb6bf3c8e0",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "386"
@@ -1073,8 +1073,8 @@
         "supported": false
       },
       "openbsd-ppc64": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-ppc64.tar.gz",
-        "sha256": "903ad58d419383b4121a707da0e896d94f0cbda850f9d30c3bee7b7aad0f384b",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-ppc64.tar.gz",
+        "sha256": "3c263a787dc2200a4e50d320013eef7743d372571b99378a1cf3eefb9525bd14",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "ppc64"
@@ -1082,8 +1082,8 @@
         "supported": false
       },
       "openbsd-riscv64": {
-        "url": "https://dl.google.com/go/go1.23.10.openbsd-riscv64.tar.gz",
-        "sha256": "dd17279a65f5cfb3918d5762ce20368d1a23861ea2e17c0740165a30d1ba844f",
+        "url": "https://dl.google.com/go/go1.23.11.openbsd-riscv64.tar.gz",
+        "sha256": "aa9ff4f2214dc5f03cb4dc122abb5f4c5335fdbec2438159c7beaa2932fce988",
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "riscv64"
@@ -1091,8 +1091,8 @@
         "supported": false
       },
       "plan9-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.plan9-amd64.tar.gz",
-        "sha256": "9743e264ef63aa0bd3f0adad728e6a7ebfd198c9a4031a7f71e5db6da3314406",
+        "url": "https://dl.google.com/go/go1.23.11.plan9-amd64.tar.gz",
+        "sha256": "37e882db8351875d743b7d6bcd8074b09a2c7126dc7f78edf0799fff15a1d02a",
         "env": {
           "GOOS": "plan9",
           "GOARCH": "amd64"
@@ -1100,8 +1100,8 @@
         "supported": false
       },
       "plan9-arm": {
-        "url": "https://dl.google.com/go/go1.23.10.plan9-arm.tar.gz",
-        "sha256": "06edf10c85499331117ec850d0575c049ddffe3ebe2b38702249487ad0cc02ac",
+        "url": "https://dl.google.com/go/go1.23.11.plan9-arm.tar.gz",
+        "sha256": "bae8bfd476d33e7db521efdb1dbe741ef7fb3e56cb739cbd35947cf1a08cdbb7",
         "env": {
           "GOOS": "plan9",
           "GOARCH": "arm"
@@ -1109,8 +1109,8 @@
         "supported": false
       },
       "plan9-i386": {
-        "url": "https://dl.google.com/go/go1.23.10.plan9-386.tar.gz",
-        "sha256": "65b234462bb35a2f1184d3b46513d42c211bd96d76151a1b800f50195686bf94",
+        "url": "https://dl.google.com/go/go1.23.11.plan9-386.tar.gz",
+        "sha256": "201f0184641cc957d5ba7a1b80766b8a80c9198bc990124bb5d061d48b977ad0",
         "env": {
           "GOOS": "plan9",
           "GOARCH": "386"
@@ -1118,8 +1118,8 @@
         "supported": false
       },
       "ppc64": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-ppc64.tar.gz",
-        "sha256": "5ea8296b02c214d30287d1c8436f3b1ce217f7f6fac4b9cc750df8148077957a",
+        "url": "https://dl.google.com/go/go1.23.11.linux-ppc64.tar.gz",
+        "sha256": "739ff2ed9247512313ac31c691feaab2d945fdeca67b53ad53a9e151ca34fdf9",
         "env": {
           "GOOS": "linux",
           "GOARCH": "ppc64"
@@ -1127,8 +1127,8 @@
         "supported": false
       },
       "ppc64le": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-ppc64le.tar.gz",
-        "sha256": "8fb94455cfa5e9a5e8af2bfbc7323a6fed2dabaffda1a69dae5dd41b669bbb57",
+        "url": "https://dl.google.com/go/go1.23.11.linux-ppc64le.tar.gz",
+        "sha256": "0e2fcb735fae945aa141833ad0e50abadb970b827aeb55553d649ae1d9142ba8",
         "env": {
           "GOOS": "linux",
           "GOARCH": "ppc64le"
@@ -1136,8 +1136,8 @@
         "supported": true
       },
       "riscv64": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-riscv64.tar.gz",
-        "sha256": "ed68dbd165b2d2bf3725239a5bad852493b0de8ea45fa7a585159a63e0e1194a",
+        "url": "https://dl.google.com/go/go1.23.11.linux-riscv64.tar.gz",
+        "sha256": "63784043011a343c323c1b39c0263d415d19c8702cd03f1689ca35bf65132e6a",
         "env": {
           "GOOS": "linux",
           "GOARCH": "riscv64",
@@ -1146,8 +1146,8 @@
         "supported": true
       },
       "s390x": {
-        "url": "https://dl.google.com/go/go1.23.10.linux-s390x.tar.gz",
-        "sha256": "7d0e8651eb54fce5cfe2d4b412ddfa50144ce21907f72192a6549ffe03db4e1f",
+        "url": "https://dl.google.com/go/go1.23.11.linux-s390x.tar.gz",
+        "sha256": "aba0dc8cc4e4de32a5850149d8c366aa2c48b4ba0e8162f1f3e88aab0556c42a",
         "env": {
           "GOOS": "linux",
           "GOARCH": "s390x"
@@ -1155,8 +1155,8 @@
         "supported": true
       },
       "solaris-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.solaris-amd64.tar.gz",
-        "sha256": "9f69f422caa8944c562f5312159b422e6cb12b95d42e9fc861667f1a07cbba6e",
+        "url": "https://dl.google.com/go/go1.23.11.solaris-amd64.tar.gz",
+        "sha256": "2f718aae7fd48661636a787ec8f787f7761dd7baf874284607454fa268963f92",
         "env": {
           "GOOS": "solaris",
           "GOARCH": "amd64"
@@ -1164,13 +1164,13 @@
         "supported": false
       },
       "src": {
-        "url": "https://dl.google.com/go/go1.23.10.src.tar.gz",
-        "sha256": "800a7ae1bff179a227b653a2f644517c800443b8b4abf3273af5e1cb7113de59",
+        "url": "https://dl.google.com/go/go1.23.11.src.tar.gz",
+        "sha256": "296381607a483a8a8667d7695331752f94a1f231c204e2527d2f22e1e3d1247d",
         "supported": true
       },
       "windows-amd64": {
-        "url": "https://dl.google.com/go/go1.23.10.windows-amd64.zip",
-        "sha256": "3b533bbe63e73732bf19b8facc9160417e97d13eb174dfe58a213c6d0dee0010",
+        "url": "https://dl.google.com/go/go1.23.11.windows-amd64.zip",
+        "sha256": "1dbcf0b4183066550964b22890fe119b0b867b51f12c1eea4445c71494d98cbb",
         "env": {
           "GOOS": "windows",
           "GOARCH": "amd64"
@@ -1178,8 +1178,8 @@
         "supported": true
       },
       "windows-arm": {
-        "url": "https://dl.google.com/go/go1.23.10.windows-arm.zip",
-        "sha256": "191ff2076fb8ac7a21186683211b46de867387db383926890b13c0317fb3a8d2",
+        "url": "https://dl.google.com/go/go1.23.11.windows-arm.zip",
+        "sha256": "4afb97797815b263a2cd74ae7cc381f32a4d268a5b83505c3ab9a9c06ffdb6df",
         "env": {
           "GOOS": "windows",
           "GOARCH": "arm"
@@ -1187,8 +1187,8 @@
         "supported": false
       },
       "windows-arm64v8": {
-        "url": "https://dl.google.com/go/go1.23.10.windows-arm64.zip",
-        "sha256": "91d990c6346f1b0723134ac3bc833a92cb974ed977872bb4c13620c250c280cf",
+        "url": "https://dl.google.com/go/go1.23.11.windows-arm64.zip",
+        "sha256": "83b81a03b51b92a26e711cf28d0633266c82d503d1c0d4f8fcaecf096b9df42d",
         "env": {
           "GOOS": "windows",
           "GOARCH": "arm64"
@@ -1196,8 +1196,8 @@
         "supported": false
       },
       "windows-i386": {
-        "url": "https://dl.google.com/go/go1.23.10.windows-386.zip",
-        "sha256": "fcd197c3fc72f2b89f3a034c13c65171fdc0ba9348c70e096f6cc196e862f01b",
+        "url": "https://dl.google.com/go/go1.23.11.windows-386.zip",
+        "sha256": "64abdd62ad1c9cf49b41fe457be3481537366a81295ed35ca4d1d08784b35188",
         "env": {
           "GOOS": "windows",
           "GOARCH": "386"
