@@ -4,11 +4,11 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:bullseye-scm AS build
+FROM buildpack-deps:trixie-scm AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-COPY --from=golang:bullseye /usr/local/go /usr/local/goroot-bootstrap
+COPY --from=golang:trixie /usr/local/go /usr/local/goroot-bootstrap
 
 # tip-20250808: https://github.com/golang/go/tree/fbac94a79998d4730a58592f0634fa8a39d8b9fb
 ARG GOLANG_COMMIT='fbac94a79998d4730a58592f0634fa8a39d8b9fb'
@@ -107,7 +107,7 @@ RUN set -eux; \
 	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]; \
 	find /target -newer /target/usr/local/go -exec sh -c 'ls -ld "$@" && exit "$#"' -- '{}' +
 
-FROM buildpack-deps:bullseye-scm
+FROM buildpack-deps:trixie-scm
 
 # install cgo-related dependencies
 RUN set -eux; \
