@@ -10,8 +10,8 @@ ENV PATH /usr/local/go/bin:$PATH
 
 COPY --from=golang:bookworm /usr/local/go /usr/local/goroot-bootstrap
 
-# tip-20250823: https://github.com/golang/go/tree/f2db0dca0b0399c08319d22cbcbfa83be2bb781a
-ARG GOLANG_COMMIT='f2db0dca0b0399c08319d22cbcbfa83be2bb781a'
+# tip-20250831: https://github.com/golang/go/tree/6a08e80399bd65b95e60e3c74b7e1f86754752a7
+ARG GOLANG_COMMIT='6a08e80399bd65b95e60e3c74b7e1f86754752a7'
 ENV GOLANG_COMMIT $GOLANG_COMMIT
 
 RUN set -eux; \
