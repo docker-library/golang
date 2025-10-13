@@ -616,6 +616,24 @@
         },
         "supported": false
       },
+      "netbsd-arm64v8": {
+        "url": "https://dl.google.com/go/go1.24.9.netbsd-arm64.tar.gz",
+        "sha256": "cb804d458817551d91e5f15abdbb6f37a5747136ca3544d86c70d6644d37ea22",
+        "env": {
+          "GOOS": "netbsd",
+          "GOARCH": "arm64"
+        },
+        "supported": false
+      },
+      "netbsd-i386": {
+        "url": "https://dl.google.com/go/go1.24.9.netbsd-386.tar.gz",
+        "sha256": "6ff174e543b523c79f8241666592fb0338ac5db8fcb9e4d81a5b94f89e9cc10e",
+        "env": {
+          "GOOS": "netbsd",
+          "GOARCH": "386"
+        },
+        "supported": false
+      },
       "openbsd-amd64": {
         "url": "https://dl.google.com/go/go1.24.9.openbsd-amd64.tar.gz",
         "sha256": "b8617f2e91263e84776ec6cfadb4df110b19a9df0e38df7c7f646c65b94491ec",
@@ -649,6 +667,15 @@
         "env": {
           "GOOS": "openbsd",
           "GOARCH": "386"
+        },
+        "supported": false
+      },
+      "openbsd-ppc64": {
+        "url": "https://dl.google.com/go/go1.24.9.openbsd-ppc64.tar.gz",
+        "sha256": "cb52b5641b8e9d6e53308ab13a76f94075d88b792b0e2ad38b0b8ff8331e5984",
+        "env": {
+          "GOOS": "openbsd",
+          "GOARCH": "ppc64"
         },
         "supported": false
       },
