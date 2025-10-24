@@ -9,6 +9,7 @@ potentiallySupportedArches=(
 	arm32v7
 	arm64v8
 	i386
+	loong64
 	mips64le
 	ppc64le
 	riscv64
