@@ -4,11 +4,11 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM buildpack-deps:trixie-scm AS build
+FROM buildpack-deps:bookworm-scm AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.26rc3
+ENV GOLANG_VERSION 1.26
 
 RUN set -eux; \
 	now="$(date '+%s')"; \
@@ -16,35 +16,35 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'amd64') \
-			url='https://dl.google.com/go/go1.26rc3.linux-amd64.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-amd64.tar.gz'; \
 			sha256='5eef7fb80790d3c5339607f7b17b4b8b7b67a4c322fc636cea8820f490cede00'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.26rc3.linux-armv6l.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-armv6l.tar.gz'; \
 			sha256='616670989d950b1b70cf5999a944e2a51a5d096a5e24ab34fa757c8877611e2d'; \
 			;; \
 		'arm64') \
-			url='https://dl.google.com/go/go1.26rc3.linux-arm64.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-arm64.tar.gz'; \
 			sha256='7c3bf203f7ae95499914d358cad26442a3b2259ac8a79d0e21f59cef921b59bb'; \
 			;; \
 		'i386') \
-			url='https://dl.google.com/go/go1.26rc3.linux-386.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-386.tar.gz'; \
 			sha256='b3c0ed3e37fb023510aa2d0627e018e204e0606da5524a9824e7dd431245a1d7'; \
 			;; \
 		'mips64el') \
-			url='https://dl.google.com/go/go1.26rc3.linux-mips64le.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-mips64le.tar.gz'; \
 			sha256='538d91a2e592a2f00b8e73b61a43df953f683010d6662e4712676dbdedb283e9'; \
 			;; \
 		'ppc64el') \
-			url='https://dl.google.com/go/go1.26rc3.linux-ppc64le.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-ppc64le.tar.gz'; \
 			sha256='9c218d68b501db4e143f97ffe243469edc1ad8e18dbc70145a1c12fa9501f9a0'; \
 			;; \
 		'riscv64') \
-			url='https://dl.google.com/go/go1.26rc3.linux-riscv64.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-riscv64.tar.gz'; \
 			sha256='a15b0374b7395854743205fc93eb241e8312e6a7dd2e54c55673dedb71113d4b'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.26rc3.linux-s390x.tar.gz'; \
+			url='https://dl.google.com/go/go1.26.linux-s390x.tar.gz'; \
 			sha256='fb7427d956013c3869b2b3735d86f36496684356c9658f79a66c83ca9a0ec983'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
@@ -102,7 +102,7 @@ RUN set -eux; \
 	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]; \
 	find /target -newer /target/usr/local/go -exec sh -c 'ls -ld "$@" && exit "$#"' -- '{}' +
 
-FROM buildpack-deps:trixie-scm
+FROM buildpack-deps:bookworm-scm
 
 # install cgo-related dependencies
 RUN set -eux; \
@@ -126,7 +126,7 @@ RUN set -eux; \
 	fi; \
 	rm -rf /var/lib/apt/lists/*
 
-ENV GOLANG_VERSION 1.26rc3
+ENV GOLANG_VERSION 1.26
 
 # don't auto-upgrade the gotoolchain
 # https://github.com/docker-library/golang/issues/472
