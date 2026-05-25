@@ -797,9 +797,9 @@
     ]
   },
   "tip": {
-    "version": "tip-20260517",
+    "version": "tip-20260523",
     "commit": {
-      "version": "69a99fdcbbb1e7642329e62f0b281c1920860e48"
+      "version": "24ec7d2120d3d16b79cb2a7009a3e8025e4a2ce4"
     },
     "arches": {
       "amd64": {
@@ -880,7 +880,7 @@
         "supported": true
       },
       "src": {
-        "url": "https://github.com/golang/go/archive/69a99fdcbbb1e7642329e62f0b281c1920860e48.tar.gz",
+        "url": "https://github.com/golang/go/archive/24ec7d2120d3d16b79cb2a7009a3e8025e4a2ce4.tar.gz",
         "supported": false
       },
       "windows-amd64": {
