@@ -10,8 +10,8 @@ ENV PATH /usr/local/go/bin:$PATH
 
 COPY --from=golang:alpine3.22 /usr/local/go /usr/local/goroot-bootstrap
 
-# tip-20260530: https://github.com/golang/go/tree/7bd807271cf4ee370b1a2499e863c4fcb6bf7301
-ARG GOLANG_COMMIT='7bd807271cf4ee370b1a2499e863c4fcb6bf7301'
+# tip-20260530: https://github.com/golang/go/tree/80ab7bc1fa0c3907ad4f6026eb10a777f9b602c0
+ARG GOLANG_COMMIT='80ab7bc1fa0c3907ad4f6026eb10a777f9b602c0'
 ENV GOLANG_COMMIT $GOLANG_COMMIT
 
 RUN set -eux; \
