@@ -4,11 +4,11 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM alpine:3.22 AS build
+FROM alpine:3.24 AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-COPY --from=golang:alpine3.22 /usr/local/go /usr/local/goroot-bootstrap
+COPY --from=golang:alpine3.24 /usr/local/go /usr/local/goroot-bootstrap
 
 # tip-20260606: https://github.com/golang/go/tree/d00c67f297ef6f2cb2cd0e9aae59fa3936bb7eca
 ARG GOLANG_COMMIT='d00c67f297ef6f2cb2cd0e9aae59fa3936bb7eca'
@@ -110,7 +110,7 @@ RUN set -eux; \
 	[ "$SOURCE_DATE_EPOCH" = "$epoch" ]; \
 	find /target -newer /target/usr/local/go -exec sh -c 'ls -ld "$@" && exit "$#"' -- '{}' +
 
-FROM alpine:3.22
+FROM alpine:3.24
 
 RUN apk add --no-cache ca-certificates
 
