@@ -385,8 +385,8 @@
     "variants": [
       "trixie",
       "bookworm",
+      "alpine3.24",
       "alpine3.23",
-      "alpine3.22",
       "windows/windowsservercore-ltsc2025",
       "windows/windowsservercore-ltsc2022",
       "windows/nanoserver-ltsc2025",
@@ -788,8 +788,8 @@
     "variants": [
       "trixie",
       "bookworm",
+      "alpine3.24",
       "alpine3.23",
-      "alpine3.22",
       "windows/windowsservercore-ltsc2025",
       "windows/windowsservercore-ltsc2022",
       "windows/nanoserver-ltsc2025",
@@ -894,8 +894,8 @@
     "variants": [
       "trixie",
       "bookworm",
-      "alpine3.23",
-      "alpine3.22"
+      "alpine3.24",
+      "alpine3.23"
     ]
   }
 }
