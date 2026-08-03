@@ -175,7 +175,7 @@
           "GOOS": "linux",
           "GOARCH": "mips64le"
         },
-        "supported": true
+        "supported": false
       },
       "mipsle": {
         "url": "https://dl.google.com/go/go1.27rc2.linux-mipsle.tar.gz",
@@ -569,7 +569,7 @@
           "GOOS": "linux",
           "GOARCH": "mips64le"
         },
-        "supported": true
+        "supported": false
       },
       "mipsle": {
         "url": "https://dl.google.com/go/go1.26.5.linux-mipsle.tar.gz",
@@ -972,7 +972,7 @@
           "GOOS": "linux",
           "GOARCH": "mips64le"
         },
-        "supported": true
+        "supported": false
       },
       "mipsle": {
         "url": "https://dl.google.com/go/go1.25.12.linux-mipsle.tar.gz",
@@ -1241,13 +1241,6 @@
           "GOOS": "linux",
           "GOARCH": "386",
           "GO386": "softfloat"
-        },
-        "supported": true
-      },
-      "mips64le": {
-        "env": {
-          "GOOS": "linux",
-          "GOARCH": "mips64le"
         },
         "supported": true
       },
