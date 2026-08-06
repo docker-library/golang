@@ -31,10 +31,6 @@ RUN set -eux; \
 			url='https://dl.google.com/go/go1.27rc2.linux-386.tar.gz'; \
 			sha256='d50d2decea974bf182f49fc2508846b8fb2449fed567c0db710c8a8636cdc4e7'; \
 			;; \
-		'mips64el') \
-			url='https://dl.google.com/go/go1.27rc2.linux-mips64le.tar.gz'; \
-			sha256='0fe1ddd3654d2f8ee3e77777f38c9daf0d0195c44b627ca4ee81c587f7e0544c'; \
-			;; \
 		'ppc64el') \
 			url='https://dl.google.com/go/go1.27rc2.linux-ppc64le.tar.gz'; \
 			sha256='5b212764c040f469b214060469d6e29d6d384c44ee5d4aa61635aab76086e9ef'; \

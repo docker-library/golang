@@ -9,7 +9,6 @@ potentiallySupportedArches=(
 	arm32v7
 	arm64v8
 	i386
-	mips64le
 	ppc64le
 	riscv64
 	s390x

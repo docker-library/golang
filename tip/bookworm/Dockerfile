@@ -33,9 +33,6 @@ RUN set -eux; \
 		'i386') \
 			export GO386='softfloat' GOARCH='386' GOOS='linux'; \
 			;; \
-		'mips64el') \
-			export GOARCH='mips64le' GOOS='linux'; \
-			;; \
 		'ppc64el') \
 			export GOARCH='ppc64le' GOOS='linux'; \
 			;; \
