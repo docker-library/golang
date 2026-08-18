@@ -103,7 +103,8 @@ for version in "${versions[@]}"; do
 					# ... so we use GitHub's "atom feeds" endpoint instead, which if you ask for JSON, gives back JSON 😄
 					wget -qO- --header 'Accept: application/json' "https://github.com/golang/go/commits/$commit.atom" \
 						| jq -r '
-							.payload.commitGroups[].commits[]
+							..
+							| .commits?[]?
 							| first([ .committedDate, .authoredDate ] | sort | reverse[]) as $date
 							| "\(.oid) \($date)"
 							| @sh
