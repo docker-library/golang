@@ -8,7 +8,7 @@ FROM alpine:3.23 AS build
 
 ENV PATH /usr/local/go/bin:$PATH
 
-ENV GOLANG_VERSION 1.26.7
+ENV GOLANG_VERSION 1.26.8
 
 RUN set -eux; \
 	now="$(date '+%s')"; \
@@ -22,36 +22,36 @@ RUN set -eux; \
 	url=; \
 	case "$arch" in \
 		'x86_64') \
-			url='https://dl.google.com/go/go1.26.7.linux-amd64.tar.gz'; \
-			sha256='ffb5f8de10c62550dfddab66b36b57030721e0a44a3218e9e1181d7b59f121ca'; \
+			url='https://dl.google.com/go/go1.26.8.linux-amd64.tar.gz'; \
+			sha256='d0f743b33e8d8945e6b1f432edd15785c70507121d6e2a723b21285eddf8b57b'; \
 			;; \
 		'armhf') \
-			url='https://dl.google.com/go/go1.26.7.linux-armv6l.tar.gz'; \
-			sha256='6a41557335d1d9fa9bfc7439cedcfd0e4df2fc83d916175b5f3eae4685f5fe3f'; \
+			url='https://dl.google.com/go/go1.26.8.linux-armv6l.tar.gz'; \
+			sha256='eab440beabf395870752021fa74cedf04f97b61e43ebbe005ecbb98b94e55697'; \
 			;; \
 		'armv7') \
-			url='https://dl.google.com/go/go1.26.7.linux-armv6l.tar.gz'; \
-			sha256='6a41557335d1d9fa9bfc7439cedcfd0e4df2fc83d916175b5f3eae4685f5fe3f'; \
+			url='https://dl.google.com/go/go1.26.8.linux-armv6l.tar.gz'; \
+			sha256='eab440beabf395870752021fa74cedf04f97b61e43ebbe005ecbb98b94e55697'; \
 			;; \
 		'aarch64') \
-			url='https://dl.google.com/go/go1.26.7.linux-arm64.tar.gz'; \
-			sha256='5a4ec883379d51ee9ce1040d5e87f8d35e20387574dd8c947feb01eabc3c1b37'; \
+			url='https://dl.google.com/go/go1.26.8.linux-arm64.tar.gz'; \
+			sha256='211ffced9dcb9633a55eac6364816ec0ddd951389a740e88fa8b3337971bdda0'; \
 			;; \
 		'x86') \
-			url='https://dl.google.com/go/go1.26.7.linux-386.tar.gz'; \
-			sha256='5b6fad4a7fe8fa230c935625b67450305be95e2f4f976b731623f76b88fc4821'; \
+			url='https://dl.google.com/go/go1.26.8.linux-386.tar.gz'; \
+			sha256='55115677dfcd953fa9d2fe376039125a60ff14fe0e619a2339a364860dda64ef'; \
 			;; \
 		'ppc64le') \
-			url='https://dl.google.com/go/go1.26.7.linux-ppc64le.tar.gz'; \
-			sha256='22d3b362d557175fd16b79651cab0cad64f8aaaedca745f66d16f44d56bc5de1'; \
+			url='https://dl.google.com/go/go1.26.8.linux-ppc64le.tar.gz'; \
+			sha256='0ddf3ecab842013e6bd618602823a0b8158a18d3e9362f2540463ea5aa184975'; \
 			;; \
 		'riscv64') \
-			url='https://dl.google.com/go/go1.26.7.linux-riscv64.tar.gz'; \
-			sha256='21e1dc0e2f7dd9f80e0e94613fc324f1f99403b99997f9d8c5f80f8132fc642b'; \
+			url='https://dl.google.com/go/go1.26.8.linux-riscv64.tar.gz'; \
+			sha256='75d368eef1dc44ff9de0c8cac4b37c519e541e6d46c4291c1ff959644a71af32'; \
 			;; \
 		's390x') \
-			url='https://dl.google.com/go/go1.26.7.linux-s390x.tar.gz'; \
-			sha256='bc3308e05e9397958ad4aac453e3dc4565ba6d548e9ace0a9b4b165feb6382f2'; \
+			url='https://dl.google.com/go/go1.26.8.linux-s390x.tar.gz'; \
+			sha256='339d1a09716815f737cb5ddd355e04e339312b449c268cc417118f4b8137ddd1'; \
 			;; \
 		*) echo >&2 "error: unsupported architecture '$arch' (likely packaging update needed)"; exit 1 ;; \
 	esac; \
@@ -114,7 +114,7 @@ FROM alpine:3.23
 
 RUN apk add --no-cache ca-certificates
 
-ENV GOLANG_VERSION 1.26.7
+ENV GOLANG_VERSION 1.26.8
 
 # don't auto-upgrade the gotoolchain
 # https://github.com/docker-library/golang/issues/472
