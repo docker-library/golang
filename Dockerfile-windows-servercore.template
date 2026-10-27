@@ -8,10 +8,10 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 # https://gitforwindows.org/
 # https://github.com/git-for-windows/git/releases
 # TODO in some future release, consider the BusyBox variant?  maybe only once https://github.com/git-for-windows/git/issues/1439 is officially closed?
-ENV GIT_VERSION 2.48.1
-ENV GIT_TAG v${GIT_VERSION}.windows.1
+ENV GIT_VERSION 2.56.0.4
+ENV GIT_TAG v2.56.0.windows.4
 ENV GIT_DOWNLOAD_URL https://github.com/git-for-windows/git/releases/download/${GIT_TAG}/MinGit-${GIT_VERSION}-64-bit.zip
-ENV GIT_DOWNLOAD_SHA256 11e8f462726827acccc7ecdad541f2544cbe5506d70fef4fa1ffac7c16288709
+ENV GIT_DOWNLOAD_SHA256 e3bf78351fe777fba47ddee5950082f8a98bb0f02604fdc7ba3ee2cb68ffa877
 # steps inspired by "chcolateyInstall.ps1" from "git.install" (https://chocolatey.org/packages/git.install)
 RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
@@ -30,7 +30,7 @@ RUN Write-Host ('Downloading {0} ...' -f $env:GIT_DOWNLOAD_URL); \
 	Remove-Item git.zip -Force; \
 	\
 	Write-Host 'Updating PATH ...'; \
-	$env:PATH = 'C:\git\cmd;C:\git\mingw64\bin;C:\git\usr\bin;' + $env:PATH; \
+	$env:PATH = 'C:\git\cmd;C:\git\ucrt64\bin;C:\git\usr\bin;' + $env:PATH; \
 	[Environment]::SetEnvironmentVariable('PATH', $env:PATH, [EnvironmentVariableTarget]::Machine); \
 	\
 	Write-Host 'Verifying install ("git version") ...'; \
